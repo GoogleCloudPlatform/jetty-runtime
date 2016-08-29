@@ -1,21 +1,14 @@
-jetty9
-=========
+# Google Cloud Platform Jetty Docker Image
 
-This project builds a Docker Image for 
-Google App Engine [Java Managed VM](https://cloud.google.com/appengine/docs/managed-vms/)
-that provides the Jetty 9.3 Servlet container on top of the openjdk8 image.
+This repository contains the source for the `gcr.io/google_appengine/jetty` [docker](https://docker.com) image. This image can be used as the base image for running Java web applications on [Google App Engine Flexible Environment](https://cloud.google.com/appengine/docs/flexible/java/) and [Google Container Engine](https://cloud.google.com/container-engine). It provides the Jetty Servlet container on top of the [OpenJDK image](https://github.com/GoogleCloudPlatform/openjdk-runtime).
 
-The layout of this image is intended to mostly mimic the official 
-[docker-jetty](https://github.com/appropriate/docker-jetty) image and unless otherwise noted,
-the official [docker-jetty documentation](https://github.com/docker-library/docs/tree/master/jetty)
-should apply.
+The layout of this image is intended to mostly mimic the official [docker-jetty](https://github.com/appropriate/docker-jetty) image and unless otherwise noted, the official [docker-jetty documentation](https://github.com/docker-library/docs/tree/master/jetty) should apply.
 
 ## Building the Jetty image
 To build the image you need git, docker and maven installed and to have the openjdk8:8-jre
 image available in your docker repository:
 ```console
-git clone https://github.com/GoogleCloudPlatform/appengine-java-vm-runtime.git
-cd appengine-java-vm-runtime/jetty9
+git clone https://github.com/GoogleCloudPlatform/jetty-runtime.git
 mvn clean install
 ```
 
@@ -61,8 +54,8 @@ RUN java -jar "$JETTY_HOME/start.jar" --add-to-startd=jmx,stats
 ```
 Modules may be configured in a `Dockerfile` by editing the properties in the corresponding `/var/lib/jetty/start.d/*.mod` file or the module can be deactivated by removing that file.
 
-## GAE Managed VMs
-This image works with App Engine Managed VMs as a custom runtime.
+## App Engine Flexible Environment
+This image works with App Engine Flexible Environment as a custom runtime.
 In order to use it, you need to build the image (let's call it `YOUR_BUILT_IMAGE`), (and optionally push it to a Docker registery like gcr.io). Then, you can add to any pure Java EE 7 Web Application projects these 2 configuration files next to the exploded WAR directory:
 
 `Dockerfile` file would be:
@@ -72,21 +65,20 @@ In order to use it, you need to build the image (let's call it `YOUR_BUILT_IMAGE
       
 That will add the Web App Archive directory in the correct location for the Docker container.
 
-Then, an `app.yaml` file to configure the GAE Managed VM product:
+Then, an `app.yaml` file to configure the App Engine Flexible Environment product:
 
       runtime: custom
       vm: true
-      api_version: 1
       
 Once you have this configuration, you can use the Google Cloud SDK to deploy this directory containing the 2 configuration files and the Web App directory using:
 
-     gcloud preview app deploy app.yaml
+     gcloud app deploy app.yaml
      
 
 ## Entry Point Features
-The entry point for the image is [docker-entrypoint.bash](https://github.com/GoogleCloudPlatform/appengine-java-vm-runtime/blob/master/jetty9/src/main/docker/docker-entrypoint.bash), which does the processing of the passed command line arguments to look for an executable alternative or arguments to the default command (java).
+The entry point for the image is [docker-entrypoint.bash](https://github.com/GoogleCloudPlatform/jetty-runtime/blob/master/jetty9/src/main/docker/docker-entrypoint.bash), which does the processing of the passed command line arguments to look for an executable alternative or arguments to the default command (java).
 
-If the default command (java) is used, then the entry point sources the [setup-env.bash](https://github.com/GoogleCloudPlatform/appengine-java-vm-runtime/blob/master/openjdk8/src/main/docker/setup-env.bash), which looks for supported features to be enabled and/or configured.  The following table indicates the environment variables that may be used to enable/disable/configure features, any default values if they are not set: 
+If the default command (java) is used, then the entry point sources the [setup-env.bash](https://github.com/GoogleCloudPlatform/openjdk-runtime/blob/master/openjdk8/src/main/docker/setup-env.bash), which looks for supported features to be enabled and/or configured.  The following table indicates the environment variables that may be used to enable/disable/configure features, any default values if they are not set: 
 
 |Env Var           | Description         | Type     | Default                               |
 |------------------|---------------------|----------|---------------------------------------|
@@ -120,6 +112,10 @@ java $JAVA_OPTS \
      "$@"
 ```
 
+# Contributing changes
 
+* See [CONTRIBUTING.md](CONTRIBUTING.md)
 
-Enjoy...
+## Licensing
+
+* See [LICENSE.md](LICENSE)
