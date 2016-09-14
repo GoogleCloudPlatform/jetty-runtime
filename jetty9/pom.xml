@@ -125,7 +125,7 @@
             <configuration>
               <imageName>jetty9</imageName>
               <imageTags>
-                <imageTag>${docker.label.prefix}${jetty.version}</imageTag>
+                <imageTag>${docker.tag}</imageTag>
               </imageTags>
               <dockerDirectory>${project.build.directory}/docker</dockerDirectory>
             </configuration>
@@ -139,7 +139,7 @@
             <configuration>
               <imageName>jetty9</imageName>
               <imageTags>
-                <imageTag>${docker.label.prefix}${jetty.version}</imageTag>
+                <imageTag>${docker.tag}</imageTag>
               </imageTags>
             </configuration>
           </execution>
