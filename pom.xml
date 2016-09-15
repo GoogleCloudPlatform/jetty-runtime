@@ -35,7 +35,8 @@
     <maven.build.timestamp.format>yyyyMMddHHmm</maven.build.timestamp.format>
     <jetty.version>9.3.8.v20160314</jetty.version>
     <appengine.api.version>1.9.40</appengine.api.version>
-    <docker.label.prefix>async-</docker.label.prefix>
+    <docker.tag>${jetty.version}</docker.tag>
+    <docker.openjdk.image>openjdk8:8-jre</docker.openjdk.image>
   </properties>
 
   <developers>
