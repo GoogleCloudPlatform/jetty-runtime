@@ -23,11 +23,6 @@ ENV GAE_IMAGE_NAME ${project.artifactId}
 ENV GAE_IMAGE_LABEL ${docker.tag}
 ENV GAE_IMAGE_VERSION ${project.version}
 
-# Create log directory
-RUN mkdir /var/log/app_engine \
- && chgrp jetty /var/log/app_engine \
- && chmod g+rw /var/log/app_engine
-
 # Create Jetty Home
 ENV JETTY_HOME /usr/local/jetty
 ENV PATH $JETTY_HOME/bin:$PATH
