@@ -21,7 +21,7 @@
   <parent>
     <groupId>com.google.cloud.runtimes</groupId>
     <artifactId>jetty-parent</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>1-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <name>Google App Engine Image Jetty (jetty9)</name>
@@ -38,7 +38,6 @@
   </dependencies>
 
   <build>
-
     <plugins>
       <plugin>
         <artifactId>maven-resources-plugin</artifactId>
@@ -79,7 +78,7 @@
                 <artifactItem>
                   <groupId>org.eclipse.jetty</groupId>
                   <artifactId>jetty-distribution</artifactId>
-                  <version>${jetty.version}</version>
+                  <version>${jetty9.version}</version>
                   <type>tar.gz</type>
                   <overWrite>true</overWrite>
                   <includes>**</includes>
@@ -123,9 +122,13 @@
               <goal>build</goal>
             </goals>
             <configuration>
-              <imageName>jetty9</imageName>
+              <imageName>jetty</imageName>
               <imageTags>
-                <imageTag>${docker.tag}</imageTag>
+                <imageTag>${docker.tag.prefix}${jetty9.version}-${project.version}-${maven.build.timestamp}</imageTag>
+                <imageTag>${docker.tag.prefix}${jetty9.version}-${project.version}</imageTag>
+                <imageTag>${docker.tag.prefix}${jetty9.version}-${maven.build.timestamp}</imageTag>
+                <imageTag>${docker.tag.prefix}${jetty9.version}</imageTag>
+                <imageTag>${docker.tag.prefix}9</imageTag>
               </imageTags>
               <dockerDirectory>${project.build.directory}/docker</dockerDirectory>
             </configuration>
@@ -137,9 +140,13 @@
               <goal>removeImage</goal>
             </goals>
             <configuration>
-              <imageName>jetty9</imageName>
+              <imageName>jetty</imageName>
               <imageTags>
-                <imageTag>${docker.tag}</imageTag>
+                <imageTag>${docker.tag.prefix}${jetty9.version}-${project.version}-${maven.build.timestamp}</imageTag>
+                <imageTag>${docker.tag.prefix}${jetty9.version}-${project.version}</imageTag>
+                <imageTag>${docker.tag.prefix}${jetty9.version}-${maven.build.timestamp}</imageTag>
+                <imageTag>${docker.tag.prefix}${jetty9.version}</imageTag>
+                <imageTag>${docker.tag.prefix}9</imageTag>
               </imageTags>
             </configuration>
           </execution>
