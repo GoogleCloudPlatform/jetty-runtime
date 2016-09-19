@@ -128,6 +128,7 @@
                 <imageTag>${docker.tag.prefix}${jetty9.version}-${project.version}</imageTag>
                 <imageTag>${docker.tag.prefix}${jetty9.version}-${maven.build.timestamp}</imageTag>
                 <imageTag>${docker.tag.prefix}${jetty9.version}</imageTag>
+                <imageTag>${docker.tag.prefix}9.3</imageTag>
                 <imageTag>${docker.tag.prefix}9</imageTag>
               </imageTags>
               <dockerDirectory>${project.build.directory}/docker</dockerDirectory>
@@ -146,6 +147,7 @@
                 <imageTag>${docker.tag.prefix}${jetty9.version}-${project.version}</imageTag>
                 <imageTag>${docker.tag.prefix}${jetty9.version}-${maven.build.timestamp}</imageTag>
                 <imageTag>${docker.tag.prefix}${jetty9.version}</imageTag>
+                <imageTag>${docker.tag.prefix}9.3</imageTag>
                 <imageTag>${docker.tag.prefix}9</imageTag>
               </imageTags>
             </configuration>
