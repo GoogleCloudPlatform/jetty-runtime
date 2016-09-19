@@ -36,6 +36,7 @@
     <jetty.version>9.3.8.v20160314</jetty.version>
     <appengine.api.version>1.9.40</appengine.api.version>
     <docker.label.prefix>async-</docker.label.prefix>
+    <gcloud-projectId-file>${project.build.directory}/gcloud-projectid.properties</gcloud-projectId-file>
   </properties>
 
   <developers>
@@ -79,6 +80,7 @@
   <modules>
     <module>jetty9-base</module>
     <module>jetty9</module>
+    <module>tests</module>
   </modules>
 
   <dependencyManagement>
@@ -245,9 +247,9 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
         <version>2.19.1</version>
-	<configuration>
-	  <useSystemClassLoader>false</useSystemClassLoader>
-	</configuration>
+        <configuration>
+          <useSystemClassLoader>false</useSystemClassLoader>
+        </configuration>
         <executions>
           <execution>
             <goals>
@@ -291,6 +293,62 @@
             <artifactId>maven-javadoc-plugin</artifactId>
           </plugin>
        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>get-gcloud-project-id</id>
+      <activation>
+        <property>
+          <name>!app.deploy.project</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>1.8</version>
+            <executions>
+              <execution>
+                <id>find-app-deploy-project</id>
+                <phase>validate</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <target>
+                    <echo file="${gcloud-projectId-file}" append="false">app.deploy.project=</echo>
+                    <exec executable="gcloud" logError="true" append="true" output="${gcloud-projectId-file}">
+                      <arg value="--quiet"/>
+                      <arg value="config"/>
+                      <arg value="list"/>
+                      <arg value="--format=value(core.project)"/>
+                    </exec>
+                  </target>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>properties-maven-plugin</artifactId>
+            <version>1.0.0</version>
+            <executions>
+              <execution>
+                <id>read-gcloud-properties</id>
+                <phase>initialize</phase>
+                <goals>
+                  <goal>read-project-properties</goal>
+                </goals>
+                <configuration>
+                  <files>
+                    <file>${gcloud-projectId-file}</file>
+                  </files>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
       </build>
     </profile>
   </profiles>
