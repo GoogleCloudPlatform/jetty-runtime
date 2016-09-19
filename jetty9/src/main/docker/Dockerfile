@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM openjdk8:${docker.label.prefix}8-jre
+FROM ${docker.openjdk.image}
 
 # create jetty group and user
 RUN groupadd -r jetty \
@@ -20,13 +20,8 @@ RUN groupadd -r jetty \
 
 # Create env vars to identify image
 ENV GAE_IMAGE_NAME ${project.artifactId}
-ENV GAE_IMAGE_LABEL ${docker.label.prefix}${jetty.version}
+ENV GAE_IMAGE_LABEL ${docker.tag}
 ENV GAE_IMAGE_VERSION ${project.version}
-
-# Create log directory
-RUN mkdir /var/log/app_engine \
- && chgrp jetty /var/log/app_engine \
- && chmod g+rw /var/log/app_engine
 
 # Create Jetty Home
 ENV JETTY_HOME /usr/local/jetty
