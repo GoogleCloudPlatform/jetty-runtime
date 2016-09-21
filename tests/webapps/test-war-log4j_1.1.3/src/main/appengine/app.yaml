@@ -1,3 +1,3 @@
 runtime: custom
 vm: true
-module: log4j113
+service: log4j113
