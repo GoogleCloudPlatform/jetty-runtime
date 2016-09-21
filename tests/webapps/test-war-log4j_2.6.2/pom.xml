@@ -6,25 +6,20 @@
     <artifactId>tests-webapps-parent</artifactId>
     <version>0.1.0-SNAPSHOT</version>
   </parent>
-  <artifactId>test-war-slf4j_1.2</artifactId>
-  <name>Jetty :: Logging Test War :: Slf4J 1.2</name>
+  <artifactId>test-war-log4j_2.0</artifactId>
+  <name>Jetty :: Logging Test War :: Log4J 2.6.2</name>
   <packaging>war</packaging>
   <dependencies>
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>1.2</version>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
-      <version>1.2</version>
-    </dependency>
-    <dependency>
       <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-      <version>2.5</version>
+      <artifactId>javax.servlet-api</artifactId>
+      <version>3.1.0</version>
       <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-core</artifactId>
+      <version>2.6.2</version>
     </dependency>
     <dependency>
       <groupId>com.google.cloud.runtimes.jetty.tests</groupId>

@@ -47,12 +47,6 @@
     </dependency>
   </dependencies>
   <build>
-    <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-        <targetPath>${project.build.directory}/${project.artifactId}-${project.version}/WEB-INF/classes</targetPath>
-      </resource>
-    </resources>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -77,6 +71,24 @@
                 <unjar src="${project.build.directory}/${project.build.finalName}.war"
                        dest="${project.build.directory}/docker/root"/>
               </target>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>com.google.cloud.tools</groupId>
+        <artifactId>appengine-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>deploy-integration-test</id>
+            <phase>pre-integration-test</phase>
+            <goals>
+              <goal>deploy</goal>
+            </goals>
+            <configuration>
+              <deploy.project>${app.deploy.project}</deploy.project>
+              <deploy.version>${maven.build.timestamp}</deploy.version>
+              <deploy.promote>false</deploy.promote>
             </configuration>
           </execution>
         </executions>

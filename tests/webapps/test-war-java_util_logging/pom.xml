@@ -52,6 +52,24 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>com.google.cloud.tools</groupId>
+        <artifactId>appengine-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>deploy-integration-test</id>
+            <phase>pre-integration-test</phase>
+            <goals>
+              <goal>deploy</goal>
+            </goals>
+            <configuration>
+              <deploy.project>${app.deploy.project}</deploy.project>
+              <deploy.version>${maven.build.timestamp}</deploy.version>
+              <deploy.promote>false</deploy.promote>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 </project>

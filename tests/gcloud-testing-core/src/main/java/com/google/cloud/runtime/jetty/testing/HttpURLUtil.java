@@ -14,9 +14,8 @@ import java.nio.charset.StandardCharsets;
 public final class HttpURLUtil {
   /**
    * Open a new {@link HttpURLConnection} to the provided URI.
-   *
    * <p>
-   *   Note: will also set the 'User-Agent' to {@code jetty-runtime/gcloud-testing-core}
+   * Note: will also set the 'User-Agent' to {@code jetty-runtime/gcloud-testing-core}
    * </p>
    *
    * @param uri the URI to open to
@@ -24,6 +23,7 @@ public final class HttpURLUtil {
    * @throws IOException if unable to open the connection
    */
   public static HttpURLConnection openTo(URI uri) throws IOException {
+    System.err.println("HttpURLUtil.openTo(" + uri + ")");
     HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
     http.setRequestProperty("User-Agent", "jetty-runtime/gcloud-testing-core");
     return http;
@@ -32,9 +32,8 @@ public final class HttpURLUtil {
   /**
    * Obtain the text (non-binary) response body from an {@link HttpURLConnection},
    * using the response provided charset.
-   *
    * <p>
-   *   Note: Normal HttpURLConnection doesn't use the provided charset properly.
+   * Note: Normal HttpURLConnection doesn't use the provided charset properly.
    * </p>
    *
    * @param http the {@link HttpURLConnection} to obtain the response body from

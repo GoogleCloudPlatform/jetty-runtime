@@ -51,5 +51,17 @@
         <targetPath>${project.build.directory}/docker</targetPath>
       </resource>
     </resources>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>com.google.cloud.tools</groupId>
+          <artifactId>appengine-maven-plugin</artifactId>
+          <version>0.1.2</version>
+          <configuration>
+            <dockerDirectory>${project.build.directory}/docker</dockerDirectory>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
   </build>
 </project>

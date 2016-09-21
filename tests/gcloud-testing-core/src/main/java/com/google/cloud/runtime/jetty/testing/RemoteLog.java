@@ -1,6 +1,8 @@
 package com.google.cloud.runtime.jetty.testing;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.Assert.assertThat;
 
 import org.eclipse.jetty.toolchain.test.MavenTestingUtils;
@@ -92,6 +94,10 @@ public class RemoteLog {
    * @param expectedEntries the expected entries
    */
   public static void assertHasEntries(List<Entry> logs, List<String> expectedEntries) {
+    assertThat("Logs", logs, notNullValue());
+    assertThat("Logs.size", logs.size(), greaterThan(0));
+    assertThat("Expected Entries", expectedEntries, notNullValue());
+    assertThat("Expected Entries.size", expectedEntries.size(), greaterThan(0));
     List<String> expected = new ArrayList<>(expectedEntries);
     for (Entry entry : logs) {
       if (expected.isEmpty()) {
