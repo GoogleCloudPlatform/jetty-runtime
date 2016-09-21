@@ -1,0 +1,3 @@
+runtime: custom
+vm: true
+module: slf4j1720

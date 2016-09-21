@@ -303,6 +303,10 @@
       </build>
     </profile>
     <profile>
+      <!-- When the appengine-maven-plugin implements the issue
+           https://github.com/GoogleCloudPlatform/app-maven-plugin/issues/86
+           then this entire profile can be removed in favor of using a
+           simpler maven plugin approach -->
       <id>get-gcloud-project-id</id>
       <activation>
         <property>
