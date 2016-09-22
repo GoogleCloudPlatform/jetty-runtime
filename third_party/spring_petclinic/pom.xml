@@ -2,7 +2,7 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.springframework.samples</groupId>
+    <groupId>com.google.cloud.runtime.jetty.third_party</groupId>
     <artifactId>spring-petclinic</artifactId>
     <version>4.2.6-SNAPSHOT</version>
 
@@ -36,7 +36,7 @@
         <mysql-driver.version>5.1.36</mysql-driver.version>
 
         <!-- Web dependencies -->
-        <dandelion.version>1.1.1</dandelion.version>
+        <dandelion.version>1.2-SNAPSHOT</dandelion.version>
         <dandelion.datatables.version>1.1.0</dandelion.datatables.version>
 
         <cobertura.version>2.7</cobertura.version>
@@ -246,17 +246,17 @@
 
         <!-- Dandelion -->
         <dependency>
-            <groupId>com.github.dandelion</groupId>
+            <groupId>com.google.cloud.runtime.jetty.third_party</groupId>
             <artifactId>dandelion-jsp</artifactId>
             <version>${dandelion.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.github.dandelion</groupId>
+            <groupId>com.google.cloud.runtime.jetty.third_party</groupId>
             <artifactId>datatables-jsp</artifactId>
             <version>${dandelion.datatables.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.github.dandelion</groupId>
+            <groupId>com.google.cloud.runtime.jetty.third_party</groupId>
             <artifactId>datatables-export-itext</artifactId>
             <version>${dandelion.datatables.version}</version>
         </dependency>
