@@ -124,11 +124,11 @@
             <configuration>
               <imageName>jetty</imageName>
               <imageTags>
-                <imageTag>${docker.tag.prefix}${jetty9.version}-${project.version}-${maven.build.timestamp}</imageTag>
-                <imageTag>${docker.tag.prefix}${jetty9.version}-${project.version}</imageTag>
                 <imageTag>${docker.tag.prefix}${jetty9.version}-${maven.build.timestamp}</imageTag>
                 <imageTag>${docker.tag.prefix}${jetty9.version}</imageTag>
-                <imageTag>${docker.tag.prefix}9.3</imageTag>
+                <imageTag>${docker.tag.prefix}9.${jetty9.minor.version}.${jetty9.dot.version}-${maven.build.timestamp}</imageTag>
+                <imageTag>${docker.tag.prefix}9.${jetty9.minor.version}.${jetty9.dot.version}</imageTag>
+                <imageTag>${docker.tag.prefix}9.${jetty9.minor.version}</imageTag>
                 <imageTag>${docker.tag.prefix}9</imageTag>
               </imageTags>
               <dockerDirectory>${project.build.directory}/docker</dockerDirectory>
@@ -143,11 +143,12 @@
             <configuration>
               <imageName>jetty</imageName>
               <imageTags>
-                <imageTag>${docker.tag.prefix}${jetty9.version}-${project.version}-${maven.build.timestamp}</imageTag>
-                <imageTag>${docker.tag.prefix}${jetty9.version}-${project.version}</imageTag>
                 <imageTag>${docker.tag.prefix}${jetty9.version}-${maven.build.timestamp}</imageTag>
                 <imageTag>${docker.tag.prefix}${jetty9.version}</imageTag>
-                <imageTag>${docker.tag.prefix}9.3</imageTag>
+                <imageTag>${docker.tag.prefix}${jetty9.base.version}</imageTag>
+                <imageTag>${docker.tag.prefix}9.${jetty9.minor.version}.${jetty9.dot.version}-${maven.build.timestamp}</imageTag>
+                <imageTag>${docker.tag.prefix}9.${jetty9.minor.version}.${jetty9.dot.version}</imageTag>
+                <imageTag>${docker.tag.prefix}9.${jetty9.minor.version}</imageTag>
                 <imageTag>${docker.tag.prefix}9</imageTag>
               </imageTags>
             </configuration>
