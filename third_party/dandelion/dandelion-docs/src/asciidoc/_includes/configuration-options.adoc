@@ -1,0 +1,94 @@
+== 12. Configuration options
+
+One of the key features of Dandelion-Core is that it is highly configurable. Plenty of options, with default values depending on the active <<10-profiles, profile>>, are at your disposal to configure the framework.
+
+=== 12.1. Available options
+
+See the <<appendix-c-configuration-options-reference, configuration options reference>> for an exhaustive list of available options and their corresponding default value with both *dev* and *prod* <<10-2-built-in-profiles, profiles>>.
+
+=== 12.2. Reading configuration options
+
+==== 12.2.1. From classpath
+
+By default, Dandelion-Core expects a file called `dandelion.properties` to be located in the `classpath-root/dandelion` folder.
+
+.Example with a Maven project
+[source, xml]
+----
+project-root
+|__ src
+   |__ main
+      |__ java
+         |__ resources
+            |__ dandelion
+               |__ dandelion.properties
+----
+
+IMPORTANT: Note that when a profile is explicitely activated, Dandelion will try to load a file called `dandelion_[profileName].properties`. See the <<10-profiles, profile section>> for more information.
+
+==== 12.2.2. From System property
+
+Dandelion-Core can also load an externalized configuration file, using the `dandelion.configuration` System property.
+
+===== Example
+
+Let's consider the following structure:
+
+[source, xml]
+----
+C:
+|__ Documents
+   |__ MyApp
+      |__ dandelion.properties
+----
+
+In order to read the externalized file, just add the `-Ddandelion.configuration` System property to the server starting script.
+
+NOTE: Note that when reading from an externalized file, you don't have to place the properties file under the `dandelion/` folder
+
+=== 12.3. Setting configuration options
+
+All Dandelion configuration options can be set in different ways.
+
+==== 12.3.1. Using properties
+
+.dandelion/dandelion.properties
+[source, properties]
+----
+tool.debugger=true
+----
+
+==== 12.3.2. Using filter initialization parameters
+
+You can also set configuration options as initialization parameters of the `DandelionFilter`:
+
+.web.xml
+[source, xml]
+----
+<filter>
+  <filter-name>dandelion</filter-name>
+  <filter-class>com.github.dandelion.core.web.DandelionFilter</filter-class>
+  <init-param>
+    <param-name>tool.debugger</param-name>
+    <param-value>true</param-value>
+  </init-param>
+</filter>
+----
+
+==== 12.3.3. Using Java System properties
+
+And finally as Java System properties:
+
+.Inside your server startup script
+[source, bash]
+----
+-Dtool.debugger=true
+----
+
+[IMPORTANT] 
+==== 
+Remember that the following precedence rule applies:
+
+*System property* > *filter init param* > *property*
+====
+

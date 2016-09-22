@@ -1,0 +1,141 @@
+== 3. Installation
+
+=== 3.1. Common installation steps
+
+The list below covers the common steps across all supported template engines.
+
+* *Step 1: Add the server-side dependency*
+
+Depending on the template engine you wish to use in your web application, add either `dandelion-jsp` or `dandelion-thymeleaf` to your project's dependencies.
+
+.Example with Apache Maven and a JSP-based project
+[source,xml,subs="+attributes"]
+----
+<dependency>
+  <groupId>com.github.dandelion</groupId>
+  <artifactId>dandelion-jsp</artifactId>
+  <version>{project-version}</version>
+</dependency>
+----
+
+.Example with Apache Maven and a Thymeleaf-based project
+[source,xml,subs="+attributes"]
+----
+<dependency>
+  <groupId>com.github.dandelion</groupId>
+  <artifactId>dandelion-thymeleaf</artifactId>
+  <version>{project-version}</version>
+</dependency>
+----
+
+NOTE: When using a build tool such as http://maven.apache.org/[Maven], the above dependencies are not explicitely needed when you directly use a component such as Dandelion-Datatables, thanks to the transitive dependencies
+
+* *Step 2: Configure the Dandelion filter*
+
+Add the following configuration to your `web.xml` file:
+
+[source,xml]
+----
+<!-- Dandelion filter definition and mapping -->
+<filter>
+  <filter-name>dandelionFilter</filter-name>
+  <filter-class>com.github.dandelion.core.web.DandelionFilter</filter-class>
+</filter>
+<filter-mapping>
+  <filter-name>dandelionFilter</filter-name>
+  <url-pattern>/*</url-pattern>
+  <dispatcher>REQUEST</dispatcher> <1>
+  <dispatcher>FORWARD</dispatcher>
+  <dispatcher>INCLUDE</dispatcher>
+  <dispatcher>ERROR</dispatcher>
+</filter-mapping>
+----
+<1> Note that all dispatcher types should be specified in order for the filter to work in any situation.
+
+* *Step 3: Configure the Dandelion servlet*
+
+Add the following configuration to your `web.xml` file:
+
+[source,xml]
+----
+<!-- Dandelion servlet definition and mapping -->
+<servlet>
+  <servlet-name>dandelionServlet</servlet-name>
+  <servlet-class>com.github.dandelion.core.web.DandelionServlet</servlet-class>
+</servlet>
+<servlet-mapping>
+  <servlet-name>dandelionServlet</servlet-name>
+  <url-pattern>/dandelion-assets/*</url-pattern> <1>
+</servlet-mapping>
+----
+<1> Note that the URL pattern can be customized thanks to the <<opt-asset.url.pattern, `asset.url.pattern`>> config option
+
+=== 3.2. JSP-specific step
+
+* *Declare the taglib definition*
+
+Anywhere you wish to use the taglib, declare it in the JSP:
+
+ <%@ taglib prefix="dandelion" uri="http://github.com/dandelion" %>
+
+=== 3.3. Thymeleaf-specific steps
+
+* *Declare the Thymeleaf dialect*
+
+If you're using Spring/Spring MVC, update the `SpringTemplateEngine` bean as follows:
+
+[source, xml]
+----
+<bean id="templateEngine" class="org.thymeleaf.spring3.SpringTemplateEngine">
+  <property name="templateResolver" ref="templateResolver" />
+  <property name="additionalDialects">
+    <set>
+      <bean class="com.github.dandelion.thymeleaf.dialect.DandelionDialect" />
+    </set>
+  </property>
+</bean>
+----
+
+Otherwise, add the `DandelionDialect` to your existing Thymeleaf template engine like this:
+
+[source, java]
+----
+...
+TemplateEngine templateEngine = new TemplateEngine();
+templateEngine.addDialect(new DandelionDialect());
+...
+----
+
+* *Declare the Thymeleaf namespace*
+
+[source, xml]
+----
+<html xmlns:th="http://www.thymeleaf.org" xmlns:dt="http://github.com/dandelion">
+----
+
+This way you can benefit from some content assist in your favorite IDE:
+
+* Eclipse: see the http://www.thymeleaf.org/ecosystem.html#thymeleaf-extras-eclipse-plugin[Thymeleaf Eclipse plugin]
+* IntelliJ IDEA: see this http://forum.thymeleaf.org/IntelliJ-IDEA-14-includes-Thymeleaf-support-td4028544.html[topic]
+
+WARNING: Using a wrong namespace will prevent the content assist from working correctly
+
+=== 3.4. Spring-specific steps
+
+In case you're using http://spring.io/[Spring] and the Spring's dispatcher is configured with a `/` mapping, you will need to configure the Spring's default servlet handler in order to have static content properly served.
+
+Using JavaConfig:
+
+[source, java]
+----
+public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
+  configurer.enable(); 
+}
+----
+
+Or XML:
+
+[source, xml]
+----
+<mvc:default-servlet-handler/>
+----

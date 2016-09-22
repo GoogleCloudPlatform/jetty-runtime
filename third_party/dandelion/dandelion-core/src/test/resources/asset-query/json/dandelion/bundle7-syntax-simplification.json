@@ -1,0 +1,24 @@
+{
+    "bundle": "bundle7",
+    "assets": [
+               {
+                   "version": "1.0.0",
+                   "dom" : "head",
+                   "locations": {
+                       "classpath": "asset-query/json/dandelion/assets/a7_1.js"
+                   }
+               },
+               {
+                   "version": "1.0.0",
+                   "locations": {
+                       "classpath": "asset-query/json/dandelion/assets/a7_2.css"
+                   }
+               },
+               {
+                   "version": "1.0.0",
+                   "locations": {
+                       "classpath": "asset-query/json/dandelion/assets/a7_3.js"
+                   }
+               }
+           ]
+}

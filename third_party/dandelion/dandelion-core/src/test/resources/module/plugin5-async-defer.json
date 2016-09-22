@@ -1,0 +1,45 @@
+{
+    "parent": "none",
+    "bundle": "plugin5",
+    "assets": [
+        {
+            "name": "asset5",
+            "version": "5",
+            "type": "js",
+            "dom": "head",
+            "attributesOnlyName": [
+                "async"
+            ],
+            "locations": {
+                "remote": "remoteURL.js",
+                "local": "localPath.js"
+            }
+        },
+        {
+            "name": "asset5-1",
+            "version": "5",
+            "type": "js",
+            "dom": "body",
+            "attributesOnlyName": [
+                "defer"
+            ],
+            "locations": {
+                "remote": "remoteURL.js",
+                "local": "localPath.js"
+            }
+        },
+        {
+            "name": "asset5-2",
+            "version": "5",
+            "type": "js",
+            "dom": "body",
+            "attributesOnlyName": [
+                "async", "defer"
+            ],
+            "locations": {
+                "remote": "remoteURL.js",
+                "local": "localPath.js"
+            }
+        }
+    ]
+}
