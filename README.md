@@ -9,6 +9,7 @@ To build the image you need git, docker and maven installed and to have the open
 image available in your docker repository:
 ```console
 git clone https://github.com/GoogleCloudPlatform/jetty-runtime.git
+cd jetty-runtime
 mvn clean install
 ```
 
