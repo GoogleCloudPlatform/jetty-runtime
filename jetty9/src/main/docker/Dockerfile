@@ -19,9 +19,9 @@ RUN groupadd -r jetty \
  && useradd -r -g jetty jetty
 
 # Create env vars to identify image
-ENV GAE_IMAGE_NAME ${project.artifactId}
-ENV GAE_IMAGE_LABEL ${docker.tag}
-ENV GAE_IMAGE_VERSION ${project.version}
+ENV JETTY_VERSION ${jetty9.version}
+ENV GAE_IMAGE_NAME jetty
+ENV GAE_IMAGE_LABEL ${docker.tag.long}
 
 # Create Jetty Home
 ENV JETTY_HOME /usr/local/jetty
