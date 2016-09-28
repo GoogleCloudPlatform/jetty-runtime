@@ -28,19 +28,6 @@
   </Ref>
 
   <!-- =========================================================== -->
-  <!-- Setup server log -->
-  <!-- =========================================================== -->
-  <Call id="logMgr" class="java.util.logging.LogManager" name="getLogManager">
-    <Call name="readConfiguration">
-      <Arg>
-        <New class="java.io.FileInputStream">
-          <Arg><Property name="jetty.base" default="."/>/etc/java-util-logging.properties</Arg>
-        </New>
-      </Arg>
-    </Call>
-  </Call>
-
-  <!-- =========================================================== -->
   <!-- Setup a request log -->
   <!-- =========================================================== -->
   <Ref refid="Handlers">
