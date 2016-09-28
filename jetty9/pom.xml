@@ -40,7 +40,9 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-resources-plugin</artifactId>
+        <version>3.0.0</version>
         <executions>
           <execution>
             <id>copy-resources</id>
@@ -142,6 +144,41 @@
                 <imageTag>${docker.tag.short}</imageTag>
                 <imageTag>${docker.tag.long}</imageTag>
               </imageTags>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.8</version>
+        <executions>
+          <execution>
+            <id>tag-and-deploy-integration-tests</id>
+            <phase>integration-test</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <target>
+                <exec executable="gcloud" logError="true" outputproperty="app.deploy.project">
+                  <arg value="--quiet"/>
+                  <arg value="config"/>
+                  <arg value="list"/>
+                  <arg value="--format=value(core.project)"/>
+                </exec>
+                <echo>app.deploy.project=${app.deploy.project}</echo>
+                <exec executable="docker">
+                  <arg value="tag"/>
+                  <arg value="jetty9:${docker.label.prefix}${jetty.version}"/>
+                  <arg value="gcr.io/${app.deploy.project}/jetty9:testing"/>
+                </exec>
+                <exec executable="gcloud">
+                  <arg value="docker"/>
+                  <arg value="push"/>
+                  <arg value="gcr.io/${app.deploy.project}/jetty9:testing"/>
+                </exec>
+              </target>
             </configuration>
           </execution>
         </executions>
