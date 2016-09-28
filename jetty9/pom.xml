@@ -38,7 +38,6 @@
   </dependencies>
 
   <build>
-
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -81,7 +80,7 @@
                 <artifactItem>
                   <groupId>org.eclipse.jetty</groupId>
                   <artifactId>jetty-distribution</artifactId>
-                  <version>${jetty.version}</version>
+                  <version>${jetty9.version}</version>
                   <type>tar.gz</type>
                   <overWrite>true</overWrite>
                   <includes>**</includes>
@@ -125,9 +124,10 @@
               <goal>build</goal>
             </goals>
             <configuration>
-              <imageName>jetty9</imageName>
+              <imageName>jetty</imageName>
               <imageTags>
-                <imageTag>${docker.tag}</imageTag>
+                <imageTag>${docker.tag.short}</imageTag>
+                <imageTag>${docker.tag.long}</imageTag>
               </imageTags>
               <dockerDirectory>${project.build.directory}/docker</dockerDirectory>
             </configuration>
@@ -139,9 +139,10 @@
               <goal>removeImage</goal>
             </goals>
             <configuration>
-              <imageName>jetty9</imageName>
+              <imageName>jetty</imageName>
               <imageTags>
-                <imageTag>${docker.tag}</imageTag>
+                <imageTag>${docker.tag.short}</imageTag>
+                <imageTag>${docker.tag.long}</imageTag>
               </imageTags>
             </configuration>
           </execution>
