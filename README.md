@@ -5,18 +5,19 @@ This repository contains the source for the `gcr.io/google_appengine/jetty` [doc
 The layout of this image is intended to mostly mimic the official [docker-jetty](https://github.com/appropriate/docker-jetty) image and unless otherwise noted, the official [docker-jetty documentation](https://github.com/docker-library/docs/tree/master/jetty) should apply.
 
 ## Building the Jetty image
-To build the image you need git, docker and maven installed and to have the openjdk8:8-jre
+To build the image you need git, docker and maven installed and to have the openjdk:8
 image available in your docker repository:
 ```console
 git clone https://github.com/GoogleCloudPlatform/jetty-runtime.git
+cd jetty-runtime
 mvn clean install
 ```
 
 ## Running the Jetty image
-The resulting image is called jetty9:9.3.5.v20151012 (or the current jetty version as the label) 
+The resulting image is called jetty (with more specific tags also created)
 and can be run with:
 ```console
-docker run jetty9:9.3.5.v20151012
+docker run jetty
 ```
 ## Google Modules & Configuration
 The jetty base in this image has some additional google specific modules:
@@ -37,13 +38,13 @@ The request log also defaults to log into `/var/log/app_engine/` by the
 Arguments passed to the docker run command are passed to Jetty, so the 
 configuration of the jetty server can be seen with a command like:
 ```console
-docker run jetty9:9.3.5.v20151012 --list-config
+docker run jetty --list-config
 ```
 
 Alternate commands can also be passed to the docker run command, so the
 image can be explored with 
 ```console
-docker run t --rm jetty9:9.3.5.v20151012 bash
+docker run -it --rm jetty bash
 ```
 
 To update the server configuration in a derived Docker image, the `Dockerfile` may
@@ -52,7 +53,7 @@ enable additional modules with `RUN` commands like:
 WORKDIR $JETTY_BASE
 RUN java -jar "$JETTY_HOME/start.jar" --add-to-startd=jmx,stats
 ```
-Modules may be configured in a `Dockerfile` by editing the properties in the corresponding `/var/lib/jetty/start.d/*.mod` file or the module can be deactivated by removing that file.
+Modules may be configured in a `Dockerfile` by editing the properties in the corresponding mod files in `/var/lib/jetty/start.d/` or the module can be deactivated by removing that file.
 
 ## App Engine Flexible Environment
 This image works with App Engine Flexible Environment as a custom runtime.
@@ -80,18 +81,19 @@ The entry point for the image is [docker-entrypoint.bash](https://github.com/Goo
 
 If the default command (java) is used, then the entry point sources the [setup-env.bash](https://github.com/GoogleCloudPlatform/openjdk-runtime/blob/master/openjdk8/src/main/docker/setup-env.bash), which looks for supported features to be enabled and/or configured.  The following table indicates the environment variables that may be used to enable/disable/configure features, any default values if they are not set: 
 
-|Env Var           | Description         | Type     | Default                               |
-|------------------|---------------------|----------|---------------------------------------|
-|`DBG_ENABLE`      | Stackdriver Debugger| boolean  | `true`                                |
-|`TMPDIR`          | Temporary Directory | dirname  |                                       |
-|`JAVA_TMP_OPTS`   | JVM tmpdir args     | JVM args | `-Djava.io.tmpdir=${TMPDIR}`          |
-|`HEAP_SIZE`       | Available heap      | size     | Derived from `/proc/meminfo`          |
-|`JAVA_HEAP_OPTS`  | JVM heap args       | JVM args | `-Xms${HEAP_SIZE} -Xmx${HEAP_SIZE}`   |
-|`JAVA_GC_OPTS`    | JVM GC args         | JVM args | `-XX:+UseG1GC` plus configuration     |
-|`JAVA_GC_LOG`     | JVM GC log file     | filename |                                       |
-|`JAVA_GC_LOG_OPTS`| JVM GC args         | JVM args | Derived from `$JAVA_GC_LOG`           |
-|`JAVA_USER_OPTS`  | JVM other args      | JVM args |                                       |
-|`JAVA_OPTS`       | JVM args            | JVM args | See below                             |
+|Env Var           | Description         | Type     | Default                                     |
+|------------------|---------------------|----------|---------------------------------------------|
+|`DBG_ENABLE`      | Stackdriver Debugger| boolean  | `true`                                      |
+|`TMPDIR`          | Temporary Directory | dirname  |                                             |
+|`JAVA_TMP_OPTS`   | JVM tmpdir args     | JVM args | `-Djava.io.tmpdir=${TMPDIR}`                |
+|`GAE_MEMORY_MB`   | Available memory    | size     | Set by GAE or `/proc/meminfo`-400M          |
+|`HEAP_SIZE_MB`    | Available heap      | size     | 80% of `${GAE_MEMORY_MB}`                   |
+|`JAVA_HEAP_OPTS`  | JVM heap args       | JVM args | `-Xms${HEAP_SIZE_MB}M -Xmx${HEAP_SIZE_MB}M` |
+|`JAVA_GC_OPTS`    | JVM GC args         | JVM args | `-XX:+UseG1GC` plus configuration           |
+|`JAVA_GC_LOG`     | JVM GC log file     | filename |                                             |
+|`JAVA_GC_LOG_OPTS`| JVM GC args         | JVM args | Derived from `$JAVA_GC_LOG`                 |
+|`JAVA_USER_OPTS`  | JVM other args      | JVM args |                                             |
+|`JAVA_OPTS`       | JVM args            | JVM args | See below                                   |
 
 If not explicitly set, `JAVA_OPTS` is defaulted to 
 ```
