@@ -1,9 +1,0 @@
-{
-    "assets": [
-		{
-			"locations" : {
-				"remote" : "//domain.com/js/asset1.js"
-			}
-		}    
-    ]
-}
