@@ -1,3 +1,6 @@
 [submodule "third_party/dandelion"]
 	path = third_party/dandelion
 	url = git@github.com:dandelion/dandelion.git
+[submodule "third_party/spring_petclinic"]
+	path = third_party/spring_petclinic
+	url = git@github.com:spring-projects/spring-petclinic.git
