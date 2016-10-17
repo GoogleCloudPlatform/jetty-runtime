@@ -5,8 +5,7 @@ This repository contains the source for the `gcr.io/google_appengine/jetty` [doc
 The layout of this image is intended to mostly mimic the official [docker-jetty](https://github.com/appropriate/docker-jetty) image and unless otherwise noted, the official [docker-jetty documentation](https://github.com/docker-library/docs/tree/master/jetty) should apply.
 
 ## Building the Jetty image
-To build the image you need git, docker and maven installed and to have the openjdk:8
-image available in your docker repository:
+To build the image you need git, docker and maven installed:
 ```console
 git clone https://github.com/GoogleCloudPlatform/jetty-runtime.git
 cd jetty-runtime
