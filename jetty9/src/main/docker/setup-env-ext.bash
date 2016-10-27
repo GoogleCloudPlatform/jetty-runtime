@@ -39,4 +39,20 @@ if ! type "$1" &>/dev/null; then
   export JAVA_OPTS="$JAVA_OPTS $JETTY_ARGS"
 fi
 
+
+
+# Remove unwanted session managers - TODO only instantiate modules we want in jetty.commands
+case "${SESSIONS:=local}" in
+  memcached-datastore)
+           ;;
+  datastore)
+           rm -f $JETTY_BASE/start.d/session-store-cache.ini
+           ;;
+  *)
+           rm -f $JETTY_BASE/start.d/session-store-cache.ini
+           rm -f $JETTY_BASE/start.d/session-store-gcloud.ini
+           rm -f $JETTY_BASE/start.d/slf4j-jul.ini
+           ;;
+esac
+
 # End setup-env-ext.bash

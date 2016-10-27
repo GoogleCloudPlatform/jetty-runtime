@@ -35,7 +35,7 @@ ENV TMPDIR /tmp/jetty
 ADD jetty-base $JETTY_BASE
 WORKDIR $JETTY_BASE
 RUN mkdir webapps $TMPDIR \
- && java -jar $JETTY_HOME/start.jar --add-to-start=setuid \
+ && java -jar $JETTY_HOME/start.jar --approve-all-licenses --add-to-start=setuid,session-store-gcloud,session-store-cache,slf4j-jul \
  && chown -R jetty:jetty $JETTY_BASE $TMPDIR
 
 # Start Jetty directly
