@@ -26,7 +26,7 @@
   </parent>
   <name>Google App Engine Image Jetty (jetty9-base)</name>
   <artifactId>jetty9-base</artifactId>
-  <packaging>pom</packaging>
+  <packaging>jar</packaging>
 
   <dependencies>
     <dependency>
