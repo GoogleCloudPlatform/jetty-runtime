@@ -30,12 +30,6 @@
 
   <dependencies>
     <dependency>
-      <groupId>com.google.cloud.runtimes</groupId>
-      <artifactId>logging</artifactId>
-      <version>0.1.0-SNAPSHOT</version>
-      <type>jar</type>
-    </dependency>
-    <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-server</artifactId>
       <version>${jetty9.version}</version>
@@ -52,6 +46,14 @@
 
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>2.3.1</version>
+        <configuration>
+          <outputDirectory>${project.build.directory}/jetty-base/lib/gae</outputDirectory>
+        </configuration>
+      </plugin>
       <plugin>
         <artifactId>maven-resources-plugin</artifactId>
         <executions>
@@ -135,7 +137,8 @@
           <arguments>
             <argument>-jar</argument>
             <argument>../jetty-distribution-${jetty9.version}/start.jar</argument>
-            <argument>--add-to-startd=http,deploy,jsp,jstl,http-forwarded,resources,gae</argument>
+            <argument>--add-to-startd=http,deploy,jsp,jstl,http-forwarded,resources,gae,logging-jul</argument>
+            <argument>--approve-all-licenses</argument>
           </arguments>
         </configuration>
       </plugin>
