@@ -19,31 +19,66 @@ import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.ContextHandler.Context;
 
 import java.util.Stack;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class RequestContextScope implements ContextHandler.ContextScopeListener {
+  static final Logger logger = Logger.getLogger(RequestContextScope.class.getName());
 
-  private static ThreadLocal<Stack<Request>> _request = new ThreadLocal<Stack<Request>>() {
+  private static final String X_CLOUD_TRACE = "x-cloud-trace-context";
+  private static final ThreadLocal<String> traceid = new ThreadLocal<>();
+  private static final ThreadLocal<Stack<Request>> requestStack = 
+      new ThreadLocal<Stack<Request>>() {
     @Override
     protected Stack<Request> initialValue() {
       return new Stack<>();
     }
   };
-  
+
   @Override
   public void enterScope(Context context, Request request, Object reason) {
     if (request != null) {
-      _request.get().push(request);
+      Stack<Request> stack = requestStack.get();
+      if (stack.isEmpty()) {
+        String id = (String) request.getAttribute(X_CLOUD_TRACE);
+        if (id == null) {
+          id = request.getHeader(X_CLOUD_TRACE);
+          if (id != null) {
+            int slash = id.indexOf('/');
+            if (slash >= 0) {
+              id = id.substring(0, slash);
+            }
+            request.setAttribute(X_CLOUD_TRACE, id);
+          }
+        }
+        traceid.set(id);
+      }
+      stack.push(request);
+    }
+    if (logger.isLoggable(Level.FINE)) {
+      logger.fine("enterScope " + context);
     }
   }
 
   @Override
   public void exitScope(Context context, Request request) {
+    if (logger.isLoggable(Level.FINE)) {
+      logger.fine("exitScope " + context);
+    }
     if (request != null) {
-      _request.get().pop();
+      Stack<Request> stack = requestStack.get();
+      stack.pop();
+      if (stack.isEmpty()) {
+        traceid.set(null);
+      }
     }
   }
 
   public static Request getCurrentRequest() {
-    return _request.get().peek();
+    return requestStack.get().peek();
+  }
+
+  public static String getCurrentTraceid() {
+    return traceid.get();
   }
 }
