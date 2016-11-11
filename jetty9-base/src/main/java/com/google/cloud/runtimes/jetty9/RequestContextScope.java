@@ -74,6 +74,16 @@ public class RequestContextScope implements ContextHandler.ContextScopeListener 
     }
   }
 
+  public static void runWith(String traceid, Runnable runnable) {
+    String original = RequestContextScope.traceid.get();
+    RequestContextScope.traceid.set(traceid);
+    try {
+      runnable.run();
+    } finally {
+      RequestContextScope.traceid.set(original);
+    }
+  }
+  
   public static Request getCurrentRequest() {
     return requestStack.get().peek();
   }

@@ -42,6 +42,17 @@
       <version>${project.version}</version>
       <type>pom</type>
     </dependency>
+    <dependency>
+      <groupId>com.google.cloud</groupId>
+      <artifactId>google-cloud-logging</artifactId>
+      <version>${gcloud.api.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>javax.servlet</groupId>
+          <artifactId>servlet-api</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
   </dependencies>
 
   <build>
@@ -137,7 +148,8 @@
           <arguments>
             <argument>-jar</argument>
             <argument>../jetty-distribution-${jetty9.version}/start.jar</argument>
-            <argument>--add-to-startd=http,deploy,jsp,jstl,http-forwarded,resources,gae,logging-jul</argument>
+            <argument>--create-startd</argument>
+            <argument>--add-to-start=http,deploy,jsp,jstl,http-forwarded,resources,gae,gcloud,jcl-slf4j,logging-jul</argument>
             <argument>--approve-all-licenses</argument>
           </arguments>
         </configuration>
