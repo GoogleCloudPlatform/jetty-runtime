@@ -128,6 +128,7 @@
                 <imageTag>${docker.tag.long}</imageTag>
               </imageTags>
               <dockerDirectory>${project.build.directory}/docker</dockerDirectory>
+              <pullOnBuild>true</pullOnBuild>
             </configuration>
           </execution>
           <execution>
