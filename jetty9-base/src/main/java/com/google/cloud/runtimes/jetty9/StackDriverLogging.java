@@ -6,6 +6,7 @@ import java.util.logging.Logger;
 public class StackDriverLogging {
 
   static void init() throws Exception {
+
     Logger log = Logger.getLogger(StackDriverLogging.class.getName());
 
     for (Logger l : new Logger[] {log,
@@ -16,15 +17,14 @@ public class StackDriverLogging {
         l = l.getParent();
       }
     }
-    System.err.println("httpurl log");
-    Logger.getLogger("sun.net.www.protocol.http.HttpURLConnection").info("test");
-    System.err.println("some.random.log log");
-    Logger.getLogger("some.random.log").info("test");
-    System.err.println("com.google.cloud.runtimes.jetty9.StackDriverLogging log info");
-    log.info("test info");
-    System.err.println("com.google.cloud.runtimes.jetty9.StackDriverLogging log fine");
-    log.fine("test fine");
-    System.err.println("done");
+    Logger.getLogger("").info("root info!");
+    log.info("test info!");
+    log.fine("test fine!");
+
+    ((TracingLogHandler) Logger.getLogger("").getHandlers()[0]).flush();
+    System.err.println("flushed");
+
+    Thread.sleep(5000);
   }
 
   public static void main(String... args) throws Exception {

@@ -18,7 +18,8 @@ import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.ContextHandler.Context;
 
-import java.util.Stack;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -27,18 +28,18 @@ public class RequestContextScope implements ContextHandler.ContextScopeListener 
 
   private static final String X_CLOUD_TRACE = "x-cloud-trace-context";
   private static final ThreadLocal<String> traceid = new ThreadLocal<>();
-  private static final ThreadLocal<Stack<Request>> requestStack = 
-      new ThreadLocal<Stack<Request>>() {
+  private static final ThreadLocal<Deque<Request>> requestStack = 
+      new ThreadLocal<Deque<Request>>() {
     @Override
-    protected Stack<Request> initialValue() {
-      return new Stack<>();
+    protected Deque<Request> initialValue() {
+      return new ArrayDeque<>();
     }
   };
 
   @Override
   public void enterScope(Context context, Request request, Object reason) {
     if (request != null) {
-      Stack<Request> stack = requestStack.get();
+      Deque<Request> stack = requestStack.get();
       if (stack.isEmpty()) {
         String id = (String) request.getAttribute(X_CLOUD_TRACE);
         if (id == null) {
@@ -66,14 +67,14 @@ public class RequestContextScope implements ContextHandler.ContextScopeListener 
       logger.fine("exitScope " + context);
     }
     if (request != null) {
-      Stack<Request> stack = requestStack.get();
-      stack.pop();
-      if (stack.isEmpty()) {
-        traceid.set(null);
-      }
+      requestStack.get().pop();
     }
   }
 
+  /** Run a Runnable in the scope of a traceid.
+   * @param traceid The trace ID
+   * @param runnable the runnable
+   */
   public static void runWith(String traceid, Runnable runnable) {
     String original = RequestContextScope.traceid.get();
     RequestContextScope.traceid.set(traceid);

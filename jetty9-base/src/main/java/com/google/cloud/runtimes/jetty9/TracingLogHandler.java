@@ -21,11 +21,19 @@ import com.google.cloud.logging.LogEntry;
 import com.google.cloud.logging.LogEntry.Builder;
 import com.google.cloud.logging.LoggingOptions;
 
+import org.eclipse.jetty.server.Request;
+
 import java.util.logging.LogManager;
 import java.util.logging.LogRecord;
 
+/**
+ * A Google Cloud Logging Handler extended with a request traceid label.
+ */
 public class TracingLogHandler extends AsyncLoggingHandler {
 
+  /**
+   * Construct a TracingLogHandler for "jetty.log"
+   */
   public TracingLogHandler() {
     this(firstNonNull(
         LogManager.getLogManager().getProperty(TracingLogHandler.class.getName() + ".log"),
@@ -41,6 +49,14 @@ public class TracingLogHandler extends AsyncLoggingHandler {
     String traceid = RequestContextScope.getCurrentTraceid();
     if (traceid != null) {
       builder.addLabel("traceid", traceid);
+    } else {
+      Request request = RequestContextScope.getCurrentRequest();
+      if (request != null) {
+        builder.addLabel("http-scheme", request.getScheme());
+        builder.addLabel("http-method", request.getMethod());
+        builder.addLabel("http-uri", request.getOriginalURI());
+        builder.addLabel("http-remote-addr", request.getRemoteAddr());
+      }
     }
     return super.buildEntryFor(record, builder);
   }
