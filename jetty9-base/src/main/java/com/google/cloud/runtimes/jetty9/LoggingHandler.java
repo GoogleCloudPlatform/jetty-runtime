@@ -26,14 +26,10 @@ import com.google.cloud.logging.LoggingLevel;
 import com.google.cloud.logging.LoggingOptions;
 import com.google.cloud.logging.Payload;
 import com.google.cloud.logging.Severity;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.logging.ErrorManager;
 import java.util.logging.Filter;
 import java.util.logging.Formatter;
@@ -96,13 +92,7 @@ import java.util.logging.SimpleFormatter;
  * </pre>
  */
 public class LoggingHandler extends Handler {
-
-  private static final String HANDLERS_PROPERTY = "handlers";
-  private static final String ROOT_LOGGER_NAME = "";
-  private static final String[] NO_HANDLERS = new String[0];
-  private static final Set<String> EXCLUDED_LOGGERS = ImmutableSet.of("io.grpc", "io.netty",
-      "com.google.api.client.http", "sun.net.www.protocol.http");
-
+  private final ThreadLocal<Boolean> flushing = new ThreadLocal<>();
   private final LoggingOptions options;
   private final List<LogEntry> buffer = new LinkedList<>();
   private final WriteOption[] writeOptions;
@@ -155,63 +145,8 @@ public class LoggingHandler extends Handler {
     String logName = firstNonNull(log, helper.getProperty(className + ".log", "java.log"));
     MonitoredResource resource = firstNonNull(monitoredResource, getDefaultResource());
     writeOptions = new WriteOption[]{WriteOption.logName(logName), WriteOption.resource(resource)};
-    maskLoggers();
   }
 
-  private static void maskLoggers() {
-    for (String loggerName : EXCLUDED_LOGGERS) {
-      Logger logger = Logger.getLogger(loggerName);
-      // We remove the Clould Logging handler if it has been registered for a logger that should be
-      // masked
-      List<LoggingHandler> loggingHandlers = getLoggingHandlers(logger);
-      for (LoggingHandler loggingHandler : loggingHandlers) {
-        logger.removeHandler(loggingHandler);
-      }
-      // We mask ancestors if they have a Stackdriver Logging Handler registered
-      Logger currentLogger = logger;
-      Logger ancestor = currentLogger.getParent();
-      boolean masked = false;
-      while (ancestor != null && !masked) {
-        if (hasLoggingHandler(ancestor)) {
-          currentLogger.setUseParentHandlers(false);
-          masked = true;
-        }
-        currentLogger = ancestor;
-        ancestor = ancestor.getParent();
-      }
-    }
-  }
-
-  private static List<LoggingHandler> getLoggingHandlers(Logger logger) {
-    ImmutableList.Builder<LoggingHandler> builder = ImmutableList.builder();
-    for (Handler handler : logger.getHandlers()) {
-      if (handler instanceof LoggingHandler) {
-        builder.add((LoggingHandler) handler);
-      }
-    }
-    return builder.build();
-  }
-
-  private static boolean hasLoggingHandler(Logger logger) {
-    // look for Stackdriver Logging handler registered with addHandler()
-    for (Handler handler : logger.getHandlers()) {
-      if (handler instanceof LoggingHandler) {
-        return true;
-      }
-    }
-    // look for Stackdriver Logging handler registered via logging.properties
-    String loggerName = logger.getName();
-    String propertyName = loggerName.equals(ROOT_LOGGER_NAME)
-        ? HANDLERS_PROPERTY : loggerName + "." + HANDLERS_PROPERTY;
-    String handlersProperty = LogManager.getLogManager().getProperty(propertyName);
-    String[] handlers = handlersProperty != null ? handlersProperty.split(",") : NO_HANDLERS;
-    for (String handlerName : handlers) {
-      if (handlerName.contains(LoggingHandler.class.getPackage().getName())) {
-        return true;
-      }
-    }
-    return false;
-  }
 
   private MonitoredResource getDefaultResource() {
     return MonitoredResource.of("global", ImmutableMap.of("project_id", options.getProjectId()));
@@ -251,7 +186,7 @@ public class LoggingHandler extends Handler {
       String stringFilter = manager.getProperty(name);
       try {
         if (stringFilter != null) {
-          Class clz = ClassLoader.getSystemClassLoader().loadClass(stringFilter);
+          Class<?> clz = ClassLoader.getSystemClassLoader().loadClass(stringFilter);
           return (Filter) clz.newInstance();
         }
       } catch (Exception ex) {
@@ -264,7 +199,7 @@ public class LoggingHandler extends Handler {
       String stringFilter = manager.getProperty(name);
       try {
         if (stringFilter != null) {
-          Class clz = ClassLoader.getSystemClassLoader().loadClass(stringFilter);
+          Class<?> clz = ClassLoader.getSystemClassLoader().loadClass(stringFilter);
           return (Formatter) clz.newInstance();
         }
       } catch (Exception ex) {
@@ -286,8 +221,8 @@ public class LoggingHandler extends Handler {
 
   @Override
   public synchronized void publish(LogRecord record) {
-    // check that the log record should be logged
-    if (!isLoggable(record)) {
+    // check that the log record should be logged and we are not already flushing logs
+    if (!isLoggable(record) || Boolean.TRUE.equals(flushing.get())) {
       return;
     }
     LogEntry entry = entryFor(record);
@@ -362,11 +297,13 @@ public class LoggingHandler extends Handler {
   @Override
   public synchronized void flush() {
     try {
+      flushing.set(Boolean.TRUE);
       write(buffer, writeOptions);
     } catch (Exception ex) {
       // writing can fail but we should not throw an exception, we report the error instead
       reportError(null, ex, ErrorManager.FLUSH_FAILURE);
     } finally {
+      flushing.set(Boolean.FALSE);
       buffer.clear();
     }
   }
@@ -411,8 +348,8 @@ public class LoggingHandler extends Handler {
    * Logging handlers instead of {@link Logger#addHandler(Handler)} to avoid infinite recursion
    * when logging.
    */
+  @Deprecated
   public static void addHandler(Logger logger, LoggingHandler handler) {
     logger.addHandler(handler);
-    maskLoggers();
   }
 }
