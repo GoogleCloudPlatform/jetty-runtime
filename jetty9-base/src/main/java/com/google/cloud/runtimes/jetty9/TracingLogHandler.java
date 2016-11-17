@@ -17,7 +17,6 @@ package com.google.cloud.runtimes.jetty9;
 import static com.google.common.base.MoreObjects.firstNonNull;
 
 import com.google.cloud.MonitoredResource;
-import com.google.cloud.logging.LogEntry;
 import com.google.cloud.logging.LogEntry.Builder;
 import com.google.cloud.logging.LoggingOptions;
 
@@ -31,6 +30,8 @@ import java.util.logging.LogRecord;
  */
 public class TracingLogHandler extends AsyncLoggingHandler {
 
+  private final ThreadLocal<Boolean> flushing = new ThreadLocal<>();
+  
   /**
    * Construct a TracingLogHandler for "jetty.log"
    */
@@ -40,12 +41,22 @@ public class TracingLogHandler extends AsyncLoggingHandler {
         "jetty.log"), null, null);
   }
 
+  @Override
+  public synchronized void publish(LogRecord record) {
+    // check we are not already flushing logs
+    if (Boolean.TRUE.equals(flushing.get())) {
+      return;
+    }
+    super.publish(record);
+  }
+  
   public TracingLogHandler(String logName, LoggingOptions options, MonitoredResource resource) {
     super(logName, options, resource);
   }
 
   @Override
-  protected LogEntry buildEntryFor(LogRecord record, Builder builder) {
+  protected void enhanceLogEntry(Builder builder, LogRecord record) {
+    super.enhanceLogEntry(builder, record);
     String traceid = RequestContextScope.getCurrentTraceid();
     if (traceid != null) {
       builder.addLabel("traceid", traceid);
@@ -58,6 +69,15 @@ public class TracingLogHandler extends AsyncLoggingHandler {
         builder.addLabel("http-remote-addr", request.getRemoteAddr());
       }
     }
-    return super.buildEntryFor(record, builder);
+  }
+
+  @Override
+  public synchronized void flush() {
+    try {
+      flushing.set(Boolean.TRUE);
+      super.flush();
+    } finally {
+      flushing.set(Boolean.FALSE);
+    }
   }
 }
