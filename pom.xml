@@ -85,6 +85,7 @@
   <modules>
     <module>jetty9-base</module>
     <module>jetty9</module>
+    <module>tests</module>
   </modules>
 
   <dependencyManagement>
