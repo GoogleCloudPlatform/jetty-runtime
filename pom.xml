@@ -137,7 +137,7 @@
           <version>2.10</version>
         </plugin>
 
-	<plugin>
+	    <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-resources-plugin</artifactId>
           <version>3.0.1</version>
@@ -280,6 +280,12 @@
   </build>
 
   <profiles>
+    <profile>
+      <id>test</id>
+      <modules>
+        <module>tests</module>
+      </modules>
+    </profile>
     <profile>
       <id>sonatype-oss-release</id>
       <build>
