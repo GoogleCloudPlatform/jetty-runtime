@@ -46,11 +46,22 @@
             <phase>package</phase>
             <configuration>
               <target>
-                <unjar src="${project.build.directory}/${project.build.finalName}.war"                       dest="${project.build.directory}/docker/root"/>
+                <unjar src="${project.build.directory}/${project.build.finalName}.war"
+                       dest="${project.build.directory}/docker/root"/>
               </target>
             </configuration>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.19.1</version>
+        <configuration>
+          <excludes>
+            <exclude>**/*IntegrationTest.java</exclude>
+          </excludes>
+        </configuration>
       </plugin>
     </plugins>
   </build>
@@ -85,7 +96,7 @@
             <version>2.19.1</version>
             <configuration>
               <systemPropertyVariables>
-                <test.port>${local.test.port}</test.port>
+                <app.deploy.port>${app.deploy.port}</app.deploy.port>
               </systemPropertyVariables>
             </configuration>
             <executions>
@@ -105,7 +116,7 @@
                   <alias>test-war-hello</alias>
                   <run>
                     <ports>
-                      <port>${local.test.port}:8080</port>
+                      <port>${app.deploy.port}:8080</port>
                     </ports>
                   </run>
                 </image>
@@ -158,6 +169,24 @@
                   </target>
                 </configuration>
               </execution>
+              <execution>
+                <id>cleanup-integration-test</id>
+                <phase>post-integration-test</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <target>
+                    <exec executable="gcloud">
+                      <arg value="--quiet"/>
+                      <arg value="app"/>
+                      <arg value="versions"/>
+                      <arg value="delete"/>
+                      <arg value="${maven.build.timestamp}"/>
+                    </exec>
+                  </target>
+                </configuration>
+              </execution>
             </executions>
           </plugin>
           <plugin>
@@ -175,31 +204,6 @@
                   <files>
                     <file>${gcloud-projectId-file}</file>
                   </files>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-antrun-plugin</artifactId>
-            <version>1.8</version>
-            <executions>
-              <execution>
-                <id>cleanup-integration-test</id>
-                <phase>post-integration-test</phase>
-                <goals>
-                  <goal>run</goal>
-                </goals>
-                <configuration>
-                  <target>
-                    <exec executable="gcloud">
-                      <arg value="--quiet"/>
-                      <arg value="app"/>
-                      <arg value="versions"/>
-                      <arg value="delete"/>
-                      <arg value="${maven.build.timestamp}"/>
-                    </exec>
-                  </target>
                 </configuration>
               </execution>
             </executions>

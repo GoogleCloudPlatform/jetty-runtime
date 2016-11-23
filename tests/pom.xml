@@ -9,9 +9,10 @@
   </parent>
   <groupId>com.google.cloud.runtimes.tests</groupId>
   <artifactId>tests-parent</artifactId>
+  <name>Jetty Runtime :: Tests :: Parent</name>
   <packaging>pom</packaging>
   <properties>
-    <checkstyle.skip>true</checkstyle.skip>
+    <checkstyle.skip>false</checkstyle.skip>
   </properties>
   <modules>
     <module>gcloud-testing-core</module>
@@ -67,7 +68,7 @@
             <configuration>
               <skipTests>false</skipTests>
               <includes>
-                <include>%regex[.*LocalITCase.*]</include>
+                <include>%regex[.*LocalIntegrationTest.*]</include>
               </includes>
             </configuration>
           </plugin>
@@ -89,7 +90,7 @@
             <configuration>
               <skipTests>false</skipTests>
               <includes>
-                <include>%regex[.*RemoteITCase.*]</include>
+                <include>%regex[.*RemoteIntegrationTest.*]</include>
               </includes>
             </configuration>
           </plugin>
