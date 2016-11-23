@@ -8,8 +8,8 @@ DEFAULT_ARGS="-Djetty.base=$JETTY_BASE -jar $JETTY_HOME/start.jar"
 WEBAPP_WAR=$JETTY_BASE/webapps/root.war
 WEBAPP_ROOT=$JETTY_BASE/webapps/root
 if [ -e "$WEBAPP_WAR" ]; then
-  # Unpack it only if $WEBAPP_ROOT doesn't exist or empty.
-  if [ ! -e "$WEBAPP_ROOT" -o ! "$( ls -A $WEBAPP_ROOT )" ]; then
+  # Unpack it only if $WEBAPP_ROOT doesn't exist or the root is older than the war.
+  if [ -e "$WEBAPP_WAR" -a \( \( ! -e "$WEBAPP_ROOT" \) -o \( "$WEBAPP_ROOT" -ot "$WEBAPP_WAR" \) \) ]; then
     unzip $WEBAPP_WAR -d $WEBAPP_ROOT
     chown -R jetty.jetty $WEBAPP_ROOT
   fi
