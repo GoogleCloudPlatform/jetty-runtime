@@ -58,34 +58,43 @@ Test cases are logically combined into a single deployable that may or may not b
 The test-war-hello module is a simple example for how local and remote testings can be laid out.
 
 Requirements:
+====
+
 * local docker installation
 * gcloud installation
-* ‘beta’ component required
+* *beta* component required
 * remote tests require proper gcloud authentication configured
-** <list required permissions>
+  * _list required permissions_
 
 Conventions:
+====
+
 * testing is disabled by default, activated via -Plocal or -Premote
 * local and remote testing should be mutually exclusive
 * local integration tests end in ‘LocalITCase’
 * remote integration tests end in ‘RemoteITCase’
 
-Properties
+Properties:
+====
+
 * Both: jetty.test.image is the name in the FROM line in the Dockerfile
 * Local: app.deploy.port is the localhost port used for http
 * Remote: app.deploy.project is the configured gcloud project id
 * Remote: app.deploy.version is the version used on deploy
 
 Local Test Process:
-* -Plocal enables failsafe-maven-plugin processing of ‘LocalITCase’ tests
-* com.spotify:docker-maven-plugin builds target container based on value of ‘jetty.test.image’
+====
+* -Plocal enables failsafe-maven-plugin processing of *LocalITCase* tests
+* com.spotify:docker-maven-plugin builds target container based on value of *jetty.test.image*
 * io.fabric8:docker-maven-plugin starts the target container in pre-integration-test phase
-**  random local port mapped to 8080 of container and available to test case as system property ‘app.deploy.port’
+  * random local port mapped to 8080 of container and available to test case as system property *app.deploy.port*
 * failsafe-maven-plugin runs in integration-test phase
 * io.fabric8:docker-maven-plugin stops the target container in  post-integration-test phase
 
 Remote Test Process:
-* -Premote enables failsafe-maven-plugin process of ‘RemoteITCase’ tests
+====
+
+* -Premote enables failsafe-maven-plugin process of *RemoteITCase* tests
 * maven-antrun-plugin runs to find the gcloud project id and place in properties file
 * properties-maven-plugin runs to load properties file
 * appengine-maven-plugin runs to build and deploy target application
