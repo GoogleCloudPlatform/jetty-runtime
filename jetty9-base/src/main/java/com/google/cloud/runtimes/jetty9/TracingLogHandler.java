@@ -17,6 +17,7 @@ package com.google.cloud.runtimes.jetty9;
 import static com.google.common.base.MoreObjects.firstNonNull;
 
 import com.google.cloud.MonitoredResource;
+import com.google.cloud.logging.AsyncLoggingHandler;
 import com.google.cloud.logging.LogEntry.Builder;
 import com.google.cloud.logging.LoggingOptions;
 
@@ -31,6 +32,8 @@ import java.util.logging.LogRecord;
 public class TracingLogHandler extends AsyncLoggingHandler {
 
   private final ThreadLocal<Boolean> flushing = new ThreadLocal<>();
+  private final MonitoredResource monitored;
+  private final String instanceid;
   
   /**
    * Construct a TracingLogHandler for "jetty.log"
@@ -41,6 +44,16 @@ public class TracingLogHandler extends AsyncLoggingHandler {
         "jetty.log"), null, null);
   }
 
+  public TracingLogHandler(String logName, LoggingOptions options, MonitoredResource resource) {
+    super(logName, options, resource);
+    monitored = MonitoredResource.newBuilder("gae_app")
+        .addLabel("project_id", System.getenv("GCLOUD_PROJECT"))
+        .addLabel("module_id", System.getenv("GAE_SERVICE"))
+        .addLabel("version_id", System.getenv("GAE_VERSION"))
+        .build();
+    instanceid = System.getenv("GAE_INSTANCE");
+  }
+
   @Override
   public synchronized void publish(LogRecord record) {
     // check we are not already flushing logs
@@ -49,15 +62,12 @@ public class TracingLogHandler extends AsyncLoggingHandler {
     }
     super.publish(record);
   }
-  
-  public TracingLogHandler(String logName, LoggingOptions options, MonitoredResource resource) {
-    super(logName, options, resource);
-  }
 
   @Override
   protected void enhanceLogEntry(Builder builder, LogRecord record) {
     super.enhanceLogEntry(builder, record);
     String traceid = RequestContextScope.getCurrentTraceid();
+    builder.setResource(monitored);
     if (traceid != null) {
       builder.addLabel("traceid", traceid);
     } else {
@@ -68,6 +78,9 @@ public class TracingLogHandler extends AsyncLoggingHandler {
         builder.addLabel("http-uri", request.getOriginalURI());
         builder.addLabel("http-remote-addr", request.getRemoteAddr());
       }
+    }
+    if (instanceid != null) {
+      builder.addLabel("instanceid", instanceid);
     }
   }
 

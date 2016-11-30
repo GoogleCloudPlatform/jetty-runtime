@@ -34,7 +34,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <maven.build.timestamp.format>yyyy-MM-dd_HH_mm</maven.build.timestamp.format>
     <appengine.api.version>1.9.40</appengine.api.version>
-    <gcloud.api.version>0.5.1</gcloud.api.version>
+    <gcloud.api.version>0.7.0</gcloud.api.version>
     <jetty9.minor.version>4</jetty9.minor.version>
     <jetty9.dot.version>0</jetty9.dot.version>
     <jetty9.version>9.${jetty9.minor.version}.${jetty9.dot.version}.RC2</jetty9.version>
