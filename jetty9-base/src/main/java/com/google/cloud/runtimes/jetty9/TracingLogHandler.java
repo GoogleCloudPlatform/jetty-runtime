@@ -44,6 +44,13 @@ public class TracingLogHandler extends AsyncLoggingHandler {
         "jetty.log"), null, null);
   }
 
+  /** 
+   * Construct a TracingLogHandler.
+   * 
+   * @param logName Name of the log
+   * @param options LoggingOptions to access Google cloud API
+   * @param resource The resource to log against
+   */
   public TracingLogHandler(String logName, LoggingOptions options, MonitoredResource resource) {
     super(logName, options, resource);
     monitored = MonitoredResource.newBuilder("gae_app")
@@ -69,7 +76,7 @@ public class TracingLogHandler extends AsyncLoggingHandler {
     String traceid = RequestContextScope.getCurrentTraceid();
     builder.setResource(monitored);
     if (traceid != null) {
-      builder.addLabel("traceid", traceid);
+      builder.addLabel("appengine.googleapis.com/trace_id", traceid);
     } else {
       Request request = RequestContextScope.getCurrentRequest();
       if (request != null) {
@@ -80,7 +87,7 @@ public class TracingLogHandler extends AsyncLoggingHandler {
       }
     }
     if (instanceid != null) {
-      builder.addLabel("instanceid", instanceid);
+      builder.addLabel("appengine.googleapis.com/instance_name", instanceid);
     }
   }
 
