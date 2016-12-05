@@ -142,7 +142,7 @@
             <argument>-jar</argument>
             <argument>../jetty-distribution-${jetty9.version}/start.jar</argument>
             <argument>--create-startd</argument>
-            <argument>--add-to-start=http,deploy,jsp,jstl,http-forwarded,resources,gae,gcloud,jcl-slf4j,logging-jul</argument>
+            <argument>--add-to-start=server,http,deploy,jsp,jstl,http-forwarded,resources,gae,gcloud,jcl-slf4j,logging-jul</argument>
             <argument>--approve-all-licenses</argument>
           </arguments>
         </configuration>

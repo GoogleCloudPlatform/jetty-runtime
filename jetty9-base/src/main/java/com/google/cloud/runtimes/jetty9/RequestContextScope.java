@@ -17,17 +17,25 @@ package com.google.cloud.runtimes.jetty9;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.ContextHandler.Context;
+import org.eclipse.jetty.server.handler.ContextHandler.ContextScopeListener;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * A Jetty {@link ContextScopeListener} that is called whenever
+ * a container managed thread enters or exits the scope of a context and/or request.
+ * Used to maintain {@link ThreadLocal} references to the current request and 
+ * Google traceID, primarily for logging.
+ * @see TracingLogHandler
+ */
 public class RequestContextScope implements ContextHandler.ContextScopeListener {
   static final Logger logger = Logger.getLogger(RequestContextScope.class.getName());
 
   private static final String X_CLOUD_TRACE = "x-cloud-trace-context";
-  private static final ThreadLocal<String> traceid = new ThreadLocal<>();
+  private static final ThreadLocal<String> traceId = new ThreadLocal<>();
   private static final ThreadLocal<Deque<Request>> requestStack = 
       new ThreadLocal<Deque<Request>>() {
     @Override
@@ -52,7 +60,7 @@ public class RequestContextScope implements ContextHandler.ContextScopeListener 
             request.setAttribute(X_CLOUD_TRACE, id);
           }
         }
-        traceid.set(id);
+        traceId.set(id);
       }
       stack.push(request);
     }
@@ -70,26 +78,12 @@ public class RequestContextScope implements ContextHandler.ContextScopeListener 
       requestStack.get().pop();
     }
   }
-
-  /** Run a Runnable in the scope of a traceid.
-   * @param traceid The trace ID
-   * @param runnable the runnable
-   */
-  public static void runWith(String traceid, Runnable runnable) {
-    String original = RequestContextScope.traceid.get();
-    RequestContextScope.traceid.set(traceid);
-    try {
-      runnable.run();
-    } finally {
-      RequestContextScope.traceid.set(original);
-    }
-  }
   
   public static Request getCurrentRequest() {
     return requestStack.get().peek();
   }
 
   public static String getCurrentTraceid() {
-    return traceid.get();
+    return traceId.get();
   }
 }

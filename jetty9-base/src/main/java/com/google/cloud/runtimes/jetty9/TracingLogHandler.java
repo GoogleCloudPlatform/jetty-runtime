@@ -39,12 +39,18 @@ public class TracingLogHandler extends AsyncLoggingHandler {
    * Construct a TracingLogHandler for "jetty.log"
    */
   public TracingLogHandler() {
-    this(firstNonNull(
-        LogManager.getLogManager().getProperty(TracingLogHandler.class.getName() + ".log"),
-        "jetty.log"), null, null);
+    this(
+        firstNonNull(
+            LogManager.getLogManager().getProperty(TracingLogHandler.class.getName() + ".log"),
+            "jetty.log"),
+        null,
+        MonitoredResource.newBuilder("gae_app")
+            .addLabel("project_id", System.getenv("GCLOUD_PROJECT"))
+            .addLabel("module_id", System.getenv("GAE_SERVICE"))
+            .addLabel("version_id", System.getenv("GAE_VERSION")).build());
   }
 
-  /** 
+  /**
    * Construct a TracingLogHandler.
    * 
    * @param logName Name of the log
@@ -53,21 +59,16 @@ public class TracingLogHandler extends AsyncLoggingHandler {
    */
   public TracingLogHandler(String logName, LoggingOptions options, MonitoredResource resource) {
     super(logName, options, resource);
-    monitored = MonitoredResource.newBuilder("gae_app")
-        .addLabel("project_id", System.getenv("GCLOUD_PROJECT"))
-        .addLabel("module_id", System.getenv("GAE_SERVICE"))
-        .addLabel("version_id", System.getenv("GAE_VERSION"))
-        .build();
+    monitored = resource;
     instanceid = System.getenv("GAE_INSTANCE");
   }
 
   @Override
   public synchronized void publish(LogRecord record) {
     // check we are not already flushing logs
-    if (Boolean.TRUE.equals(flushing.get())) {
-      return;
+    if (!Boolean.TRUE.equals(flushing.get())) {
+      super.publish(record);
     }
-    super.publish(record);
   }
 
   @Override
