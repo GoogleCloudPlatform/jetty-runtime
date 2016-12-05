@@ -41,7 +41,7 @@
     <docker.tag.short>${docker.tag.prefix}9.${jetty9.minor.version}</docker.tag.short>
     <docker.tag.long>${docker.tag.prefix}9.${jetty9.minor.version}-${maven.build.timestamp}</docker.tag.long>
 
-    <docker.openjdk.image>gcr.io/google_appengine/openjdk</docker.openjdk.image>
+    <docker.openjdk.image>gcr.io/google_appengine/openjdk:8-2016-12-01_18_57</docker.openjdk.image>
   </properties>
 
   <developers>
