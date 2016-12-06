@@ -34,7 +34,7 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>com.google.cloud.runtimes.jetty.tests</groupId>
+      <groupId>com.google.cloud.runtimes.tests</groupId>
       <artifactId>gcloud-testing-core</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
