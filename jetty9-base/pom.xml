@@ -135,31 +135,8 @@
           <arguments>
             <argument>-jar</argument>
             <argument>../jetty-distribution-${jetty9.version}/start.jar</argument>
-            <argument>--add-to-startd=http,deploy,jsp,jstl,http-forwarded,resources,gae</argument>
+            <argument>--commands=${basedir}/src/main/jetty-config/jetty.commands</argument>
           </arguments>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>com.google.code.maven-replacer-plugin</groupId>
-        <artifactId>maven-replacer-plugin</artifactId>
-        <version>1.3.5</version>
-        <executions>
-            <execution>
-                <id>replaceTokens</id>
-                <phase>pre-integration-test</phase>
-                <goals>
-                    <goal>replace</goal>
-                </goals>
-            </execution>
-        </executions>
-        <configuration>
-            <file>target/jetty-base/start.d/server.ini</file>
-            <replacements>
-                <replacement>
-                    <token># jetty.httpConfig.securePort=8443</token>
-                    <value>jetty.httpConfig.securePort=443</value>
-                </replacement>
-            </replacements>
         </configuration>
       </plugin>
       <plugin>
