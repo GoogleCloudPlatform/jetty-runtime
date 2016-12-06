@@ -34,13 +34,12 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <maven.build.timestamp.format>yyyy-MM-dd_HH_mm</maven.build.timestamp.format>
     <appengine.api.version>1.9.40</appengine.api.version>
-    <jetty9.minor.version>3</jetty9.minor.version>
-    <jetty9.dot.version>8</jetty9.dot.version>
-    <jetty9.version>9.${jetty9.minor.version}.${jetty9.dot.version}.v20160314</jetty9.version>
+    <jetty9.minor.version>4</jetty9.minor.version>
+    <jetty9.dot.version>0</jetty9.dot.version>
+    <jetty9.version>9.${jetty9.minor.version}.${jetty9.dot.version}.RC3</jetty9.version>
     <docker.tag.prefix></docker.tag.prefix>
     <docker.tag.short>${docker.tag.prefix}9.${jetty9.minor.version}</docker.tag.short>
     <docker.tag.long>${docker.tag.prefix}9.${jetty9.minor.version}-${maven.build.timestamp}</docker.tag.long>
-
     <docker.openjdk.image>gcr.io/google_appengine/openjdk:8-2016-12-01_18_57</docker.openjdk.image>
   </properties>
 
