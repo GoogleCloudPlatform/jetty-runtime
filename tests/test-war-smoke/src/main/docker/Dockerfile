@@ -1,2 +1,2 @@
 FROM ${jetty.test.image}
-ADD root /app
+ADD ${project.build.finalName}.war $JETTY_BASE/webapps/root.war
