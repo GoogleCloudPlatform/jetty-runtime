@@ -1,0 +1,12 @@
+--create-startd
+
+--add-to-start=server,webapp,http,deploy,jsp,jstl,http-forwarded,resources,gae
+
+jetty.httpConfig.outputAggregationSize=32768
+jetty.httpConfig.headerCacheSize=512
+jetty.httpConfig.sendServerVersion=true
+jetty.httpConfig.sendDateHeader=false
+
+jetty.server.stopTimeout=30000
+
+jetty.httpConfig.securePort=443

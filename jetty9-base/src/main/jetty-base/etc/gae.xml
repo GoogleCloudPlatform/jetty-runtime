@@ -16,17 +16,7 @@
   -->
 
 <!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure_9_0.dtd">
-
 <Configure id="Server" class="org.eclipse.jetty.server.Server">
-  <!-- =========================================================== -->
-  <!-- Ammend HttpConfig -->
-  <!-- =========================================================== -->
-  <Ref refid="httpConfig">
-    <Set name="headerCacheSize">
-      <Property name="jetty.httpConfig.headerCacheSize" default="512" />
-    </Set>
-  </Ref>
-
   <Ref refid="DeploymentManager">
     <Call name="addLifeCycleBinding">
       <Arg>
@@ -36,8 +26,4 @@
       </Arg>
     </Call>
   </Ref>
-
-  <!-- TODO remove when this has been added to jetty.xml -->
-  <Set name="stopTimeout"><Property name="jetty.server.stopTimeout" default="30000"/></Set>
-
 </Configure>
