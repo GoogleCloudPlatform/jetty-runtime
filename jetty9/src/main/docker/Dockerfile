@@ -35,14 +35,15 @@ RUN mv /usr/local/jetty-distribution-* $JETTY_HOME \
 ENV JETTY_BASE /var/lib/jetty
 ADD jetty-base $JETTY_BASE
 WORKDIR $JETTY_BASE
-RUN java -jar $JETTY_HOME/start.jar --add-to-startd=setuid \
- && chown -R jetty:jetty $JETTY_BASE \
- && mkdir /tmp/jetty && chown -R jetty:jetty /tmp/jetty \
- && ln -s $JETTY_BASE/webapps/root /app
+RUN mkdir webapps /tmp/jetty \
+ && chown -R jetty:jetty /tmp/jetty $JETTY_BASE
 
 # Start Jetty directly
 COPY docker-entrypoint.bash /
 RUN chmod +x /docker-entrypoint.bash
+
+# Use the Jetty USER
+USER jetty
 
 EXPOSE 8080
 CMD ["java","-Djetty.base=/var/lib/jetty","-jar","/usr/local/jetty/start.jar"]
