@@ -135,11 +135,10 @@
           <arguments>
             <argument>-jar</argument>
             <argument>../jetty-distribution-${jetty9.version}/start.jar</argument>
-            <argument>--add-to-startd=http,deploy,jsp,jstl,http-forwarded,resources,gae</argument>
+            <argument>--commands=${basedir}/src/main/jetty-config/jetty.commands</argument>
           </arguments>
         </configuration>
       </plugin>
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
@@ -159,6 +158,8 @@
           <appendAssemblyId>false</appendAssemblyId>
         </configuration>
       </plugin>
+
+
     </plugins>
   </build>
 </project>
