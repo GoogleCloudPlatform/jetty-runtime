@@ -16,7 +16,9 @@ FROM ${docker.openjdk.image}
 
 # create jetty group and user
 RUN groupadd -r jetty \
- && useradd -r -g jetty jetty
+ && useradd -r -g jetty jetty \
+ && apt-get -q update \
+ && apt-get -y -q --no-install-recommends install sudo 
 
 # Create env vars to identify image
 ENV JETTY_VERSION ${jetty9.version}
@@ -41,9 +43,6 @@ RUN mkdir webapps /tmp/jetty \
 # Start Jetty directly
 COPY docker-entrypoint.bash /
 RUN chmod +x /docker-entrypoint.bash
-
-# Use the Jetty USER
-USER jetty
 
 EXPOSE 8080
 CMD ["java","-Djetty.base=/var/lib/jetty","-jar","/usr/local/jetty/start.jar"]
