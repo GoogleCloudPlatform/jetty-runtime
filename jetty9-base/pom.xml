@@ -26,7 +26,7 @@
   </parent>
   <name>Google App Engine Image Jetty (jetty9-base)</name>
   <artifactId>jetty9-base</artifactId>
-  <packaging>pom</packaging>
+  <packaging>jar</packaging>
 
   <dependencies>
     <dependency>
@@ -40,6 +40,13 @@
 
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <outputDirectory>${project.build.directory}/jetty-base/lib/gae</outputDirectory>
+        </configuration>
+      </plugin>
       <plugin>
         <artifactId>maven-resources-plugin</artifactId>
         <executions>
