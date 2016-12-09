@@ -18,7 +18,9 @@ FROM ${docker.openjdk.image}
 RUN groupadd -r jetty \
  && useradd -r -g jetty jetty \
  && apt-get -q update \
- && apt-get -y -q --no-install-recommends install sudo 
+ && apt-get -y -q --no-install-recommends install sudo \
+ && apt-get clean \
+ && rm /var/lib/apt/lists/*_*
 
 # Create env vars to identify image
 ENV JETTY_VERSION ${jetty9.version}
