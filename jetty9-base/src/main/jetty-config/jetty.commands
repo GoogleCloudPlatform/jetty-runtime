@@ -10,3 +10,5 @@ jetty.httpConfig.sendDateHeader=false
 jetty.server.stopTimeout=30000
 
 jetty.httpConfig.securePort=443
+
+jetty.deploy.scanInterval=0
