@@ -1,12 +1,8 @@
 package com.google.cloud.runtime.jetty.testing;
 
-import org.eclipse.jetty.toolchain.test.IO;
-import org.junit.Assert;
+import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -50,7 +46,7 @@ public final class HttpUrlUtil {
           waiting = false;
         }
       } catch (MalformedURLException e) {
-        Assert.fail("Invalid URI: " + uri.toString());
+        throw new IllegalArgumentException("Invalid URI: " + uri.toString());
       } catch (IOException e) {
         log.log(Level.FINEST, "Ignoring IOException", e);
       } catch (InterruptedException ignore) {
@@ -95,11 +91,6 @@ public final class HttpUrlUtil {
       responseEncoding = Charset.forName(http.getContentEncoding());
     }
 
-    try (InputStream in = http.getInputStream();
-        InputStreamReader reader = new InputStreamReader(in, responseEncoding);
-        StringWriter writer = new StringWriter()) {
-      IO.copy(reader, writer);
-      return writer.toString();
-    }
+    return IOUtils.toString(http.getInputStream(), responseEncoding);
   }
 }

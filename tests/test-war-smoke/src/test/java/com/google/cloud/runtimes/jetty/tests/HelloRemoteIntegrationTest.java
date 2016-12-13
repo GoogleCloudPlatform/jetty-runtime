@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 public class HelloRemoteIntegrationTest extends AbstractHelloIntegrationTest {
+
   @BeforeClass
   public static void isServerUp() {
     HttpUrlUtil.waitForServerUp(AppDeployment.SERVER_URI, 5, TimeUnit.MINUTES);
