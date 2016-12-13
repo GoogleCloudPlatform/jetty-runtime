@@ -26,4 +26,9 @@
       </Arg>
     </Call>
   </Ref>
+  <Call name="addLifeCycleListener">
+    <Arg>
+      <New class="com.google.cloud.runtimes.jetty9.DeploymentCheck"/>
+    </Arg>
+  </Call>
 </Configure>
