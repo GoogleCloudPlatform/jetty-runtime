@@ -273,6 +273,12 @@
 
   <profiles>
     <profile>
+      <id>tests</id>
+      <modules>
+        <module>tests</module>
+      </modules>
+    </profile>
+    <profile>
       <id>sonatype-oss-release</id>
       <build>
         <plugins>
