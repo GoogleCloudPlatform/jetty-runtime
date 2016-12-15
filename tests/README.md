@@ -1,7 +1,7 @@
 Jetty Testing Design
 ==
 
-The goal of testing in the context of the vanilla runtime is to provide an extensible framework with two modes, one for local testing and validation of an application and one for remote testing which deploys applications as services into the GCE.  Tests are not a part of the normal build process, they are a separate process with both local and remote components.  Additionally tests are conceptually disconnected from the actual build of the jetty-runtime project and should be considered as something that can pulled into their own github repository with minimal changes required to the core jetty-runtime build or project.
+The goal of testing in the context of the vanilla runtime is to provide an extensible framework with two modes, one for local testing and validation of an application and one for remote testing which deploys applications as services into the GCE.  Tests are not a part of the normal build process, they are a separate process with both local and remote components.  Additionally tests are effectively disconnected from the actual build of the jetty-runtime project and should be considered as something that can be pulled into their own github repository with minimal changes required to the core jetty-runtime build or project.
 
 
 Execution Examples:
@@ -13,49 +13,67 @@ Below are a series of commands and their expected behaviors.
 Standard Execution
 ====
 
+At the top level of the project.
+
 ```
 > mvn install
 ```
 
+This will run a normal build cycle for the jetty-runtime project.  No tests are expected to run during this step.  The docker image being built will be available to use in later local testing steps.  To see what tags are available use the following docker command:
 
-This should run the normal build cycle for the jetty-runtime project.  No tests are expected to run during this step.  The docker image being built should be installed locally minimally to the tag jetty:9.4 (or the appropriate version).
+```
+> docker images
+REPOSITORY                        TAG                        IMAGE ID            CREATED             SIZE
+jetty                             9.4                        b6cbab53c076        47 hours ago        359.2 MB
+jetty                             9.4-2016-12-13_17_02       b6cbab53c076        47 hours ago        359.2 MB
+jetty                             latest                     b6cbab53c076        47 hours ago        359.2 MB
+```
 
+In order to make these images available for remote testing you can use the following commands:
 
 ```
 > docker tag jetty:9.4 gcr.io/{project}/jetty9:9.4
 > gcloud docker push gcr.io/{project}/jetty9:9.4 
 ```
 
-This will build the relevant artifacts and additionally deploy them to minimally gcr.io/{project}/jetty9:9.4 (or the appropriate version).
+This will take the local artifacts and make them available for remote testing (or general usage for the given {project}).
 
 
 Test Executions
 ====
 
-All tests are located under a /tests directory in the jetty-runtime project.  Each group of tests should exist within the scope of a single maven artifact which contains a deployable docker container (local, remote, or both) and the associated test cases which follow the conventions listed below.
+All tests are located under a /tests directory in the jetty-runtime project.  Each group of tests should exist within the scope of a single maven artifact which contains a deployable docker container (local, remote, or both) and the associated test cases which follow the conventions listed further below.
 
-> NOTE: The property ‘jetty.test.image’ will be passed in which is analogous to the FROM Docker directive.  This serves as an effective disconnect between the jetty-runtime project and the specific docker image/tag that the respective tests will be run against.
+> NOTE: The property ‘jetty.test.image’ being passed is analogous to the FROM Docker directive.  This serves as an effective disconnect between the jetty-runtime project and the specific docker image/tag that the respective tests will be run against.  It is absolutely possible to run tests under the /tests directory against an arbitrary image.  It is up to the user to ensure they are testing from a valid container image.
 
-```
-> cd tests;
-> mvn install -Premote -Djetty.test.image=gcr.io/{project}/jetty9:9.4
-```
+Local Testing
+=====
 
-This will activate a profile and enable remote testing. For each test artifact the appengine-maven-plugin will be used to deploy an instance of the application and the appropriate test cases will be run.  The webapps that will be built will be done through the cloud builder mechanism so the image to be tested (as linked in the jetty.test.image property) will need to be deployed to the appropriate gcr.io location.
+From the jetty-runtime/tests directory:
 
 ```
-> cd tests;
 > mvn install -Plocal -Djetty.test.image=jetty:9.4
 ```
 
-This will activate a profile and enable local testing.  The tests activated under this profile will make use of the locally installed image and tag.  The docker-maven-plugin is used to build the test docker container and the io.fabric8 plugin is used to manage the integration test lifecycle..  Local tests have a much smaller scope as they are not able to make use of many of the features of the jetty-runtime project.
+This will activate the 'local' profile and enable testing.  The tests activated under this profile will make use of the locally installed image and tag referenced in the jetty.test.image property.  The spotify docker-maven-plugin is used to build the test docker container and the io.fabric8 docker plugin is used to manage the integration test lifecycle. Local tests may have a smaller scope as they are not intended to the complete Google Flex environment.  Local testing is intended to test and validate configuration of Jetty and basic environment. 
+
+Remote Testing
+=====
+
+Again from the jetty-runtime/tests directory:
+
+```
+> mvn install -Premote -Djetty.test.image=gcr.io/{project}/jetty9:9.4
+```
+
+This will activate the remote profile and enable testing. Under this scenario, for each test artifact the appengine-maven-plugin is used to deploy an instance of the application to the Google Flex environment and then run appropriate test cases.  The containers for each webapp will be built through using the cloud builder mechanism.  This means the image to be tested (as referenced in the jetty.test.image property) will need to be deployed to the appropriate gcr.io location.  Remote testing can make use of the entire scope of services available to Google Flex.  
 
 
-Building Test Cases
+
+Test Case Requirements and Conventions
 ===
 
-Test cases are logically combined into a single deployable that may or may not be appropriate for remote and local testing.  Where possible the test source should minimize code duplication and convenient utility classes should be located in the ‘gcloud-testing-core’ artifact.  Additionally, the overarching goal is to test live integrations with Google services locally to validate proper container behaviors within the scope of the docker container itself.
-
+Both local and remote test cases are logically combined into a single deployable container that may or may not be appropriate for remote and local testing.  Where possible the test source should minimize code duplication and convenient utility classes should be located in the ‘gcloud-testing-core’ artifact.
 
 The test-war-smoke module is a simple example for how local and remote testings can be laid out.
 
@@ -63,7 +81,7 @@ Requirements:
 ====
 
 * local docker installation
-* local gcloud installation (gcloud init)
+* local gcloud installation configured with authenticated user and project
 
 
 Conventions:
@@ -102,3 +120,17 @@ Remote Test Process:
 * maven-antrun-plugin used to delete the test version of the application from remote service
 
 
+Developing Tests
+===
+
+Writing test cases is fairly straight forward.  The server portion of a test case is created as a standard webapp and the actual test portion is typically comprised of querying the running server and validating output.  Simple environment tests can be handled entirely within the response from a servlet or filter.  More complex tests like validating logging configuration or session management features may require additional dependencies and more complex configuration and teardown.
+
+To interact with a local test under development the following docker command may be useful:
+
+```
+> cd tests/test-war-smoke
+> mvn install
+> docker run --rm -it -p 8088:8080 test-war-smoke:latest
+```
+
+This will deploy the test-war-smoke container and you will be able to query the service with your browser by nagivating to (http://localhost:8088/).
