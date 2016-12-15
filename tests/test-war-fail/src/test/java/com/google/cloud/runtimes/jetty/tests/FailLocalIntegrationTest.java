@@ -6,6 +6,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Objects;
@@ -26,7 +27,7 @@ public class FailLocalIntegrationTest extends AbstractFailIntegrationTest {
 
     testUri = new URI("http://localhost:" + testPort);
 
-    HttpUrlUtil.waitForServerUp(testUri, 10000, TimeUnit.MILLISECONDS);
+    HttpUrlUtil.waitForServerUp(testUri, 5000, TimeUnit.MILLISECONDS);
   }
 
   @Test
