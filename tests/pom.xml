@@ -33,6 +33,7 @@
   <modules>
     <module>gcloud-testing-core</module>
     <module>test-war-smoke</module>
+    <module>test-war-fail</module>
   </modules>
   <build>
     <pluginManagement>
