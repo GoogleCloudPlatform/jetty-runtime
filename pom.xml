@@ -39,7 +39,7 @@
     <docker.tag.prefix></docker.tag.prefix>
     <docker.tag.short>${docker.tag.prefix}9.${jetty9.minor.version}</docker.tag.short>
     <docker.tag.long>${docker.tag.prefix}9.${jetty9.minor.version}-${maven.build.timestamp}</docker.tag.long>
-    <docker.openjdk.image>gcr.io/google_appengine/openjdk:8-2016-12-08_19_56</docker.openjdk.image>
+    <docker.openjdk.image>gcr.io/google-appengine/openjdk:8-2016-12-08_19_56</docker.openjdk.image>
   </properties>
 
   <developers>
@@ -129,7 +129,7 @@
           <version>2.10</version>
         </plugin>
 
-	<plugin>
+	    <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-resources-plugin</artifactId>
           <version>3.0.1</version>
@@ -286,6 +286,9 @@
   <profiles>
     <profile>
       <id>tests</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
       <modules>
         <module>tests</module>
       </modules>
