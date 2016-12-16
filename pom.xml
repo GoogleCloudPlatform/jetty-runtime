@@ -243,6 +243,16 @@
               <includeTestSourceDirectory>true</includeTestSourceDirectory>
             </configuration>
           </execution>
+          <execution>
+            <id>header-check</id>
+            <goals>
+              <goal>check</goal>
+            </goals>
+            <configuration>
+              <configLocation>checkstyle/checkstyle-header.xml</configLocation>
+              <headerLocation>checkstyle/header-java.txt</headerLocation>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
       <plugin>
