@@ -14,35 +14,28 @@
 
 FROM ${docker.openjdk.image}
 
-# create jetty group and user
-RUN groupadd -r jetty \
- && useradd -r -g jetty jetty
-
 # Create env vars to identify image
 ENV JETTY_VERSION ${jetty9.version}
 ENV GAE_IMAGE_NAME jetty
 ENV GAE_IMAGE_LABEL ${docker.tag.long}
 
 # Create Jetty Home
-ENV JETTY_HOME /usr/local/jetty
+ENV JETTY_HOME ${jetty.home}
 ENV PATH $JETTY_HOME/bin:$PATH
 ENV TMPDIR /tmp/jetty
-ADD jetty-distribution.tar.gz /usr/local/
-RUN mv /usr/local/jetty-distribution-* $JETTY_HOME \
- && chown -R jetty:jetty $JETTY_HOME
+RUN mkdir $TMPDIR
+ADD jetty-distribution.tar.gz $JETTY_HOME/..
 
 # Create Jetty Base
-ENV JETTY_BASE /var/lib/jetty
+ENV JETTY_BASE ${jetty.base}
 ADD jetty-base $JETTY_BASE
 WORKDIR $JETTY_BASE
-RUN java -jar $JETTY_HOME/start.jar --create-startd --add-to-start=setuid \
- && chown -R jetty:jetty $JETTY_BASE \
- && mkdir /tmp/jetty && chown -R jetty:jetty /tmp/jetty \
- && ln -s $JETTY_BASE/webapps/root /app
 
 # Start Jetty directly
 COPY docker-entrypoint.bash /
-RUN chmod +x /docker-entrypoint.bash
+RUN chmod +rx /docker-entrypoint.bash
+ENTRYPOINT ["/docker-entrypoint.bash"]
 
 EXPOSE 8080
-CMD ["java","-Djetty.base=/var/lib/jetty","-jar","/usr/local/jetty/start.jar"]
+
+CMD ["java","-Djetty.base=${jetty.base}","-jar","${jetty.home}/start.jar"]
