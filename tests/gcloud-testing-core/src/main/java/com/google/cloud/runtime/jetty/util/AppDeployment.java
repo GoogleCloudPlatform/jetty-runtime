@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.cloud.runtime.jetty.testing;
+package com.google.cloud.runtime.jetty.util;
 
 import org.eclipse.jetty.toolchain.test.MavenTestingUtils;
 import org.yaml.snakeyaml.Yaml;

@@ -14,22 +14,16 @@
  * limitations under the License.
  */
 
-package com.google.cloud.runtimes.jetty.tests;
+package com.google.cloud.runtimes.jetty.test.smoke;
+
+import org.junit.Test;
 
 import java.io.IOException;
 
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+public class JspLocalIntegrationTest extends AbstractJspIntegrationTest {
 
-@WebServlet(urlPatterns = {"/hello/*"})
-public class HelloServlet extends HttpServlet {
-  @Override
-  protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-      throws ServletException, IOException {
-    resp.setContentType("text/plain");
-    resp.getWriter().println("Hello from Servlet 3.1");
+  @Test
+  public void testJspEnvironment() throws IOException {
+    assertTestJspEnvironment(getLocalUri().resolve("/jsp/dump.jsp?foo=bar"));
   }
 }

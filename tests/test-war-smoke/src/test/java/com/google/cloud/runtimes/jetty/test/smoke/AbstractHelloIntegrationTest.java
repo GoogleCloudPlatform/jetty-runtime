@@ -14,19 +14,20 @@
  * limitations under the License.
  */
 
-package com.google.cloud.runtimes.jetty.tests;
+package com.google.cloud.runtimes.jetty.test.smoke;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-import com.google.cloud.runtime.jetty.testing.HttpUrlUtil;
+import com.google.cloud.runtime.jetty.test.AbstractIntegrationTest;
+import com.google.cloud.runtime.jetty.util.HttpUrlUtil;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
 
-public abstract class AbstractHelloIntegrationTest {
+public abstract class AbstractHelloIntegrationTest extends AbstractIntegrationTest {
 
   public abstract void testGetHello() throws IOException;
 
