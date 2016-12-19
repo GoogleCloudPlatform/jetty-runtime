@@ -28,19 +28,30 @@ import java.util.concurrent.TimeUnit;
 public class AbstractIntegrationTest {
 
   private static URI localUri;
-  private static int localWait = 10; // seconds
+  private static int LOCAL_TIMEOUT_SECONDS = 10; // seconds
   private static URI remoteUri;
-  private static int remoteWait = 300; // seconds
+  private static int REMOTE_TIMEOUT_SECONDS = 300; // seconds
 
 
-  public URI getLocalUri() {
-    return localUri;
+  /**
+   * Get the URI to test with
+   * @return
+   */
+  public URI getUri() {
+    if (localUri != null) {
+      return localUri;
+    }
+    else {
+      return remoteUri;
+    }
   }
 
-  public URI getRemoteUri() {
-    return remoteUri;
-  }
-
+  /**
+   * Waits for the server to start which needs to be completed for unit
+   * tests to run.
+   *
+   * @throws Exception
+   */
   @BeforeClass
   public static void waitForServerUp() throws Exception {
 
@@ -56,7 +67,7 @@ public class AbstractIntegrationTest {
       localUri = new URI("http://localhost:" + testPort);
       Assert.assertNotNull("local uri required", localUri);
 
-      HttpUrlUtil.waitForServerUp(localUri, localWait, TimeUnit.SECONDS);
+      HttpUrlUtil.waitForServerUp(localUri, LOCAL_TIMEOUT_SECONDS, TimeUnit.SECONDS);
     }
 
     // Remote wait for
@@ -64,7 +75,7 @@ public class AbstractIntegrationTest {
       remoteUri = AppDeployment.SERVER_URI;
       Assert.assertNotNull("remote uri required", remoteUri);
 
-      HttpUrlUtil.waitForServerUp(remoteUri, remoteWait, TimeUnit.SECONDS);
+      HttpUrlUtil.waitForServerUp(remoteUri, REMOTE_TIMEOUT_SECONDS, TimeUnit.SECONDS);
     }
   }
 }

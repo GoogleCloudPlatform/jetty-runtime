@@ -21,26 +21,34 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import com.google.cloud.runtime.jetty.test.AbstractIntegrationTest;
+import com.google.cloud.runtime.jetty.test.ContainerRunner;
+import com.google.cloud.runtime.jetty.test.annotation.Local;
+import com.google.cloud.runtime.jetty.test.annotation.Remote;
 import com.google.cloud.runtime.jetty.util.HttpUrlUtil;
 
 import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.util.Properties;
 
-public abstract class AbstractJspIntegrationTest extends AbstractIntegrationTest {
-
-  public abstract void testJspEnvironment() throws IOException;
+@RunWith(ContainerRunner.class)
+public class JspIntegrationTest extends AbstractIntegrationTest {
 
   /**
    * Simple test validating the JSP environment.
    *
-   * @param target  assembled URI to run test against
    * @throws IOException test in error
    */
-  public void assertTestJspEnvironment(URI target) throws IOException {
+  @Test
+  @Local
+  @Remote
+  public void testJspEnvironment() throws IOException {
+
+    URI target = getUri().resolve("/jsp/dump.jsp?foo=bar");
 
     assertThat(target.getPath(), containsString("/jsp/dump.jsp"));
 

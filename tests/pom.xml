@@ -50,6 +50,9 @@
           </dependencies>
           <configuration>
             <skipTests>true</skipTests>
+            <includes>
+              <include>%regex[.*IntegrationTest.*]</include>
+            </includes>
           </configuration>
         </plugin>
       </plugins>
@@ -85,9 +88,9 @@
             <version>2.19.1</version>
             <configuration>
               <skipTests>false</skipTests>
-              <includes>
-                <include>%regex[.*LocalIntegrationTest.*]</include>
-              </includes>
+              <systemPropertyVariables>
+                <test.local>true</test.local>
+              </systemPropertyVariables>
             </configuration>
           </plugin>
         </plugins>
@@ -108,9 +111,9 @@
             <version>2.19.1</version>
             <configuration>
               <skipTests>false</skipTests>
-              <includes>
-                <include>%regex[.*RemoteIntegrationTest.*]</include>
-              </includes>
+              <systemPropertyVariables>
+                <test.remote>true</test.remote>
+              </systemPropertyVariables>
             </configuration>
           </plugin>
         </plugins>

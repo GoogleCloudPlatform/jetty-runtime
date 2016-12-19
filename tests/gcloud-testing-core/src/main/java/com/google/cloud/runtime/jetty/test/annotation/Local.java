@@ -14,17 +14,19 @@
  * limitations under the License.
  */
 
-package com.google.cloud.runtimes.jetty.test.smoke;
+package com.google.cloud.runtime.jetty.test.annotation;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import org.junit.Test;
-
-import java.io.IOException;
-
-public class HelloLocalIntegrationTest extends AbstractHelloIntegrationTest {
-
-  @Test
-  public void testGetHello() throws IOException {
-    assertTestGet(getLocalUri().resolve("/hello"));
-  }
+/**
+ * Indicates a test method to be run locally.
+ */
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface Local {
+    /* do nothing */
 }
+

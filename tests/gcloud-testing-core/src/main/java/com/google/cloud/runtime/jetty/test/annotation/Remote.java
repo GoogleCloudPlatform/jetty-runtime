@@ -14,17 +14,20 @@
  * limitations under the License.
  */
 
-package com.google.cloud.runtimes.jetty.test.smoke;
+package com.google.cloud.runtime.jetty.test.annotation;
 
-import org.junit.Test;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import java.io.IOException;
-
-public class JspRemoteIntegrationTest extends AbstractJspIntegrationTest {
-
-  @Test
-  public void testJspEnvironment() throws IOException {
-    assertTestJspEnvironment(getRemoteUri().resolve("/jsp/dump.jsp?foo=bar"));
-  }
-
+/**
+ * Indicates a test method to be run remotely.
+ */
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface Remote {
+    /* do nothing */
 }
+
+

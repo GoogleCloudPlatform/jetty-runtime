@@ -21,23 +21,32 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import com.google.cloud.runtime.jetty.test.AbstractIntegrationTest;
+import com.google.cloud.runtime.jetty.test.ContainerRunner;
+import com.google.cloud.runtime.jetty.test.annotation.Local;
+import com.google.cloud.runtime.jetty.test.annotation.Remote;
 import com.google.cloud.runtime.jetty.util.HttpUrlUtil;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
 
-public abstract class AbstractHelloIntegrationTest extends AbstractIntegrationTest {
-
-  public abstract void testGetHello() throws IOException;
+@RunWith(ContainerRunner.class)
+public class HelloIntegrationTest extends AbstractIntegrationTest {
 
   /**
    * Simple test validating a response code and content.
    *
-   * @param target  assembled URI to run test against
    * @throws IOException test in error
    */
-  public void assertTestGet(URI target) throws IOException {
+  @Test
+  @Local
+  @Remote
+  public void testGet() throws IOException {
+
+    URI target = getUri().resolve("/hello");
 
     assertThat(target.getPath(), containsString("/hello"));
 
