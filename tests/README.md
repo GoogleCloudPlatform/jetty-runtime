@@ -19,7 +19,7 @@ At the top level of the project.
 > mvn install
 ```
 
-This will run a normal build cycle for the jetty-runtime project.  No tests are expected to run during this step.  The docker image being built will be available to use in later local testing steps.  To see what tags are available use the following docker command:
+This will run a normal build cycle for the jetty-runtime project.  Only local container tests are expected to run during this step.  The docker image being built will be available to use in later steps.  To see what tags are available use the following docker command:
 
 ```
 > docker images
@@ -55,7 +55,7 @@ From the jetty-runtime/tests directory:
 > mvn install -Plocal -Djetty.test.image=jetty:9.4
 ```
 
-This will activate the 'local' profile and enable testing.  The tests activated under this profile will make use of the locally installed image and tag referenced in the jetty.test.image property.  The spotify docker-maven-plugin is used to build the test docker container and the io.fabric8 docker plugin is used to manage the integration test lifecycle. Local tests may have a smaller scope as they are not intended to the complete Google Flex environment.  Local testing is intended to test and validate configuration of Jetty and basic environment. 
+This will activate the 'local' profile and enable testing.  The tests activated under this profile will make use of the locally installed image and tag referenced in the jetty.test.image property, which defaults to jetty:9.4.  The spotify docker-maven-plugin is used to build the test docker container and the io.fabric8 docker plugin is used to manage the integration test lifecycle. Local tests may have a smaller scope as they are not intended to the complete Google Flex environment.  Local testing is intended to test and validate configuration of Jetty and basic environment.
 
 Remote Testing
 =====
@@ -87,7 +87,7 @@ Requirements:
 Conventions:
 ====
 
-* testing is disabled by default, activated via -Plocal or -Premote
+* remote testing is disabled by default, activated via -Premote
 * local and remote testing are mutually exclusive
 * local integration tests end in ‘LocalIntegrationTest’
 * remote integration tests end in ‘RemoteIntegrationTest’
