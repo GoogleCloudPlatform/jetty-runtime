@@ -21,8 +21,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import com.google.cloud.runtime.jetty.test.AbstractIntegrationTest;
-import com.google.cloud.runtime.jetty.test.annotation.Local;
-import com.google.cloud.runtime.jetty.test.annotation.Remote;
 import com.google.cloud.runtime.jetty.util.HttpUrlUtil;
 
 import org.junit.Assert;
@@ -41,8 +39,6 @@ public class JspIntegrationTest extends AbstractIntegrationTest {
    * @throws IOException test in error
    */
   @Test
-  @Local
-  @Remote
   public void testJspEnvironment() throws IOException {
 
     URI target = getUri().resolve("/jsp/dump.jsp?foo=bar");

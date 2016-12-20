@@ -21,8 +21,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import com.google.cloud.runtime.jetty.test.AbstractIntegrationTest;
-import com.google.cloud.runtime.jetty.test.annotation.Local;
-import com.google.cloud.runtime.jetty.test.annotation.Remote;
 import com.google.cloud.runtime.jetty.util.HttpUrlUtil;
 
 import org.junit.Test;
@@ -39,8 +37,6 @@ public class HelloIntegrationTest extends AbstractIntegrationTest {
    * @throws IOException test in error
    */
   @Test
-  @Local
-  @Remote
   public void testGet() throws IOException {
 
     URI target = getUri().resolve("/hello");
@@ -52,4 +48,5 @@ public class HelloIntegrationTest extends AbstractIntegrationTest {
     String responseBody = HttpUrlUtil.getResponseBody(http);
     assertThat(responseBody, containsString("Hello from Servlet 3.1"));
   }
+
 }

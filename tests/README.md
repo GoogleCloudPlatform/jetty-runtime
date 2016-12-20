@@ -19,7 +19,7 @@ At the top level of the project.
 > mvn install
 ```
 
-This will run a normal build cycle for the jetty-runtime project.  No tests are expected to run during this step.  The docker image being built will be available to use in later local testing steps.  To see what tags are available use the following docker command:
+This will run a normal build cycle for the jetty-runtime project.  Local tests are expected to run during this step.  The docker image being built will be available to use in later local testing steps.  To see what tags are available use the following docker command:
 
 ```
 > docker images
@@ -38,6 +38,12 @@ In order to make these images available for remote testing you can use the follo
 
 This will take the local artifacts and make them available for remote testing (or general usage for the given {project}).
 
+Local testing can be disabled via as follows:
+
+```
+> mvn install -P-test.local
+```
+
 
 Test Executions
 ====
@@ -52,10 +58,10 @@ Local Testing
 From the jetty-runtime/tests directory:
 
 ```
-> mvn install -Plocal -Djetty.test.image=jetty:9.4
+> mvn install
 ```
 
-This will activate the 'local' profile and enable testing.  The tests activated under this profile will make use of the locally installed image and tag referenced in the jetty.test.image property.  The spotify docker-maven-plugin is used to build the test docker container and the io.fabric8 docker plugin is used to manage the integration test lifecycle. Local tests may have a smaller scope as they are not intended to the complete Google Flex environment.  Local testing is intended to test and validate configuration of Jetty and basic environment. 
+The tests activated under this profile will make use of the locally installed image and tag referenced in the jetty.test.image property (default 'jetty:${docker.tag.short}').  The spotify docker-maven-plugin is used to build the test docker container and the io.fabric8 docker plugin is used to manage the integration test lifecycle. Local tests may have a smaller scope as they are not intended to the complete Google Flex environment.  Local testing is intended to test and validate configuration of Jetty and basic environment. 
 
 Remote Testing
 =====
@@ -63,10 +69,10 @@ Remote Testing
 Again from the jetty-runtime/tests directory:
 
 ```
-> mvn install -Premote -Djetty.test.image=gcr.io/{project}/jetty9:9.4
+> mvn install -Dtest.mode=remote -Djetty.test.image=gcr.io/{project}/jetty9:9.4
 ```
 
-This will activate the remote profile and enable testing. Under this scenario, for each test artifact the appengine-maven-plugin is used to deploy an instance of the application to the Google Flex environment and then run appropriate test cases.  The containers for each webapp will be built through using the cloud builder mechanism.  This means the image to be tested (as referenced in the jetty.test.image property) will need to be deployed to the appropriate gcr.io location.  Remote testing can make use of the entire scope of services available to Google Flex.  
+This will activate the remote testing profile and suppress local testing. Under this scenario, for each test artifact the appengine-maven-plugin is used to deploy an instance of the application to the Google Flex environment and then run appropriate test cases.  The containers for each webapp will be built through using the cloud builder mechanism.  This means the image to be tested (as referenced in the jetty.test.image property) will need to be deployed to the appropriate gcr.io location.  Remote testing can make use of the entire scope of services available to Google Flex.  
 
 
 
@@ -75,10 +81,10 @@ Test Case Requirements and Conventions
 
 Both local and remote test cases are logically combined into a single deployable container that may or may not be appropriate for remote and local testing.  Where possible the test source should minimize code duplication and convenient utility classes should be located in the ‘gcloud-testing-core’ artifact.
 
-Annotations are used to indicate if a test method is appropriate to run for the mode selected. Both annotations may be used on the same method but the test will only be run in the startup mode selected.
+Annotations are used to indicate if a test method should be restricted based on the execution mode selected. 
 
-* @Local
-* @Remote
+* @LocalOnly
+* @RemoteOnly
 
 The test-war-smoke module is a simple example for how local and remote testings can be laid out.
 
@@ -92,12 +98,15 @@ Requirements:
 Conventions:
 ====
 
-* testing is disabled by default, activated via -Plocal or -Premote
+* local testing is enabled by default
+* jetty.test.image default for local is 'jetty:${docker.tag.short}'
+* remote testing is enabled via -Dtest.mode=remote
+* local testing is turned off by -P-test.local
 * local and remote testing are mutually exclusive
-* a custom ContainerRunner junit test runner is used to find tests to run
+* a custom LocalRemoteTestRunner junit test runner is used to find tests to run
 * test classes should extend the AbstractIntegrationTest from gcloud-testing-core
-* local integration tests have the @Local annotation
-* remote integration tests have the @Remote annotation
+* local only integration tests have the @LocalOnly annotation
+* remote only integration tests have the @RemoteOnly annotation
 * the junit @Ignore annotation is respected
 
 Properties:

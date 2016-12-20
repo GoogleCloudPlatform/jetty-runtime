@@ -16,8 +16,8 @@
 
 package com.google.cloud.runtime.jetty.test;
 
-import com.google.cloud.runtime.jetty.test.annotation.Local;
-import com.google.cloud.runtime.jetty.test.annotation.Remote;
+import com.google.cloud.runtime.jetty.test.annotation.LocalOnly;
+import com.google.cloud.runtime.jetty.test.annotation.RemoteOnly;
 
 import org.junit.Ignore;
 import org.junit.runner.Description;
@@ -55,19 +55,21 @@ public class LocalRemoteTestRunner extends BlockJUnit4ClassRunner {
       return;
     }
 
-    if (localTestsEnabled && method.getAnnotation(Local.class) != null) {
-      notify("@Local", description);
-      super.runChild(method, notifier);
+    // if running in local mode and @RemoteOnly annotation exists, ignore
+    if (localTestsEnabled && method.getAnnotation(RemoteOnly.class) != null) {
+      notify("Skip @RemoteOnly", description);
+      notifier.fireTestIgnored(description);
       return;
     }
 
-    if (remoteTestsEnabled && method.getAnnotation(Remote.class) != null) {
-      notify("@Remote", description);
-      super.runChild(method, notifier);
+    // if running in remote mode and @LocalOnly annotation exists, ignore
+    if (remoteTestsEnabled && method.getAnnotation(LocalOnly.class) != null) {
+      notify("Skip @LocalOnly", description);
+      notifier.fireTestIgnored(description);
       return;
     }
 
-    notify("NonContainerTest", description);
+    notify("Test", description);
     super.runChild(method, notifier);
   }
 

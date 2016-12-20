@@ -41,14 +41,16 @@ public class AbstractIntegrationTest {
   private static final int DEFAULT_REMOTE_TIMEOUT_SECONDS = 300;
   private static final int TIMEOUT_SECONDS;
   private static final URI SERVER_URI;
+  private static final String MODE;
 
   static {
 
     String mode = System.getProperty("test.mode");
     Assert.assertNotNull("test mode required", mode);
+    MODE = mode;
 
     if ( "local".equals(mode) ) {
-      // Local mode setup
+      // LocalOnly mode setup
       String testPort = System.getProperty("app.deploy.port");
 
       TIMEOUT_SECONDS = DEFAULT_LOCAL_TIMEOUT_SECONDS;
@@ -56,7 +58,7 @@ public class AbstractIntegrationTest {
       Assert.assertNotNull("local uri required", SERVER_URI);
 
     } else if ( "remote".equals(mode) ) {
-      // Remote mode setup
+      // RemoteOnly mode setup
       // (see issue #93 which would replace this section)
       String projectId = System.getProperty("app.deploy.project");
       String version = System.getProperty("app.deploy.version");
@@ -104,6 +106,14 @@ public class AbstractIntegrationTest {
    */
   public URI getUri() {
     return SERVER_URI;
+  }
+
+  /**
+   * Get the mode the test env is running in.
+   * @return the testing mode
+   */
+  public String getMode() {
+    return MODE;
   }
 
   /**
