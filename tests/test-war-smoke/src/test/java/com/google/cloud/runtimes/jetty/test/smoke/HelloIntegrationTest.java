@@ -33,7 +33,6 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
 
-@RunWith(LocalRemoteTestRunner.class)
 public class HelloIntegrationTest extends AbstractIntegrationTest {
 
   /**

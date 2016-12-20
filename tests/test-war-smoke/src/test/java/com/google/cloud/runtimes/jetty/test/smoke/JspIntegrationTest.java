@@ -35,7 +35,6 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.util.Properties;
 
-@RunWith(LocalRemoteTestRunner.class)
 public class JspIntegrationTest extends AbstractIntegrationTest {
 
   /**

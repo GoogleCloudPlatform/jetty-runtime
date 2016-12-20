@@ -21,6 +21,7 @@ import com.google.cloud.runtime.jetty.util.HttpUrlUtil;
 import org.eclipse.jetty.toolchain.test.MavenTestingUtils;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.BufferedReader;
@@ -33,6 +34,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+@RunWith(LocalRemoteTestRunner.class)
 public class AbstractIntegrationTest {
 
   private static final int DEFAULT_LOCAL_TIMEOUT_SECONDS = 10;
