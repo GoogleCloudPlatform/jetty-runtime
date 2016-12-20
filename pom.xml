@@ -83,6 +83,7 @@
   <modules>
     <module>jetty9-base</module>
     <module>jetty9</module>
+    <module>tests</module>
   </modules>
 
   <dependencyManagement>
@@ -128,8 +129,7 @@
           <artifactId>maven-dependency-plugin</artifactId>
           <version>2.10</version>
         </plugin>
-
-	<plugin>
+	      <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-resources-plugin</artifactId>
           <version>3.0.1</version>
@@ -284,12 +284,6 @@
   </build>
 
   <profiles>
-    <profile>
-      <id>tests</id>
-      <modules>
-        <module>tests</module>
-      </modules>
-    </profile>
     <profile>
       <id>sonatype-oss-release</id>
       <build>

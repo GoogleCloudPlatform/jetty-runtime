@@ -26,36 +26,22 @@ import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 
-public class ContainerRunner extends BlockJUnit4ClassRunner {
+public class LocalRemoteTestRunner extends BlockJUnit4ClassRunner {
   private boolean localTestsEnabled = false;
   private boolean remoteTestsEnabled = false;
 
   @SuppressWarnings("javadoc")
-  public ContainerRunner(Class<?> klass) throws InitializationError {
+  public LocalRemoteTestRunner(Class<?> klass) throws InitializationError {
     super(klass);
 
-    this.localTestsEnabled = isEnabled("test.local", false);
-    this.remoteTestsEnabled = isEnabled("test.remote", false);
+    String mode = System.getProperty("test.mode");
 
-    if (localTestsEnabled && remoteTestsEnabled) {
-      throw new InitializationError("local and remote tests can not be run together");
+    this.localTestsEnabled = "local".equals(mode);
+    this.remoteTestsEnabled = "remote".equals(mode);
+
+    if (!localTestsEnabled && !remoteTestsEnabled) {
+      throw new InitializationError("either local or remote testing must be enabled");
     }
-  }
-
-  private boolean isEnabled(String key, boolean def) {
-    String val = System.getProperty(key);
-    if (val == null) {
-      // not declared
-      return def;
-    }
-
-    if (val.length() == 0) {
-      // declared, but with no value
-      return true;
-    }
-
-    // declared, parse value
-    return Boolean.parseBoolean(val);
   }
 
   @Override
@@ -86,7 +72,7 @@ public class ContainerRunner extends BlockJUnit4ClassRunner {
   }
 
   private void notify(String msg, Description description) {
-    System.err.printf("[ContainerRunner] %s %s.%s()%n", msg, description.getClassName(),
+    System.err.printf("[LocalRemoteTestRunner] %s %s.%s()%n", msg, description.getClassName(),
         description.getMethodName());
   }
 }

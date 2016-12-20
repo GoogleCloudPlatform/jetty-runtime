@@ -35,27 +35,34 @@ import java.util.concurrent.TimeUnit;
 
 public class AbstractIntegrationTest {
 
-  private static int DEFAULT_LOCAL_TIMEOUT_SECONDS = 10;
-  private static int DEFAULT_REMOTE_TIMEOUT_SECONDS = 300;
-  private static int TIMEOUT_SECONDS;
+  private static final int DEFAULT_LOCAL_TIMEOUT_SECONDS = 10;
+  private static final int DEFAULT_REMOTE_TIMEOUT_SECONDS = 300;
+  private static final int TIMEOUT_SECONDS;
   private static final URI SERVER_URI;
 
   static {
 
-    if ( System.getProperty("test.local") != null ) {
+    String mode = System.getProperty("test.mode");
+    Assert.assertNotNull("test mode required", mode);
+
+    if ( "local".equals(mode) ) {
+      // Local mode setup
       String testPort = System.getProperty("app.deploy.port");
 
       TIMEOUT_SECONDS = DEFAULT_LOCAL_TIMEOUT_SECONDS;
       SERVER_URI = URI.create("http://localhost:" + testPort);
       Assert.assertNotNull("local uri required", SERVER_URI);
 
-    } else if ( System.getProperty("test.remote") != null ) {
+    } else if ( "remote".equals(mode) ) {
+      // Remote mode setup
+      // (see issue #93 which would replace this section)
       String projectId = System.getProperty("app.deploy.project");
       String version = System.getProperty("app.deploy.version");
 
       Objects.requireNonNull(projectId, "app.deploy.project");
       Objects.requireNonNull(version, "app.deploy.version");
 
+      // service id is required, currently can only pull from app.yaml
       String serviceId = null;
 
       Path appYamlPath = MavenTestingUtils.getProjectFilePath("src/main/appengine/app.yaml");
@@ -72,6 +79,7 @@ public class AbstractIntegrationTest {
         }
       }
 
+      // construct the remote uri
       StringBuilder uri = new StringBuilder();
       uri.append("https://");
       uri.append(version).append("-dot-");
@@ -84,7 +92,7 @@ public class AbstractIntegrationTest {
       TIMEOUT_SECONDS = DEFAULT_REMOTE_TIMEOUT_SECONDS;
       SERVER_URI = URI.create(uri.toString());
     } else {
-      throw new IllegalArgumentException("test.local or test.remote property required");
+      throw new IllegalArgumentException("System property 'test.mode' of [local|remote] required");
     }
   }
 

@@ -79,7 +79,19 @@
   </build>
   <profiles>
     <profile>
-      <id>local</id>
+      <id>test.local</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+        <property>
+          <name>test.mode</name>
+          <value>local</value>
+        </property>
+      </activation>
+      <!--
+      <properties>
+        <test.mode>local</test.mode>
+      </properties>
+      -->
       <build>
         <plugins>
           <plugin>
@@ -89,7 +101,7 @@
             <configuration>
               <skipTests>false</skipTests>
               <systemPropertyVariables>
-                <test.local>true</test.local>
+                <test.mode>local</test.mode>
               </systemPropertyVariables>
             </configuration>
           </plugin>
@@ -97,7 +109,13 @@
       </build>
     </profile>
     <profile>
-      <id>remote</id>
+      <id>test.remote</id>
+      <activation>
+        <property>
+          <name>test.mode</name>
+          <value>remote</value>
+        </property>
+      </activation>
       <properties>
         <maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>
         <gcloud-projectId-file>${project.build.directory}/gcloud-projectid.properties
@@ -112,7 +130,7 @@
             <configuration>
               <skipTests>false</skipTests>
               <systemPropertyVariables>
-                <test.remote>true</test.remote>
+                <test.mode>remote</test.mode>
               </systemPropertyVariables>
             </configuration>
           </plugin>
