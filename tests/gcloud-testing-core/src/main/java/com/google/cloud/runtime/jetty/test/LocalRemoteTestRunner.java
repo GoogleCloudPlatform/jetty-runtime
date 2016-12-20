@@ -26,15 +26,24 @@ import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 
+/**
+ * Custom test runner that provides support for restricting test cases based on the execution
+ * environment.
+ *
+ * @Test is used to flag a method as a test case, these test cases will in either execution mode.
+ * @RemoteOnly suppresses execution local mode.
+ * @LocalOnly suppresses execution in remote mode.
+ */
 public class LocalRemoteTestRunner extends BlockJUnit4ClassRunner {
   private boolean localTestsEnabled = false;
   private boolean remoteTestsEnabled = false;
+  private String mode;
 
-  @SuppressWarnings("javadoc")
+
   public LocalRemoteTestRunner(Class<?> klass) throws InitializationError {
     super(klass);
 
-    String mode = System.getProperty("test.mode");
+    mode = System.getProperty("test.mode");
 
     this.localTestsEnabled = "local".equals(mode);
     this.remoteTestsEnabled = "remote".equals(mode);
@@ -52,25 +61,22 @@ public class LocalRemoteTestRunner extends BlockJUnit4ClassRunner {
     if (method.getAnnotation(Ignore.class) != null) {
       notify("@Ignore", description);
       notifier.fireTestIgnored(description);
-      return;
-    }
 
-    // if running in local mode and @RemoteOnly annotation exists, ignore
-    if (localTestsEnabled && method.getAnnotation(RemoteOnly.class) != null) {
+    } else if (localTestsEnabled && method.getAnnotation(RemoteOnly.class) != null) {
+
+      // if running in local mode and @RemoteOnly annotation exists, ignore
       notify("Skip @RemoteOnly", description);
       notifier.fireTestIgnored(description);
-      return;
-    }
+    } else if (remoteTestsEnabled && method.getAnnotation(LocalOnly.class) != null) {
 
-    // if running in remote mode and @LocalOnly annotation exists, ignore
-    if (remoteTestsEnabled && method.getAnnotation(LocalOnly.class) != null) {
+      // if running in remote mode and @LocalOnly annotation exists, ignore
       notify("Skip @LocalOnly", description);
       notifier.fireTestIgnored(description);
-      return;
+    } else {
+      // default is run in either mode
+      notify("Test[" + mode + "]", description);
+      super.runChild(method, notifier);
     }
-
-    notify("Test", description);
-    super.runChild(method, notifier);
   }
 
   private void notify(String msg, Description description) {

@@ -61,7 +61,7 @@ From the jetty-runtime/tests directory:
 > mvn install
 ```
 
-The tests activated under this profile will make use of the locally installed image and tag referenced in the jetty.test.image property (default 'jetty:${docker.tag.short}').  The spotify docker-maven-plugin is used to build the test docker container and the io.fabric8 docker plugin is used to manage the integration test lifecycle. Local tests may have a smaller scope as they are not intended to the complete Google Flex environment.  Local testing is intended to test and validate configuration of Jetty and basic environment. 
+The tests activated under this profile will make use of the locally installed image and tag referenced in the jetty.test.image property (default 'jetty:${docker.tag.short}').  The spotify docker-maven-plugin is used to build the test docker container and the io.fabric8 docker plugin is used to manage the integration test lifecycle. Local tests may have a smaller scope as they are not intended to the complete Google Flexible environment.  Local testing is intended to test and validate configuration of Jetty and basic environment. 
 
 Remote Testing
 =====
@@ -72,7 +72,7 @@ Again from the jetty-runtime/tests directory:
 > mvn install -Dtest.mode=remote -Djetty.test.image=gcr.io/{project}/jetty9:9.4
 ```
 
-This will activate the remote testing profile and suppress local testing. Under this scenario, for each test artifact the appengine-maven-plugin is used to deploy an instance of the application to the Google Flex environment and then run appropriate test cases.  The containers for each webapp will be built through using the cloud builder mechanism.  This means the image to be tested (as referenced in the jetty.test.image property) will need to be deployed to the appropriate gcr.io location.  Remote testing can make use of the entire scope of services available to Google Flex.  
+This will activate the remote testing profile and suppress local testing. Under this scenario, for each test artifact the appengine-maven-plugin is used to deploy an instance of the application to the Google Flexible environment and then run appropriate test cases.  The containers for each webapp will be built through using the cloud builder mechanism.  This means the image to be tested (as referenced in the jetty.test.image property) will need to be deployed to the appropriate gcr.io location.  Remote testing can make use of the entire scope of services available to Google Flex.  
 
 
 
@@ -119,17 +119,17 @@ Properties:
 
 Local Test Process:
 ====
-* -Plocal enables failsafe-maven-plugin processing of @Local annotations
+* by default failsafe-maven-plugin processes @LocalOnly annotations
 * com.spotify:docker-maven-plugin builds target container based on value of *jetty.test.image*
 * io.fabric8:docker-maven-plugin starts the target container in pre-integration-test phase
   * random local port mapped to 8080 of container and available to test case as system property *app.deploy.port*
 * failsafe-maven-plugin runs in integration-test phase
-* io.fabric8:docker-maven-plugin stops the target container in  post-integration-test phase
+* io.fabric8:docker-maven-plugin stops the target container in post-integration-test phase
 
 Remote Test Process:
 ====
 
-* -Premote enables failsafe-maven-plugin processing of @Remote annotations
+* -Dtest.remote enables failsafe-maven-plugin processing of @RemoteOnly annotations
 * maven-antrun-plugin runs to find the gcloud project id and place in properties file
 * properties-maven-plugin runs to load properties file
 * appengine-maven-plugin runs to build and deploy target application
