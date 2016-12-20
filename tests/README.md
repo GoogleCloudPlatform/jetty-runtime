@@ -75,6 +75,11 @@ Test Case Requirements and Conventions
 
 Both local and remote test cases are logically combined into a single deployable container that may or may not be appropriate for remote and local testing.  Where possible the test source should minimize code duplication and convenient utility classes should be located in the ‘gcloud-testing-core’ artifact.
 
+Annotations are used to indicate if a test method is appropriate to run for the mode selected. Both annotations may be used on the same method but the test will only be run in the startup mode selected.
+
+* @Local
+* @Remote
+
 The test-war-smoke module is a simple example for how local and remote testings can be laid out.
 
 Requirements:
@@ -89,8 +94,11 @@ Conventions:
 
 * testing is disabled by default, activated via -Plocal or -Premote
 * local and remote testing are mutually exclusive
-* local integration tests end in ‘LocalIntegrationTest’
-* remote integration tests end in ‘RemoteIntegrationTest’
+* a custom ContainerRunner junit test runner is used to find tests to run
+* test classes should extend the AbstractIntegrationTest from gcloud-testing-core
+* local integration tests have the @Local annotation
+* remote integration tests have the @Remote annotation
+* the junit @Ignore annotation is respected
 
 Properties:
 ====
@@ -102,7 +110,7 @@ Properties:
 
 Local Test Process:
 ====
-* -Plocal enables failsafe-maven-plugin processing of *LocalIntegrationTest* tests
+* -Plocal enables failsafe-maven-plugin processing of @Local annotations
 * com.spotify:docker-maven-plugin builds target container based on value of *jetty.test.image*
 * io.fabric8:docker-maven-plugin starts the target container in pre-integration-test phase
   * random local port mapped to 8080 of container and available to test case as system property *app.deploy.port*
@@ -112,7 +120,7 @@ Local Test Process:
 Remote Test Process:
 ====
 
-* -Premote enables failsafe-maven-plugin process of *RemoteIntegrationTest* tests
+* -Premote enables failsafe-maven-plugin processing of @Remote annotations
 * maven-antrun-plugin runs to find the gcloud project id and place in properties file
 * properties-maven-plugin runs to load properties file
 * appengine-maven-plugin runs to build and deploy target application
