@@ -29,6 +29,7 @@
   <packaging>pom</packaging>
   <properties>
     <checkstyle.skip>false</checkstyle.skip>
+    <jetty.test.image>jetty:${docker.tag.short}</jetty.test.image>
   </properties>
   <modules>
     <module>gcloud-testing-core</module>
