@@ -36,6 +36,10 @@ public class ContainerRunner extends BlockJUnit4ClassRunner {
 
     this.localTestsEnabled = isEnabled("test.local", false);
     this.remoteTestsEnabled = isEnabled("test.remote", false);
+
+    if (localTestsEnabled && remoteTestsEnabled) {
+      throw new InitializationError("local and remote tests can not be run together");
+    }
   }
 
   private boolean isEnabled(String key, boolean def) {
