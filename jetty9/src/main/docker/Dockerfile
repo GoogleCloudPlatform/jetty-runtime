@@ -16,11 +16,7 @@ FROM ${docker.openjdk.image}
 
 # create jetty group and user
 RUN groupadd -r jetty \
- && useradd -r -g jetty jetty \
- && apt-get -q update \
- && apt-get -y -q --no-install-recommends install sudo \
- && apt-get clean \
- && rm /var/lib/apt/lists/*_*
+ && useradd -r -g jetty jetty
 
 # Create env vars to identify image
 ENV JETTY_VERSION ${jetty9.version}
@@ -40,6 +36,7 @@ ENV JETTY_BASE /var/lib/jetty
 ADD jetty-base $JETTY_BASE
 WORKDIR $JETTY_BASE
 RUN mkdir webapps /tmp/jetty \
+ && java -jar $JETTY_HOME/start.jar --add-to-start=setuid \
  && chown -R jetty:jetty /tmp/jetty $JETTY_BASE
 
 # Start Jetty directly

@@ -1,10 +1,5 @@
 #!/bin/bash
 
-# Switch user to jetty
-if [ "$UID" = 0 ] ; then
-  exec sudo -HEu jetty -- "$0" "$@"
-fi
-
 # default jetty arguments
 DEFAULT_ARGS="-Djetty.base=$JETTY_BASE -jar $JETTY_HOME/start.jar"
 
@@ -16,6 +11,7 @@ if [ -e "$ROOT_WAR" ]; then
   # Unpack it only if $ROOT_DIR doesn't exist or the root is older than the war.
   if [ -e "$ROOT_WAR" -a \( \( ! -e "$ROOT_DIR" \) -o \( "$ROOT_DIR" -ot "$ROOT_WAR" \) \) ]; then
     unzip $ROOT_WAR -d $ROOT_DIR
+    chown -R jetty:jetty $ROOT_DIR
   fi
 fi
 
