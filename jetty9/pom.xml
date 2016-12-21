@@ -32,6 +32,7 @@
     <jetty.home>/opt/jetty-distribution-${jetty9.version}</jetty.home>
     <jetty.base>/var/lib/jetty</jetty.base>
   </properties>
+
   <dependencies>
     <dependency>
       <groupId>com.google.cloud.runtimes</groupId>
