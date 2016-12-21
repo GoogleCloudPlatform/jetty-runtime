@@ -5,14 +5,19 @@ DEFAULT_ARGS="-Djetty.base=$JETTY_BASE -jar $JETTY_HOME/start.jar"
 
 # Unpack a WAR app (if present) beforehand so that Stackdriver Debugger
 # can load it. This should be done before the JVM for Jetty starts up.
-WEBAPP_WAR=$JETTY_BASE/webapps/root.war
-WEBAPP_ROOT=$JETTY_BASE/webapps/root
-if [ -e "$WEBAPP_WAR" ]; then
-  # Unpack it only if $WEBAPP_ROOT doesn't exist or the root is older than the war.
-  if [ -e "$WEBAPP_WAR" -a \( \( ! -e "$WEBAPP_ROOT" \) -o \( "$WEBAPP_ROOT" -ot "$WEBAPP_WAR" \) \) ]; then
-    unzip $WEBAPP_WAR -d $WEBAPP_ROOT
-    chown -R jetty.jetty $WEBAPP_ROOT
+ROOT_WAR=$JETTY_BASE/webapps/root.war
+ROOT_DIR=$JETTY_BASE/webapps/root
+if [ -e "$ROOT_WAR" ]; then
+  # Unpack it only if $ROOT_DIR doesn't exist or the root is older than the war.
+  if [ -e "$ROOT_WAR" -a \( \( ! -e "$ROOT_DIR" \) -o \( "$ROOT_DIR" -ot "$ROOT_WAR" \) \) ]; then
+    unzip $ROOT_WAR -d $ROOT_DIR
+    chown -R jetty:jetty $ROOT_DIR
   fi
+fi
+
+# If webapp root not available, then try /app as used by gcloud maven plugin
+if [ ! -e "$ROOT_DIR" -a -d /app ]; then
+  ln -s /app "$ROOT_DIR"
 fi
 
 # If the passed arguments start with the java command
@@ -35,5 +40,4 @@ if ! type "$1" &>/dev/null; then
 fi
 
 exec "$@"
-
 
