@@ -26,18 +26,17 @@ ENV GAE_IMAGE_LABEL ${docker.tag.long}
 # Create Jetty Home
 ENV JETTY_HOME ${jetty.home}
 ENV PATH $JETTY_HOME/bin:$PATH
-ENV TMPDIR /tmp/jetty
 ADD jetty-distribution.tar.gz $JETTY_HOME/..
-RUN mkdir $TMPDIR \
- && chown -R jetty:jetty $JETTY_HOME $TMPDIR
+RUN chown -R jetty:jetty $JETTY_HOME
 
 # Create Jetty Base
 ENV JETTY_BASE ${jetty.base}
+ENV TMPDIR /tmp/jetty
 ADD jetty-base $JETTY_BASE
 WORKDIR $JETTY_BASE
-RUN mkdir webapps \
+RUN mkdir webapps $TMPDIR \
  && java -jar $JETTY_HOME/start.jar --add-to-start=setuid \
- && chown -R jetty:jetty $JETTY_BASE
+ && chown -R jetty:jetty $JETTY_BASE $TMPDIR
 
 # Start Jetty directly
 COPY docker-entrypoint.bash /
