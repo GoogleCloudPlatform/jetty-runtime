@@ -19,7 +19,7 @@ At the top level of the project.
 > mvn install
 ```
 
-This will run a normal build cycle for the jetty-runtime project.  No tests are expected to run during this step.  The docker image being built will be available to use in later local testing steps.  To see what tags are available use the following docker command:
+This will run a normal build cycle for the jetty-runtime project.  Local tests are expected to run during this step.  The docker image being built will be available to use in later local testing steps.  To see what tags are available use the following docker command:
 
 ```
 > docker images
@@ -32,11 +32,17 @@ jetty                             latest                     b6cbab53c076       
 In order to make these images available for remote testing you can use the following commands:
 
 ```
-> docker tag jetty:9.4 gcr.io/{project}/jetty9:9.4
-> gcloud docker push gcr.io/{project}/jetty9:9.4 
+> docker tag jetty:9.4 gcr.io/{project}/jetty:9.4
+> gcloud docker push gcr.io/{project}/jetty:9.4 
 ```
 
 This will take the local artifacts and make them available for remote testing (or general usage for the given {project}).
+
+Local testing can be disabled via as follows:
+
+```
+> mvn install -P-test.local
+```
 
 
 Test Executions
@@ -52,10 +58,10 @@ Local Testing
 From the jetty-runtime/tests directory:
 
 ```
-> mvn install -Plocal -Djetty.test.image=jetty:9.4
+> mvn install
 ```
 
-This will activate the 'local' profile and enable testing.  The tests activated under this profile will make use of the locally installed image and tag referenced in the jetty.test.image property.  The spotify docker-maven-plugin is used to build the test docker container and the io.fabric8 docker plugin is used to manage the integration test lifecycle. Local tests may have a smaller scope as they are not intended to the complete Google Flex environment.  Local testing is intended to test and validate configuration of Jetty and basic environment. 
+The tests activated under this profile will make use of the locally installed image and tag referenced in the jetty.test.image property (default 'jetty:${docker.tag.short}').  The spotify docker-maven-plugin is used to build the test docker container and the io.fabric8 docker plugin is used to manage the integration test lifecycle. Local tests may have a smaller scope as they are not intended to the complete Google Flexible environment.  Local testing is intended to test and validate configuration of Jetty and basic environment. 
 
 Remote Testing
 =====
@@ -63,10 +69,10 @@ Remote Testing
 Again from the jetty-runtime/tests directory:
 
 ```
-> mvn install -Premote -Djetty.test.image=gcr.io/{project}/jetty9:9.4
+> mvn install -Ptest.remote -Djetty.test.image=gcr.io/{project}/jetty:9.4
 ```
 
-This will activate the remote profile and enable testing. Under this scenario, for each test artifact the appengine-maven-plugin is used to deploy an instance of the application to the Google Flex environment and then run appropriate test cases.  The containers for each webapp will be built through using the cloud builder mechanism.  This means the image to be tested (as referenced in the jetty.test.image property) will need to be deployed to the appropriate gcr.io location.  Remote testing can make use of the entire scope of services available to Google Flex.  
+This will activate the remote testing profile and suppress local testing. Under this scenario, for each test artifact the appengine-maven-plugin is used to deploy an instance of the application to the Google Flexible environment and then run appropriate test cases.  The containers for each webapp will be built through using the cloud builder mechanism.  This means the image to be tested (as referenced in the jetty.test.image property) will need to be deployed to the appropriate gcr.io location.  Remote testing can make use of the entire scope of services available to Google Flex.  
 
 
 
@@ -74,6 +80,11 @@ Test Case Requirements and Conventions
 ===
 
 Both local and remote test cases are logically combined into a single deployable container that may or may not be appropriate for remote and local testing.  Where possible the test source should minimize code duplication and convenient utility classes should be located in the ‘gcloud-testing-core’ artifact.
+
+Annotations are used to indicate if a test method should be restricted based on the execution mode selected. 
+
+* @LocalOnly
+* @RemoteOnly
 
 The test-war-smoke module is a simple example for how local and remote testings can be laid out.
 
@@ -87,10 +98,16 @@ Requirements:
 Conventions:
 ====
 
-* testing is disabled by default, activated via -Plocal or -Premote
+* local testing is enabled by default
+* jetty.test.image default for local is 'jetty:${docker.tag.short}'
+* remote testing is enabled via -Ptest.remote
+* local testing is turned off by -P-test.local
 * local and remote testing are mutually exclusive
-* local integration tests end in ‘LocalIntegrationTest’
-* remote integration tests end in ‘RemoteIntegrationTest’
+* a custom LocalRemoteTestRunner junit test runner is used to find tests to run
+* test classes should extend the AbstractIntegrationTest from gcloud-testing-core
+* local only integration tests have the @LocalOnly annotation
+* remote only integration tests have the @RemoteOnly annotation
+* the junit @Ignore annotation is respected
 
 Properties:
 ====
@@ -102,17 +119,17 @@ Properties:
 
 Local Test Process:
 ====
-* -Plocal enables failsafe-maven-plugin processing of *LocalIntegrationTest* tests
+* by default failsafe-maven-plugin processes @LocalOnly annotations
 * com.spotify:docker-maven-plugin builds target container based on value of *jetty.test.image*
 * io.fabric8:docker-maven-plugin starts the target container in pre-integration-test phase
   * random local port mapped to 8080 of container and available to test case as system property *app.deploy.port*
 * failsafe-maven-plugin runs in integration-test phase
-* io.fabric8:docker-maven-plugin stops the target container in  post-integration-test phase
+* io.fabric8:docker-maven-plugin stops the target container in post-integration-test phase
 
 Remote Test Process:
 ====
 
-* -Premote enables failsafe-maven-plugin process of *RemoteIntegrationTest* tests
+* -Dtest.remote enables failsafe-maven-plugin processing of @RemoteOnly annotations
 * maven-antrun-plugin runs to find the gcloud project id and place in properties file
 * properties-maven-plugin runs to load properties file
 * appengine-maven-plugin runs to build and deploy target application

@@ -29,6 +29,7 @@
   <packaging>pom</packaging>
   <properties>
     <checkstyle.skip>false</checkstyle.skip>
+    <jetty.test.image>jetty:${docker.tag.short}</jetty.test.image>
   </properties>
   <modules>
     <module>gcloud-testing-core</module>
@@ -50,6 +51,9 @@
           </dependencies>
           <configuration>
             <skipTests>true</skipTests>
+            <includes>
+              <include>%regex[.*IntegrationTest.*]</include>
+            </includes>
           </configuration>
         </plugin>
       </plugins>
@@ -76,7 +80,19 @@
   </build>
   <profiles>
     <profile>
-      <id>local</id>
+      <id>test.local</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+        <property>
+          <name>test.mode</name>
+          <value>local</value>
+        </property>
+      </activation>
+      <!--
+      <properties>
+        <test.mode>local</test.mode>
+      </properties>
+      -->
       <build>
         <plugins>
           <plugin>
@@ -85,16 +101,22 @@
             <version>2.19.1</version>
             <configuration>
               <skipTests>false</skipTests>
-              <includes>
-                <include>%regex[.*LocalIntegrationTest.*]</include>
-              </includes>
+              <systemPropertyVariables>
+                <test.mode>local</test.mode>
+              </systemPropertyVariables>
             </configuration>
           </plugin>
         </plugins>
       </build>
     </profile>
     <profile>
-      <id>remote</id>
+      <id>test.remote</id>
+      <activation>
+        <property>
+          <name>test.mode</name>
+          <value>remote</value>
+        </property>
+      </activation>
       <properties>
         <maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>
         <gcloud-projectId-file>${project.build.directory}/gcloud-projectid.properties
@@ -108,9 +130,9 @@
             <version>2.19.1</version>
             <configuration>
               <skipTests>false</skipTests>
-              <includes>
-                <include>%regex[.*RemoteIntegrationTest.*]</include>
-              </includes>
+              <systemPropertyVariables>
+                <test.mode>remote</test.mode>
+              </systemPropertyVariables>
             </configuration>
           </plugin>
         </plugins>
