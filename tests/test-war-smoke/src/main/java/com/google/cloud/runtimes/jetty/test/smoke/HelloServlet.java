@@ -14,28 +14,22 @@
  * limitations under the License.
  */
 
-package com.google.cloud.runtimes.jetty.tests;
-
-
-import com.google.cloud.runtime.jetty.testing.AppDeployment;
-import com.google.cloud.runtime.jetty.testing.HttpUrlUtil;
-
-import org.junit.BeforeClass;
-import org.junit.Test;
+package com.google.cloud.runtimes.jetty.test.smoke;
 
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
-public class HelloRemoteIntegrationTest extends AbstractHelloIntegrationTest {
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
-  @BeforeClass
-  public static void isServerUp() {
-    HttpUrlUtil.waitForServerUp(AppDeployment.SERVER_URI, 5, TimeUnit.MINUTES);
+@WebServlet(urlPatterns = {"/hello/*"})
+public class HelloServlet extends HttpServlet {
+  @Override
+  protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+      throws ServletException, IOException {
+    resp.setContentType("text/plain");
+    resp.getWriter().println("Hello from Servlet 3.1");
   }
-
-  @Test
-  public void testGetHello() throws IOException {
-    assertTestGet(AppDeployment.SERVER_URI.resolve("/hello/"));
-  }
-
 }

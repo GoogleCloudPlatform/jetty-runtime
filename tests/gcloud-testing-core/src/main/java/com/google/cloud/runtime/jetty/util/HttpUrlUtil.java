@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.cloud.runtime.jetty.testing;
+package com.google.cloud.runtime.jetty.util;
 
 import org.apache.commons.io.IOUtils;
 
@@ -53,7 +53,7 @@ public final class HttpUrlUtil {
       try {
         System.out.print(".");
         HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
-        http.setRequestProperty("User-Agent", "jetty-runtime/gcloud-testing-core(server-up)");
+        http.setRequestProperty("User-Agent", "jetty-runtime/gcloud-util-core(server-up)");
         int statusCode = http.getResponseCode();
         if (statusCode != HttpURLConnection.HTTP_OK) {
           log.log(Level.FINER, "Waiting 2s for next attempt");
@@ -76,7 +76,7 @@ public final class HttpUrlUtil {
   /**
    * Open a new {@link HttpURLConnection} to the provided URI.
    * <p>
-   * Note: will also set the 'User-Agent' to {@code jetty-runtime/gcloud-testing-core}
+   * Note: will also set the 'User-Agent' to {@code jetty-runtime/gcloud-util-core}
    * </p>
    *
    * @param uri the URI to open to
@@ -86,7 +86,7 @@ public final class HttpUrlUtil {
   public static HttpURLConnection openTo(URI uri) throws IOException {
     log.info("HttpUrlUtil.openTo(" + uri + ")");
     HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
-    http.setRequestProperty("User-Agent", "jetty-runtime/gcloud-testing-core");
+    http.setRequestProperty("User-Agent", "jetty-runtime/gcloud-util-core");
     return http;
   }
 
