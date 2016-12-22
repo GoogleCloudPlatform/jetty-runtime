@@ -84,7 +84,7 @@
               <artifactItems>
                 <artifactItem>
                   <groupId>org.eclipse.jetty</groupId>
-                  <artifactId>jetty-distribution</artifactId>
+                  <artifactId>jetty-home</artifactId>
                   <version>${jetty9.version}</version>
                   <type>tar.gz</type>
                   <overWrite>true</overWrite>
@@ -129,7 +129,7 @@
           <workingDirectory>${project.build.directory}/jetty-base</workingDirectory>
           <arguments>
             <argument>-jar</argument>
-            <argument>../jetty-distribution-${jetty9.version}/start.jar</argument>
+            <argument>../jetty-home-${jetty9.version}/start.jar</argument>
             <argument>--commands=${basedir}/src/main/jetty-config/jetty.commands</argument>
           </arguments>
         </configuration>
