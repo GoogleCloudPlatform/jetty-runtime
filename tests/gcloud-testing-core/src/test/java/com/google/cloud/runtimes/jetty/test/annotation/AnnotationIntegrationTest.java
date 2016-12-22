@@ -47,9 +47,11 @@ public class AnnotationIntegrationTest {
   @Test
   @RemoteOnly
   public void testRemoteOnlyAnnotation() {
-    System.out.println("executed @RemoteOnly");
+    System.out.println("executed @LocalOnly");
 
-    Assert.fail("this test should not execute given plugin configuration");
+    String mode = System.getProperty("test.mode");
+    Assert.assertEquals("@RemoteOnly", "remote", mode);
+    Assert.assertNotEquals("@RemoteOnly broken", "local", mode);
   }
 
   /**
