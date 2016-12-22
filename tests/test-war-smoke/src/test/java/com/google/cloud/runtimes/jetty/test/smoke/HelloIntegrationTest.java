@@ -14,29 +14,32 @@
  * limitations under the License.
  */
 
-package com.google.cloud.runtimes.jetty.tests;
+package com.google.cloud.runtimes.jetty.test.smoke;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-import com.google.cloud.runtime.jetty.testing.HttpUrlUtil;
+import com.google.cloud.runtime.jetty.test.AbstractIntegrationTest;
+import com.google.cloud.runtime.jetty.util.HttpUrlUtil;
+
+import org.junit.Test;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
 
-public abstract class AbstractHelloIntegrationTest {
-
-  public abstract void testGetHello() throws IOException;
+public class HelloIntegrationTest extends AbstractIntegrationTest {
 
   /**
    * Simple test validating a response code and content.
    *
-   * @param target  assembled URI to run test against
    * @throws IOException test in error
    */
-  public void assertTestGet(URI target) throws IOException {
+  @Test
+  public void testGet() throws IOException {
+
+    URI target = getUri().resolve("/hello");
 
     assertThat(target.getPath(), containsString("/hello"));
 
@@ -45,4 +48,5 @@ public abstract class AbstractHelloIntegrationTest {
     String responseBody = HttpUrlUtil.getResponseBody(http);
     assertThat(responseBody, containsString("Hello from Servlet 3.1"));
   }
+
 }

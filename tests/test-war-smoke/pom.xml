@@ -65,7 +65,14 @@
   </build>
   <profiles>
     <profile>
-      <id>local</id>
+      <id>test.local</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+        <property>
+          <name>test.mode</name>
+          <value>local</value>
+        </property>
+      </activation>
       <build>
         <plugins>
           <plugin>
@@ -144,7 +151,13 @@
       </build>
     </profile>
     <profile>
-      <id>remote</id>
+      <id>test.remote</id>
+      <activation>
+        <property>
+          <name>test.mode</name>
+          <value>remote</value>
+        </property>
+      </activation>
       <build>
         <plugins>
           <plugin>

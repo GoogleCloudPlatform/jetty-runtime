@@ -29,7 +29,7 @@
   <packaging>pom</packaging>
 
   <properties>
-    <jetty.home>/opt/jetty-distribution-${jetty9.version}</jetty.home>
+    <jetty.home>/opt/jetty-home</jetty.home>
     <jetty.base>/var/lib/jetty</jetty.base>
   </properties>
 
@@ -45,50 +45,24 @@
   <build>
     <plugins>
       <plugin>
-        <artifactId>maven-resources-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>copy-resources</id>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${project.build.directory}/docker</outputDirectory>
-              <resources>
-                <resource>
-                  <directory>${basedir}/src/main/docker</directory>
-                  <filtering>true</filtering>
-                  <includes>
-                    <include>*</include>
-                  </includes>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
         <artifactId>maven-dependency-plugin</artifactId>
         <executions>
           <execution>
-            <id>jetty-distribution</id>
-            <phase>package</phase>
+            <id>jetty-home</id>
+            <phase>generate-resources</phase>
             <goals>
-              <goal>copy</goal>
+              <goal>unpack</goal>
             </goals>
             <configuration>
               <artifactItems>
                 <artifactItem>
                   <groupId>org.eclipse.jetty</groupId>
-                  <artifactId>jetty-distribution</artifactId>
+                  <artifactId>jetty-home</artifactId>
                   <version>${jetty9.version}</version>
                   <type>tar.gz</type>
                   <overWrite>true</overWrite>
                   <includes>**</includes>
-                  <outputDirectory>${project.build.directory}/docker</outputDirectory>
-                  <destFileName>jetty-distribution.tar.gz</destFileName>
+                  <outputDirectory>${project.build.directory}</outputDirectory>
                 </artifactItem>
               </artifactItems>
             </configuration>
@@ -111,6 +85,50 @@
                   <outputDirectory>${project.build.directory}/docker/</outputDirectory>
                 </artifactItem>
               </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy-resources</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/docker</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${basedir}/src/main/docker</directory>
+                  <filtering>true</filtering>
+                  <includes>
+                    <include>*</include>
+                  </includes>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+          <execution>
+            <id>copy-jetty-home</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/docker/jetty-home</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${project.build.directory}/jetty-home-${jetty9.version}</directory>
+                  <filtering>false</filtering>
+                  <includes>
+                    <include>**</include>
+                  </includes>
+                </resource>
+              </resources>
             </configuration>
           </execution>
         </executions>

@@ -26,7 +26,7 @@ ENV GAE_IMAGE_LABEL ${docker.tag.long}
 # Create Jetty Home
 ENV JETTY_HOME ${jetty.home}
 ENV PATH $JETTY_HOME/bin:$PATH
-ADD jetty-distribution.tar.gz $JETTY_HOME/..
+ADD jetty-home $JETTY_HOME
 RUN chown -R jetty:jetty $JETTY_HOME
 
 # Create Jetty Base
