@@ -33,7 +33,7 @@ In order to make these images available for remote testing you can use the follo
 
 ```
 > docker tag jetty:9.4 gcr.io/{project}/jetty:9.4
-> gcloud docker push gcr.io/{project}/jetty:9.4 
+> gcloud docker -- push gcr.io/{project}/jetty:9.4 
 ```
 
 This will take the local artifacts and make them available for remote testing (or general usage for the given {project}).
