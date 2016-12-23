@@ -12,3 +12,6 @@ handlers:
 - url: /.*
   script: ignored
   secure: optional
+
+env_variables:
+  SESSIONS: 'datastore'
