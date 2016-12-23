@@ -22,6 +22,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import com.google.cloud.runtime.jetty.test.AbstractIntegrationTest;
 import com.google.cloud.runtime.jetty.test.annotation.LocalOnly;
+import com.google.cloud.runtime.jetty.test.annotation.RemoteOnly;
 import com.google.cloud.runtime.jetty.util.HttpUrlUtil;
 
 import org.junit.Test;
@@ -58,7 +59,7 @@ public class ForwardedIntegrationTest extends AbstractIntegrationTest {
    */
   @Test
   @LocalOnly
-  public void testLocal() throws IOException {
+  public void testLocalFor() throws IOException {
     URI target = getUri().resolve("/dump/info");
     assertThat(target.getPath(), containsString("/dump/info"));
 
@@ -68,6 +69,76 @@ public class ForwardedIntegrationTest extends AbstractIntegrationTest {
     assertThat(http.getResponseCode(), is(200));
     String responseBody = HttpUrlUtil.getResponseBody(http);
     assertThat(responseBody, containsString("remoteHost/Addr:port=1.2.3.4"));
+  }
+
+  /**
+   * Validate proxy proto header is handled.
+   *
+   * @throws IOException test in error
+   */
+  @Test
+  @RemoteOnly
+  public void testRemoteProto() throws IOException {
+    URI target = getUri().resolve("/dump/info");
+    assertThat(target.getPath(), containsString("/dump/info"));
+
+    HttpURLConnection http = HttpUrlUtil.openTo(target);
+    http.setRequestProperty("X-Forwarded-Proto", "https");
+
+    assertThat(http.getResponseCode(), is(200));
+    String responseBody = HttpUrlUtil.getResponseBody(http);
+    
+    // TODO should we trust the client to say it is secure?  Not secure to the GFE!
+    assertThat(responseBody, containsString("scheme=https(secure=true)"));
+  }
+  
+  /**
+   * Validate proxy for header is handled.
+   *
+   * @throws IOException test in error
+   */
+  @Test
+  @RemoteOnly
+  public void testRemoteFor() throws IOException {
+    URI target = getUri().resolve("/dump/info");
+    assertThat(target.getPath(), containsString("/dump/info"));
+
+    HttpURLConnection http = HttpUrlUtil.openTo(target);
+    http.setRequestProperty("X-Forwarded-For", "1.2.3.4, 5.6.7.8");
+
+    assertThat(http.getResponseCode(), is(200));
+    String responseBody = HttpUrlUtil.getResponseBody(http);
+    
+    // Test that the client is trusted to say what their IP is 
+    assertThat(responseBody, containsString("remoteHost/Addr:port=1.2.3.4"));
+    // That that the GFE IP is added to the forwarded list
+    assertThat(responseBody, containsString("X-Forwarded-For: 1.2.3.4, 5.6.7.8,"));
+  }
+  
+  /**
+   * Validate Forwarded header is ignored.
+   *
+   * @throws IOException test in error
+   */
+  @Test
+  @RemoteOnly
+  public void testForwardedIgnored() throws IOException {
+    URI target = getUri().resolve("/dump/info");
+    assertThat(target.getPath(), containsString("/dump/info"));
+
+    HttpURLConnection http = HttpUrlUtil.openTo(target);
+    http.setRequestProperty("Forwarded", "for=1.2.3.4;by=1.1.1.1;proto=https;host=example.com");
+
+    assertThat(http.getResponseCode(), is(200));
+    String responseBody = HttpUrlUtil.getResponseBody(http);
+    System.err.println(responseBody);
+
+    // TODO currently it appears that the Forwarded header is not filtered out by the GFE
+    // and Jetty is configured to interpret it.  The GFE also appears to interpret the
+    // Forwarded header and set the Host header field accordingly?
+    assertThat(responseBody, containsString("Forwarded: for="));
+    assertThat(responseBody, containsString("remoteHost/Addr:port=1.2.3.4"));
+    assertThat(responseBody, containsString("scheme=https(secure=true)"));
   }
 
 }
