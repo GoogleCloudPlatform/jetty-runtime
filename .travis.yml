@@ -70,5 +70,5 @@ after_script:
   - |
     if $DO_REMOTE; then
       # cleanup deploy image
-      gcloud docker rmi $image
+      gcloud docker -q -- rmi -f $image
     fi
