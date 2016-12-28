@@ -55,16 +55,16 @@ install:
 
 script:
   # execute regular local build
-  - mvn clean verify -B -V
+  - mvn clean verify -B -V -q
   # execute remote tests
   - |
     if $DO_REMOTE; then
       # deploy image to gcr
       image=gcr.io/travis-app-maven-plugin/jetty:`date +%s`
       docker tag jetty:9.4 $image
-      gcloud docker push $image
+      gcloud docker push $image -q
       # do the remote test
-      mvn clean verify -Ptest.remote -Djett.test.image=$image -B
+      mvn clean verify -Ptest.remote -Djetty.test.image=$image -B -q
     fi
 
 after_script:
