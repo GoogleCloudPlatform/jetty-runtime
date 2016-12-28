@@ -34,7 +34,9 @@ install:
   - export PATH=$PWD/google-cloud-sdk/bin:$PATH
   - export CLOUDSDK_CORE_DISABLE_USAGE_REPORTING=true
   # update all Cloud SDK components
-  - gcloud components update --quiet
+  - gcloud components update -q
+  # add beta component to Cloud SDK
+  - gcloud components install beta -q
   # do not run remote tests for pull requests
   - |
     if [ $TRAVIS_PULL_REQUEST = 'false' ]; then
@@ -62,9 +64,8 @@ script:
       # deploy image to gcr
       image=gcr.io/travis-app-maven-plugin/jetty:`date +%s`
       docker tag jetty:9.4 $image
-      gcloud docker push $image -q
       # do the remote test
-      mvn clean verify -Ptest.remote -Djetty.test.image=$image -B -q
+      gcloud docker push $image -q && mvn clean verify -Ptest.remote -Djetty.test.image=$image -B -q
     fi
 
 after_script:
