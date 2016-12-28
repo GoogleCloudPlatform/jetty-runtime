@@ -9,6 +9,17 @@
   <Call name="addEventListener">
     <Arg><New class="com.google.cloud.runtimes.jetty9.RequestContextScope"/></Arg>
   </Call>
-    
-</Configure>
 
+  <!-- Protect app.yaml -->
+  <Get id="protected" name="ProtectedTargets"/>
+  <Set name="ProtectedTargets">
+    <Call class="org.eclipse.jetty.util.ArrayUtil" name="addToArray">
+      <Arg><Ref refid="protected"/></Arg>
+      <Arg>/app.yaml</Arg>
+      <Arg></Arg>
+    </Call>
+  </Set>
+
+  <Set name="overrideDescriptor">etc/gae-override-web.xml</Set>
+  
+</Configure>
