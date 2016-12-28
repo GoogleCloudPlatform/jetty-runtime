@@ -22,7 +22,9 @@ services:
 jdk:
   - oraclejdk8
 
-script: mvn clean verify -B
+install: true
+
+script: mvn clean verify -B -V
 
 branches:
   only:
