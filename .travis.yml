@@ -23,7 +23,7 @@ jdk:
   - oraclejdk8
 
 install: mvn dependency:resolve
-script: mvn --batch-mode clean verify
+script: mvn clean verify -B
 
 branches:
   only:
