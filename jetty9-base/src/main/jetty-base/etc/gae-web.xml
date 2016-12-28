@@ -14,6 +14,8 @@
       <Arg></Arg>
     </Call>
   </Set>
+
+  <Set name="overrideDescriptor">etc/gae-override-web.xml</Set>
   
 </Configure>
 
