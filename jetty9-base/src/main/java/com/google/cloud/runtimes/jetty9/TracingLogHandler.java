@@ -20,7 +20,7 @@ import java.util.logging.ConsoleHandler;
 import java.util.logging.LogRecord;
 
 /**
- * A Logging Handler extended with a request traceid label.
+ * A Logging Handler extended with a request traceId label.
  */
 public class TracingLogHandler extends ConsoleHandler {
 
@@ -31,9 +31,9 @@ public class TracingLogHandler extends ConsoleHandler {
 
   @Override
   public synchronized void publish(LogRecord record) {
-    String traceid = RequestContextScope.getCurrentTraceid();
-    if (traceid != null) {
-      record.setMessage(record.getMessage() + " traceid=" + traceid);
+    String traceId = RequestContextScope.getCurrentTraceId();
+    if (traceId != null) {
+      record.setMessage(record.getMessage() + " traceId=" + traceId);
     }
     super.publish(record);
   }

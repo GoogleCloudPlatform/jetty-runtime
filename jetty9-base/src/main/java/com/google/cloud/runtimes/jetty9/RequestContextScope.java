@@ -85,7 +85,7 @@ public class RequestContextScope implements ContextHandler.ContextScopeListener 
     return requestStack.get().peek();
   }
 
-  public static String getCurrentTraceid() {
+  public static String getCurrentTraceId() {
     return traceId.get();
   }
 }
