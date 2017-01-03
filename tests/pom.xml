@@ -30,7 +30,7 @@
   <properties>
     <checkstyle.skip>false</checkstyle.skip>
     <!-- default image name for local tests -->
-    <jetty.test.image>jetty:${docker.tag.short}</jetty.test.image>
+    <jetty.test.image>jetty:${docker.tag.long}</jetty.test.image>
   </properties>
   <modules>
     <module>gcloud-testing-core</module>
@@ -91,16 +91,34 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>2.19.1</version>
           <configuration>
             <excludes>
               <exclude>**/*IntegrationTest.java</exclude>
             </excludes>
           </configuration>
         </plugin>
+        <plugin>
+          <groupId>io.fabric8</groupId>
+          <artifactId>docker-maven-plugin</artifactId>
+          <version>0.17.2</version>
+          <configuration>
+            <images>
+              <image>
+                <name>${project.artifactId}:${project.version}</name>
+                <alias>${project.artifactId}</alias>
+                <run>
+                  <ports>
+                    <port>${local.app.port}:8080</port>
+                  </ports>
+                </run>
+              </image>
+            </images>
+          </configuration>
+        </plugin>
       </plugins>
     </pluginManagement>
     <plugins>
+      <!-- ensure no artifacts are published during deploy -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-deploy-plugin</artifactId>

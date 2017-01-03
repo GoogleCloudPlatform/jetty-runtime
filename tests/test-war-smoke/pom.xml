@@ -41,19 +41,6 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.5.1</version>
-        <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
   <profiles>
     <profile>
       <id>test.local</id>
@@ -65,7 +52,6 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
-            <version>2.19.1</version>
             <executions>
               <execution>
                 <id>local-integration-test</id>
@@ -85,20 +71,6 @@
           <plugin>
             <groupId>io.fabric8</groupId>
             <artifactId>docker-maven-plugin</artifactId>
-            <version>0.17.2</version>
-            <configuration>
-              <images>
-                <image>
-                  <name>${project.artifactId}:${project.version}</name>
-                  <alias>test-war-smoke</alias>
-                  <run>
-                    <ports>
-                      <port>${local.app.port}:8080</port>
-                    </ports>
-                  </run>
-                </image>
-              </images>
-            </configuration>
             <executions>
               <execution>
                 <id>start</id>
@@ -122,10 +94,14 @@
     <profile>
       <id>test.remote</id>
       <properties>
+        <!-- change the build timestamp to something palatable for gcloud -->
         <maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>
         <gcloud-projectId-file>${project.build.directory}/gcloud-projectid.properties
         </gcloud-projectId-file>
-        <!-- remote tests require image in gcr.io -->
+        <!--
+           ~ remote tests require image in gcr.io
+           ~ if local tests are enabled with remote, this image is used locally as well
+           -->
         <jetty.test.image>gcr.io/${app.deploy.project}/jetty:${docker.tag.short}</jetty.test.image>
       </properties>
       <build>
@@ -133,7 +109,6 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-antrun-plugin</artifactId>
-            <version>1.8</version>
             <executions>
               <execution>
                 <id>find-app-deploy-project</id>
@@ -156,30 +131,11 @@
                   </target>
                 </configuration>
               </execution>
-              <execution>
-                <id>cleanup-integration-test</id>
-                <phase>post-integration-test</phase>
-                <goals>
-                  <goal>run</goal>
-                </goals>
-                <configuration>
-                  <target>
-                    <exec executable="gcloud">
-                      <arg value="--quiet"/>
-                      <arg value="app"/>
-                      <arg value="versions"/>
-                      <arg value="delete"/>
-                      <arg value="${maven.build.timestamp}"/>
-                    </exec>
-                  </target>
-                </configuration>
-              </execution>
             </executions>
           </plugin>
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>properties-maven-plugin</artifactId>
-            <version>1.0.0</version>
             <executions>
               <execution>
                 <id>read-gcloud-properties</id>
@@ -198,7 +154,6 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
-            <version>2.19.1</version>
             <executions>
               <execution>
                 <id>remote-integration-test</id>
@@ -218,6 +173,7 @@
               </execution>
             </executions>
           </plugin>
+          <!-- runs lifecycle to stage and deploy a remote service to test -->
           <plugin>
             <groupId>com.google.cloud.tools</groupId>
             <artifactId>appengine-maven-plugin</artifactId>
@@ -231,6 +187,7 @@
               </execution>
             </executions>
           </plugin>
+          <!-- create tag for local docker image to push for remote use in test -->
           <plugin>
             <groupId>com.spotify</groupId>
             <artifactId>docker-maven-plugin</artifactId>
@@ -251,8 +208,8 @@
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>exec-maven-plugin</artifactId>
-            <version>1.5.0</version>
             <executions>
+              <!-- push a remote docker image to use with 'deploy-integration-test' -->
               <execution>
                 <id>deploy-remote-docker</id>
                 <phase>package</phase>
@@ -266,6 +223,43 @@
                     <argument>-q</argument>
                     <argument>--</argument>
                     <argument>push</argument>
+                    <argument>${jetty.test.image}</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+              <!-- remove the service from 'deploy-integration-test' -->
+              <execution>
+                <id>cleanup-remote-service</id>
+                <phase>post-integration-test</phase>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <configuration>
+                  <executable>gcloud</executable>
+                  <arguments>
+                    <argument>--quiet</argument>
+                    <argument>app</argument>
+                    <argument>versions</argument>
+                    <argument>delete</argument>
+                    <argument>${maven.build.timestamp}</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+              <!-- remove the remote image from 'deploy-remote-docker' -->
+              <execution>
+                <id>cleanup-remote-image</id>
+                <phase>post-integration-test</phase>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <configuration>
+                  <executable>gcloud</executable>
+                  <arguments>
+                    <argument>docker</argument>
+                    <argument>-q</argument>
+                    <argument>--</argument>
+                    <argument>rmi</argument>
+                    <argument>-f</argument>
                     <argument>${jetty.test.image}</argument>
                   </arguments>
                 </configuration>
