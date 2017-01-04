@@ -16,17 +16,12 @@
 
 package com.google.cloud.runtimes.jetty9;
 
-import java.util.Arrays;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.LogManager;
-import java.util.logging.LogRecord;
 
 /**
- * A Logging Handler extended with a request traceId label.
- * The traceId is passed in the LogRecord as an additional 
- * message format parameter.  This must be stripped by the
- * formatter before formatting the message, as is done by
- * the {@link TracingLogFormatter}.
+ * A Logging Handler that uses the {@link TracingLogFormatter}
+ * to log the trace ID.
  * @see TracingLogFormatter
  */
 public class TracingLogHandler extends ConsoleHandler {
@@ -74,41 +69,4 @@ public class TracingLogHandler extends ConsoleHandler {
     String format = manager.getProperty(cname + ".format");
     setFormatter(new TracingLogFormatter(format));    
   }
-
-  @Override
-  public synchronized void publish(LogRecord record) {
-    String traceId = getCurrentTraceId();
-    if (traceId != null) {
-      // Encode the traceId as an additional message format 
-      // parameter for the LogRecord.  This should be removed by
-      // the formatter before formatting the message and used to
-      // format the LogRecord itself
-      Object[] params = record.getParameters();
-      if (params == null) {
-        record.setParameters(new Object[] {new TraceId(traceId)});
-      } else {
-        params = Arrays.copyOf(params,params.length + 1);
-        params[params.length - 1] = new TraceId(traceId);
-        record.setParameters(params);
-      }
-    }
-    super.publish(record);
-  }
-  
-  /**
-   * Class to identify and hold the traceId in the
-   * LogRecord parameters array.
-   */
-  public static class TraceId {
-    private final String traceId;
-
-    public TraceId(String traceId) {
-      this.traceId = traceId;
-    }
-
-    public String toString() {
-      return traceId;
-    }
-  }
-
 }

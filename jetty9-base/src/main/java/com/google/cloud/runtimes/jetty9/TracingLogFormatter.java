@@ -16,11 +16,8 @@
 
 package com.google.cloud.runtimes.jetty9;
 
-import com.google.cloud.runtimes.jetty9.TracingLogHandler.TraceId;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
@@ -54,15 +51,6 @@ public class TracingLogFormatter extends Formatter {
       source = record.getLoggerName();
     }
 
-    // Look for a TraceId in the message format parameters array.
-    String traceId = null;
-    Object[] params = record.getParameters();
-    if (params != null && params.length > 0 && params[params.length - 1] instanceof TraceId) {
-      // remove the TraceId from the parameters array prior to formatting the message
-      traceId = params[params.length - 1].toString();
-      record.setParameters(params.length == 1 ? null : Arrays.copyOf(params, params.length - 1));
-    }
-
     // format the message
     String message = formatMessage(record);
     
@@ -85,6 +73,6 @@ public class TracingLogFormatter extends Formatter {
         /* %4 */ record.getLevel().toString(),
         /* %5 */ message, 
         /* %6 */ throwable, 
-        /* %7 */ traceId);
+        /* %7 */ TracingLogHandler.getCurrentTraceId());
   }
 }
