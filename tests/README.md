@@ -72,9 +72,9 @@ Again from the jetty-runtime/tests directory:
 > mvn install -Ptest.remote -Djetty.test.image=gcr.io/{project}/jetty:9.4
 ```
 
-This will activate the remote testing profile and suppress local testing. Under this scenario, for each test artifact the appengine-maven-plugin is used to deploy an instance of the application to the Google Flexible environment and then run appropriate test cases.  The containers for each webapp will be built through using the cloud builder mechanism.  This means the image to be tested (as referenced in the jetty.test.image property) will need to be deployed to the appropriate gcr.io location.  Remote testing can make use of the entire scope of services available to Google Flex.  
+This will activate the remote testing profile.. Under this scenario, for each test artifact the appengine-maven-plugin is used to deploy an instance of the application to the Google Flexible environment and then run appropriate test cases.  The containers for each webapp will be built through using the cloud builder mechanism.  This means the image to be tested (as referenced in the jetty.test.image property) will need to be deployed to the appropriate gcr.io location.  Remote testing can make use of the entire scope of services available to Google Flex.  
 
-
+It is possible to run local and remote testing at the same time by using -Ptest.remote,test.local however it is important to note that the jetty.test.image is required to point to an image in gcr.io and local testing will use this same image.
 
 Test Case Requirements and Conventions
 ===
@@ -102,7 +102,7 @@ Conventions:
 * jetty.test.image default for local is 'jetty:${docker.tag.short}'
 * remote testing is enabled via -Ptest.remote
 * local testing is turned off by -P-test.local
-* local and remote testing are mutually exclusive
+* local and remote testing can both be active but remote image is always used
 * a custom LocalRemoteTestRunner junit test runner is used to find tests to run
 * test classes should extend the AbstractIntegrationTest from gcloud-testing-core
 * local only integration tests have the @LocalOnly annotation
