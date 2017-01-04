@@ -43,6 +43,7 @@ public class TestServlet extends HttpServlet {
     getServletContext().log("init ServletContext.log");
   }
 
+  @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
     log.info("doGet info");
@@ -51,10 +52,10 @@ public class TestServlet extends HttpServlet {
     if (request.getParameter("ex") != null) {
       try {
         throw (Throwable) Class.forName(request.getParameter("ex")).newInstance();
-      } catch (ServletException | IOException e) {
-        throw e;
-      } catch (Throwable e) {
-        throw new ServletException(e);
+      } catch (ServletException | IOException ex) {
+        throw ex;
+      } catch (Throwable th) {
+        throw new ServletException(th);
       }
     }
     response.getWriter().println("Log Test");

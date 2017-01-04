@@ -21,8 +21,6 @@ import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.ContextHandler.Context;
 import org.eclipse.jetty.server.handler.ContextHandler.ContextScopeListener;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,37 +35,33 @@ public class RequestContextScope implements ContextHandler.ContextScopeListener 
   static final Logger logger = Logger.getLogger(RequestContextScope.class.getName());
 
   private static final String X_CLOUD_TRACE = "x-cloud-trace-context";
-  private static final ThreadLocal<String> traceId = new ThreadLocal<>();
-  private static final ThreadLocal<Deque<Request>> requestStack = 
-      new ThreadLocal<Deque<Request>>() {
-    @Override
-    protected Deque<Request> initialValue() {
-      return new ArrayDeque<>();
-    }
-  };
+  private static final ThreadLocal<Integer> contextDepth = new ThreadLocal<>();
 
   @Override
   public void enterScope(Context context, Request request, Object reason) {
-    if (request != null) {
-      Deque<Request> stack = requestStack.get();
-      if (stack.isEmpty()) {
-        String id = (String) request.getAttribute(X_CLOUD_TRACE);
-        if (id == null) {
-          id = request.getHeader(X_CLOUD_TRACE);
-          if (id != null) {
-            int slash = id.indexOf('/');
-            if (slash >= 0) {
-              id = id.substring(0, slash);
-            }
-            request.setAttribute(X_CLOUD_TRACE, id);
-          }
-        }
-        traceId.set(id);
-      }
-      stack.push(request);
-    }
     if (logger.isLoggable(Level.FINE)) {
       logger.fine("enterScope " + context);
+    }
+    if (request != null) {
+      Integer depth = contextDepth.get();
+      if (depth == null || depth.intValue() == 0) {
+        depth = 1;
+        String traceId = (String) request.getAttribute(X_CLOUD_TRACE);
+        if (traceId == null) {
+          traceId = request.getHeader(X_CLOUD_TRACE);
+          if (traceId != null) {
+            int slash = traceId.indexOf('/');
+            if (slash >= 0) {
+              traceId = traceId.substring(0, slash);
+            }
+            request.setAttribute(X_CLOUD_TRACE, traceId);
+            TracingLogHandler.setCurrentTraceId(traceId);
+          }
+        } else {
+          depth = depth + 1;
+        }
+        contextDepth.set(depth);
+      }
     }
   }
 
@@ -76,16 +70,14 @@ public class RequestContextScope implements ContextHandler.ContextScopeListener 
     if (logger.isLoggable(Level.FINE)) {
       logger.fine("exitScope " + context);
     }
-    if (request != null) {
-      requestStack.get().pop();
+    Integer depth = contextDepth.get();
+    if (depth != null) {
+      if (depth > 1) {
+        contextDepth.set(depth - 1);
+      } else {
+        contextDepth.remove();
+        TracingLogHandler.setCurrentTraceId(null);
+      }
     }
-  }
-  
-  public static Request getCurrentRequest() {
-    return requestStack.get().peek();
-  }
-
-  public static String getCurrentTraceId() {
-    return traceId.get();
   }
 }
