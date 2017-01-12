@@ -35,6 +35,8 @@ install:
   - export CLOUDSDK_CORE_DISABLE_USAGE_REPORTING=true
   # update all Cloud SDK components
   - gcloud components update -q
+  # install the beta component for "gcloud beta container images"
+  - gcloud components install beta -q
   # do not run remote tests for pull requests
   - |
     if [ $TRAVIS_PULL_REQUEST = 'false' ]; then
@@ -60,7 +62,7 @@ script:
   - |
     if $DO_REMOTE; then
       # deploy image to gcr
-      image=gcr.io/travis-app-maven-plugin/jetty:`date +%s`
+      image=gcr.io/travis-app-maven-plugin/jetty_test:`date +%s`
       docker tag jetty:9.4 $image
       # do the remote test
       gcloud docker -q -- push $image && mvn clean verify -Ptest.remote,test.local -Djetty.test.image=$image -B -q
@@ -69,6 +71,6 @@ script:
 after_script:
   - |
     if $DO_REMOTE; then
-      # cleanup deploy image
-      gcloud docker -q -- rmi -f $image
+      # cleanup deployed image
+      gcloud beta container images delete gcr.io/travis-app-maven-plugin/jetty_test@ -q
     fi
