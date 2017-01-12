@@ -106,6 +106,7 @@ public class TracingLogHandler extends AsyncLoggingHandler {
     if (instanceid != null) {
       builder.addLabel("appengine.googleapis.com/instance_name", instanceid);
     }
+    builder.setTimestamp(record.getMillis());
   }
 }
 
