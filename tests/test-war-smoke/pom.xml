@@ -187,6 +187,37 @@
               </execution>
             </executions>
           </plugin>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <executions>
+              <!-- remove the service from 'deploy-integration-test' -->
+              <execution>
+                <id>cleanup-remote-service</id>
+                <phase>post-integration-test</phase>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <configuration>
+                  <executable>gcloud</executable>
+                  <arguments>
+                    <argument>--quiet</argument>
+                    <argument>app</argument>
+                    <argument>versions</argument>
+                    <argument>delete</argument>
+                    <argument>${maven.build.timestamp}</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>test.remote.deploy</id>
+      <build>
+        <plugins>
           <!-- create tag for local docker image to push for remote use in test -->
           <plugin>
             <groupId>com.spotify</groupId>
@@ -227,24 +258,19 @@
                   </arguments>
                 </configuration>
               </execution>
-              <!-- remove the service from 'deploy-integration-test' -->
-              <execution>
-                <id>cleanup-remote-service</id>
-                <phase>post-integration-test</phase>
-                <goals>
-                  <goal>exec</goal>
-                </goals>
-                <configuration>
-                  <executable>gcloud</executable>
-                  <arguments>
-                    <argument>--quiet</argument>
-                    <argument>app</argument>
-                    <argument>versions</argument>
-                    <argument>delete</argument>
-                    <argument>${maven.build.timestamp}</argument>
-                  </arguments>
-                </configuration>
-              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>test.remote.clean</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <executions>
               <!-- remove the remote image from 'deploy-remote-docker' -->
               <execution>
                 <id>cleanup-remote-image</id>
@@ -255,12 +281,12 @@
                 <configuration>
                   <executable>gcloud</executable>
                   <arguments>
-                    <argument>docker</argument>
-                    <argument>-q</argument>
-                    <argument>--</argument>
-                    <argument>rmi</argument>
-                    <argument>-f</argument>
+                    <argument>beta</argument>
+                    <argument>container</argument>
+                    <argument>images</argument>
+                    <argument>delete</argument>
                     <argument>${jetty.test.image}</argument>
+                    <argument>-q</argument>
                   </arguments>
                 </configuration>
               </execution>
