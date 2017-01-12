@@ -16,15 +16,21 @@
 
 package com.google.cloud.runtimes.jetty9;
 
-import java.util.logging.ConsoleHandler;
+
+import static com.google.common.base.MoreObjects.firstNonNull;
+
+import com.google.cloud.MonitoredResource;
+import com.google.cloud.logging.AsyncLoggingHandler;
+import com.google.cloud.logging.LogEntry.Builder;
+import com.google.cloud.logging.LoggingOptions;
+
 import java.util.logging.LogManager;
+import java.util.logging.LogRecord;
 
 /**
- * A Logging Handler that uses the {@link TracingLogFormatter}
- * to log the trace ID.
- * @see TracingLogFormatter
+ * A Google Cloud Logging Handler extended with a request traceid label.
  */
-public class TracingLogHandler extends ConsoleHandler {
+public class TracingLogHandler extends AsyncLoggingHandler {
 
   private static final ThreadLocal<String> traceId = new ThreadLocal<>();
   
@@ -46,27 +52,60 @@ public class TracingLogHandler extends ConsoleHandler {
     return traceId.get();
   }
   
+  private final MonitoredResource monitored;
+  private final String instanceid;
+  
   /**
-   * Construct a TracingLogHandler.
+   * Construct a TracingLogHandler for "jetty.log"
    */
   public TracingLogHandler() {
-    configure();
+    this(
+        firstNonNull(
+            LogManager.getLogManager().getProperty(TracingLogHandler.class.getName() + ".log"),
+            "jetty.log"),
+        null,
+        addLabel(addLabel(
+            addLabel(MonitoredResource.newBuilder("gae_app"), 
+                "project_id", "GCLOUD_PROJECT"),
+                "module_id", "GAE_SERVICE"), 
+                "version_id", "GAE_VERSION").build());
   }
 
-  // Private method to configure a StreamHandler from LogManager
-  // properties and/or default values as specified in the class
-  // javadoc.
-  private void configure() {
-    LogManager manager = LogManager.getLogManager();
-    String cname = getClass().getName();
-
-    String formatter = manager.getProperty(cname + ".formatter");
-    if (formatter != null && formatter.equals(TracingLogFormatter.class.getName())) {
-      throw new IllegalStateException("Use String 'format' rather than Class 'fomatter' for "
-          + TracingLogFormatter.class.getName());
+  private static MonitoredResource.Builder addLabel(
+      MonitoredResource.Builder builder, 
+      String label,
+      String env) {
+    String value = System.getenv(env);
+    if (value != null) {
+      builder.addLabel(label, value);
     }
+    return builder;
+  }
+  
+  /**
+   * Construct a TracingLogHandler.
+   * 
+   * @param logName Name of the log
+   * @param options LoggingOptions to access Google cloud API
+   * @param resource The resource to log against
+   */
+  public TracingLogHandler(String logName, LoggingOptions options, MonitoredResource resource) {
+    super(logName, options, resource);
+    monitored = resource;
+    instanceid = System.getenv("GAE_INSTANCE");
+  }
 
-    String format = manager.getProperty(cname + ".format");
-    setFormatter(new TracingLogFormatter(format));    
+  @Override
+  protected void enhanceLogEntry(Builder builder, LogRecord record) {
+    super.enhanceLogEntry(builder, record);
+    String traceId = getCurrentTraceId();
+    builder.setResource(monitored);
+    if (traceId != null) {
+      builder.addLabel("appengine.googleapis.com/trace_id", traceId);
+    } 
+    if (instanceid != null) {
+      builder.addLabel("appengine.googleapis.com/instance_name", instanceid);
+    }
   }
 }
+
