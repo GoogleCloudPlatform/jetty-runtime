@@ -65,7 +65,7 @@ script:
       image=gcr.io/travis-app-maven-plugin/jetty_test:`date +%s`
       docker tag jetty:9.4 $image
       # do the remote test
-      gcloud docker -q -- push $image && mvn clean verify -Ptest.remote,test.local -Djetty.test.image=$image -B -q
+      gcloud docker -q -- push $image && mvn clean verify -Ptest.local,test.remote,test.remote.deploy,test.remote.clean -Djetty.test.image=$image -B -q
     fi
 
 after_script:
