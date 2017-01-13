@@ -5,8 +5,8 @@ DEFAULT_ARGS="-Djetty.base=$JETTY_BASE -jar $JETTY_HOME/start.jar"
 
 # Unpack a WAR app (if present) beforehand so that Stackdriver Debugger
 # can load it. This should be done before the JVM for Jetty starts up.
-ROOT_WAR=$JETTY_BASE/webapps/root.war
-ROOT_DIR=$JETTY_BASE/webapps/root
+: ${ROOT_WAR:=$JETTY_BASE/webapps/root.war}
+: ${ROOT_DIR:=$JETTY_BASE/webapps/root}
 if [ -e "$ROOT_WAR" ]; then
   # Unpack it only if $ROOT_DIR doesn't exist or the root is older than the war.
   if [ -e "$ROOT_WAR" -a \( \( ! -e "$ROOT_DIR" \) -o \( "$ROOT_DIR" -ot "$ROOT_WAR" \) \) ]; then
@@ -19,6 +19,9 @@ fi
 if [ ! -e "$ROOT_DIR" -a -d /app ]; then
   ln -s /app "$ROOT_DIR"
 fi
+
+# Set working directory to the root application directory
+cd "$ROOT_DIR"
 
 # If the passed arguments start with the java command
 if [ "java" = "$1" -o "$(which java)" = "$1" ] ; then
