@@ -173,24 +173,30 @@
               </execution>
             </executions>
           </plugin>
-          <!-- runs lifecycle to stage and deploy a remote service to test -->
-          <plugin>
-            <groupId>com.google.cloud.tools</groupId>
-            <artifactId>appengine-maven-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>deploy-integration-test</id>
-                <phase>pre-integration-test</phase>
-                <goals>
-                  <goal>deploy</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>exec-maven-plugin</artifactId>
             <executions>
+              <!-- deploy the service -->
+              <execution>
+                <id>deploy-remote-service</id>
+                <phase>pre-integration-test</phase>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <configuration>
+                  <workingDirectory>${project.build.directory}/appengine-staging</workingDirectory>
+                  <executable>gcloud</executable>
+                  <arguments>
+                    <argument>--quiet</argument>
+                    <argument>app</argument>
+                    <argument>deploy</argument>
+                    <argument>app.yaml</argument>
+                    <argument>--version</argument>
+                    <argument>${maven.build.timestamp}</argument>
+                  </arguments>
+                </configuration>
+              </execution>
               <!-- remove the service from 'deploy-integration-test' -->
               <execution>
                 <id>cleanup-remote-service</id>

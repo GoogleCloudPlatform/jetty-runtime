@@ -40,16 +40,6 @@
     <pluginManagement>
       <plugins>
         <plugin>
-          <groupId>com.google.cloud.tools</groupId>
-          <artifactId>appengine-maven-plugin</artifactId>
-          <configuration>
-            <deploy.project>${app.deploy.project}</deploy.project>
-            <deploy.version>${maven.build.timestamp}</deploy.version>
-            <deploy.promote>false</deploy.promote>
-            <dockerDirectory>${project.build.directory}/docker</dockerDirectory>
-          </configuration>
-        </plugin>
-        <plugin>
           <groupId>com.spotify</groupId>
           <artifactId>docker-maven-plugin</artifactId>
           <configuration>
