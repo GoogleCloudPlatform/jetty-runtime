@@ -131,6 +131,19 @@
                   </target>
                 </configuration>
               </execution>
+              <execution>
+                <id>copy-deploy-artifact</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <target>
+                    <copy file="${project.build.directory}/${project.artifactId}-${project.version}.war"
+                          todir="${project.build.directory}/appengine-staging/"/>
+                  </target>
+                </configuration>
+              </execution>
             </executions>
           </plugin>
           <plugin>

@@ -129,6 +129,11 @@
         <targetPath>${project.build.directory}/appengine-staging</targetPath>
       </resource>
       <resource>
+        <directory>src/main/docker</directory>
+        <filtering>true</filtering>
+        <targetPath>${project.build.directory}/appengine-staging</targetPath>
+      </resource>
+      <resource>
         <directory>src/main/resources</directory>
         <filtering>true</filtering>
         <targetPath>
