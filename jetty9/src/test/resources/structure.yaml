@@ -1,0 +1,40 @@
+# Test spec for the Cloud Runtimes container structure testing framework.
+#
+# See https://github.com/GoogleCloudPlatform/runtimes-common/blob/master/structure_tests/README.md for more detail.
+#
+schemaVersion: 1.0.0
+
+commandTests:
+- name: 'JETTY_HOME is set'
+  command: ['env']
+  expectedOutput: ['JETTY_HOME=${jetty.home}']
+- name: 'JETTY_BASE is set'
+  command: ['env']
+  expectedOutput: ['JETTY_BASE=${jetty.base}']
+
+fileExistenceTests:
+- name: 'jetty start.jar exists'
+  path: '${jetty.home}/start.jar'
+  isDirectory: false
+  shouldExist: true
+- name: 'JETTY_HOME directory exists'
+  path: '${jetty.home}'
+  isDirectory: true
+  shouldExist: true
+- name: 'JETTY_BASE directory exists'
+  path: '${jetty.base}'
+  isDirectory: true
+  shouldExist: true
+- name: 'webapps directory exists'
+  path: '${jetty.base}/webapps'
+  isDirectory: true
+  shouldExist: true
+- name: 'docker entrypoint exists'
+  path: '/docker-entrypoint.bash'
+  isDirectory: false
+  shouldExist: true
+
+licenseTests:
+- debian: true
+  files: []
+
