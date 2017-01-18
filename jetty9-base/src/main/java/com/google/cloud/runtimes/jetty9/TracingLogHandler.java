@@ -51,10 +51,7 @@ public class TracingLogHandler extends AsyncLoggingHandler {
   public static String getCurrentTraceId() {
     return traceId.get();
   }
-  
-  private final MonitoredResource monitored;
-  private final String instanceid;
-  
+    
   /**
    * Construct a TracingLogHandler for "jetty.log"
    */
@@ -63,23 +60,7 @@ public class TracingLogHandler extends AsyncLoggingHandler {
         firstNonNull(
             LogManager.getLogManager().getProperty(TracingLogHandler.class.getName() + ".log"),
             "jetty.log"),
-        null,
-        addLabel(addLabel(
-            addLabel(MonitoredResource.newBuilder("gae_app"), 
-                "project_id", "GCLOUD_PROJECT"),
-                "module_id", "GAE_SERVICE"), 
-                "version_id", "GAE_VERSION").build());
-  }
-
-  private static MonitoredResource.Builder addLabel(
-      MonitoredResource.Builder builder, 
-      String label,
-      String env) {
-    String value = System.getenv(env);
-    if (value != null) {
-      builder.addLabel(label, value);
-    }
-    return builder;
+        null,null);
   }
   
   /**
@@ -91,21 +72,15 @@ public class TracingLogHandler extends AsyncLoggingHandler {
    */
   public TracingLogHandler(String logName, LoggingOptions options, MonitoredResource resource) {
     super(logName, options, resource);
-    monitored = resource;
-    instanceid = System.getenv("GAE_INSTANCE");
   }
 
   @Override
   protected void enhanceLogEntry(Builder builder, LogRecord record) {
     super.enhanceLogEntry(builder, record);
     String traceId = getCurrentTraceId();
-    builder.setResource(monitored);
     if (traceId != null) {
       builder.addLabel("appengine.googleapis.com/trace_id", traceId);
     } 
-    if (instanceid != null) {
-      builder.addLabel("appengine.googleapis.com/instance_name", instanceid);
-    }
     builder.setTimestamp(record.getMillis());
   }
 }

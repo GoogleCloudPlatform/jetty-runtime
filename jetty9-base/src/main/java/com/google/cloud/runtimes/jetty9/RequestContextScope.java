@@ -16,6 +16,8 @@
 
 package com.google.cloud.runtimes.jetty9;
 
+import com.google.cloud.logging.GaeFlexLoggingEnhancer;
+
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.ContextHandler.Context;
@@ -55,7 +57,7 @@ public class RequestContextScope implements ContextHandler.ContextScopeListener 
               traceId = traceId.substring(0, slash);
             }
             request.setAttribute(X_CLOUD_TRACE, traceId);
-            TracingLogHandler.setCurrentTraceId(traceId);
+            GaeFlexLoggingEnhancer.setCurrentTraceId(traceId);
           }
         } else {
           depth = depth + 1;
@@ -76,7 +78,7 @@ public class RequestContextScope implements ContextHandler.ContextScopeListener 
         contextDepth.set(depth - 1);
       } else {
         contextDepth.remove();
-        TracingLogHandler.setCurrentTraceId(null);
+        GaeFlexLoggingEnhancer.setCurrentTraceId(null);
       }
     }
   }
