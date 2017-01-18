@@ -94,15 +94,13 @@
     <profile>
       <id>test.remote</id>
       <properties>
-        <!-- change the build timestamp to something palatable for gcloud -->
-        <maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>
         <gcloud-projectId-file>${project.build.directory}/gcloud-projectid.properties
         </gcloud-projectId-file>
         <!--
            ~ remote tests require image in gcr.io
            ~ if local tests are enabled with remote, this image is used locally as well
            -->
-        <jetty.test.image>gcr.io/${app.deploy.project}/jetty:${docker.tag.short}</jetty.test.image>
+        <jetty.test.image>gcr.io/${app.deploy.project}/jetty:${docker.tag.long}</jetty.test.image>
       </properties>
       <build>
         <plugins>
@@ -139,7 +137,7 @@
                 </goals>
                 <configuration>
                   <target>
-                    <copy file="${project.build.directory}/${project.artifactId}-${project.version}.war"
+                    <copy file="${project.build.directory}/${project.build.finalName}.war"
                           todir="${project.build.directory}/appengine-staging/"/>
                   </target>
                 </configuration>
@@ -211,6 +209,7 @@
                 </configuration>
               </execution>
               <!-- remove the service from 'deploy-integration-test' -->
+              <!--
               <execution>
                 <id>cleanup-remote-service</id>
                 <phase>post-integration-test</phase>
@@ -220,14 +219,15 @@
                 <configuration>
                   <executable>gcloud</executable>
                   <arguments>
-                    <argument>--quiet</argument>
+                    <argument>- -quiet</argument>
                     <argument>app</argument>
                     <argument>versions</argument>
                     <argument>delete</argument>
-                    <argument>${maven.build.timestamp}</argument>
+                    <argument>${maven.build.timestamp}</argument> // this needs to be sha value of image
                   </arguments>
                 </configuration>
               </execution>
+              -->
             </executions>
           </plugin>
         </plugins>
@@ -249,7 +249,7 @@
                   <goal>tag</goal>
                 </goals>
                 <configuration>
-                  <image>jetty:${docker.tag.short}</image>
+                  <image>jetty:${docker.tag.long}</image>
                   <newName>${jetty.test.image}</newName>
                 </configuration>
               </execution>
