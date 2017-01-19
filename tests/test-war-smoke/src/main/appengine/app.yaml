@@ -8,3 +8,7 @@ health_check:
 manual_scaling:
   instances: 1
 
+handlers:
+- url: /.*
+  script: ignored
+  secure: optional

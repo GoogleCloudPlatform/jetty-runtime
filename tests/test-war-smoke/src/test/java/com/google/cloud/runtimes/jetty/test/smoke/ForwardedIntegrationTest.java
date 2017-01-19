@@ -26,7 +26,6 @@ import com.google.cloud.runtime.jetty.test.annotation.LocalOnly;
 import com.google.cloud.runtime.jetty.test.annotation.RemoteOnly;
 import com.google.cloud.runtime.jetty.util.HttpUrlUtil;
 
-import org.hamcrest.Matchers;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -80,17 +79,34 @@ public class ForwardedIntegrationTest extends AbstractIntegrationTest {
    */
   @Test
   @RemoteOnly
-  public void testRemoteProto() throws IOException {
+  public void testRemoteUserProto() throws IOException {
     URI target = getUri().resolve("/dump/info");
     assertThat(target.getPath(), containsString("/dump/info"));
 
+    // Check that user provided X-Forwarded-Proto is ignored
     HttpURLConnection http = HttpUrlUtil.openTo(target);
     http.setRequestProperty("X-Forwarded-Proto", "https");
-
     assertThat(http.getResponseCode(), is(200));
     String responseBody = HttpUrlUtil.getResponseBody(http);
-    
-    // TODO should we trust the client to say it is secure?  Not secure to the GFE!
+    assertThat(responseBody, containsString("scheme=http(secure=false)"));
+  }
+  
+  /**
+   * Validate GFE proto header is handled.
+   *
+   * @throws Exception test in error
+   */
+  @Test
+  @RemoteOnly
+  public void testRemoteProto() throws Exception {
+    URI target = getUri().resolve("/dump/info");
+    target = new URI(target.toASCIIString().replace("http:", "https:"));
+    assertThat(target.getPath(), containsString("/dump/info"));
+
+    // Check that GFE X-Forwarded-Proto is not ignored
+    HttpURLConnection http = HttpUrlUtil.openTo(target);
+    assertThat(http.getResponseCode(), is(200));
+    String responseBody = HttpUrlUtil.getResponseBody(http);
     assertThat(responseBody, containsString("scheme=https(secure=true)"));
   }
   
@@ -113,7 +129,7 @@ public class ForwardedIntegrationTest extends AbstractIntegrationTest {
     
     // Test that the client is trusted to say what their IP is 
     assertThat(responseBody, containsString("remoteHost/Addr:port=1.2.3.4"));
-    // That that the GFE IP is added to the forwarded list
+    // Test GFE IP is added to the forwarded list by looking for trailing comma
     assertThat(responseBody, containsString("X-Forwarded-For: 1.2.3.4, 5.6.7.8,"));
   }
   
@@ -136,9 +152,7 @@ public class ForwardedIntegrationTest extends AbstractIntegrationTest {
 
     // Test forwarded header is ignored
     assertThat(responseBody, not(containsString("remoteHost/Addr:port=1.2.3.4")));
-    
-    // TODO Why is the request still https?
-    // assertThat(responseBody, containsString("scheme=http(secure=false)"));
+    assertThat(responseBody, containsString("scheme=http(secure=false)"));
   }
 
 }
