@@ -1,12 +1,15 @@
 #!/bin/bash
 
+# source the supported feature JVM arguments
+source /setup-env.bash
+  
 # default jetty arguments
-DEFAULT_ARGS="-Djetty.base=$JETTY_BASE -jar $JETTY_HOME/start.jar"
+export DEFAULT_ARGS="-Djetty.base=$JETTY_BASE -jar $JETTY_HOME/start.jar"
 
 # Unpack a WAR app (if present) beforehand so that Stackdriver Debugger
 # can load it. This should be done before the JVM for Jetty starts up.
-: ${ROOT_WAR:=$JETTY_BASE/webapps/root.war}
-: ${ROOT_DIR:=$JETTY_BASE/webapps/root}
+export ROOT_WAR=$JETTY_BASE/webapps/root.war
+export ROOT_DIR=$JETTY_BASE/webapps/root
 if [ -e "$ROOT_WAR" ]; then
   # Unpack it only if $ROOT_DIR doesn't exist or the root is older than the war.
   if [ -e "$ROOT_WAR" -a \( \( ! -e "$ROOT_DIR" \) -o \( "$ROOT_DIR" -ot "$ROOT_WAR" \) \) ]; then
@@ -35,12 +38,8 @@ fi
 if ! type "$1" &>/dev/null; then
   # then treat all arguments as arguments to the java command
   
-  # source the supported feature JVM arguments
-  source /setup-env.bash
-  
   # set the command line to java with the feature arguments and passed arguments
   set -- java $JAVA_OPTS $DEFAULT_ARGS "$@"
 fi
 
 exec "$@"
-
