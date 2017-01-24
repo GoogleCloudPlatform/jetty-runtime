@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure_9_3.dtd">
 <Configure class="org.eclipse.jetty.webapp.WebAppContext">
-  
+ 
   <!-- Allow start exceptions to propagate -->
   <Set name="throwUnavailableOnStartupException">true</Set>
 
@@ -21,5 +21,5 @@
   </Set>
 
   <Set name="overrideDescriptor"><Property name="jetty.base"/>/etc/gae-override-web.xml</Set>
-  
+ 
 </Configure>
