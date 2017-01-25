@@ -61,16 +61,13 @@ script:
   # execute remote tests
   - |
     if $DO_REMOTE; then
-      # deploy image to gcr
-      image=gcr.io/travis-app-maven-plugin/jetty_test:`date +%s`
-      docker tag jetty:9.4 $image
       # do the remote test
-      gcloud docker -q -- push $image && mvn clean verify -Ptest.local,test.remote,test.remote.deploy,test.remote.clean -Djetty.test.image=$image -B -q
+      mvn clean verify -Ptest.local,test.remote,test.remote.deploy,test.remote.clean -B -q
     fi
 
-after_script:
-  - |
-    if $DO_REMOTE; then
-      # cleanup deployed image
-      gcloud beta container images delete gcr.io/travis-app-maven-plugin/jetty_test@ -q
-    fi
+#after_script:
+#  - |
+#    if $DO_REMOTE; then
+#      # cleanup deployed image
+#      gcloud beta container images delete gcr.io/travis-app-maven-plugin/jetty_test@ -q
+#    fi
