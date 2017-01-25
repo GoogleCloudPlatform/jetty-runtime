@@ -57,8 +57,7 @@ install:
 
 script:
   # execute regular local build
-  - mvn clean verify
-  #- mvn clean verify -B -V -q
+  - mvn clean verify -B -V -q
   # execute remote tests
   - |
     if $DO_REMOTE; then
