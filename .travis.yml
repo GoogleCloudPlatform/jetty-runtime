@@ -61,13 +61,6 @@ script:
   # execute remote tests
   - |
     if $DO_REMOTE; then
-      # do the remote test
+      # do the remote test, will use default image setting and should clean up remote test image resources
       mvn clean verify -Ptest.local,test.remote,test.remote.deploy,test.remote.clean -B -q
     fi
-
-#after_script:
-#  - |
-#    if $DO_REMOTE; then
-#      # cleanup deployed image
-#      gcloud beta container images delete gcr.io/travis-app-maven-plugin/jetty_test@ -q
-#    fi
