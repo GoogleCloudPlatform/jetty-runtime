@@ -203,7 +203,6 @@
                     <argument>app</argument>
                     <argument>deploy</argument>
                     <argument>app.yaml</argument>
-                    <argument>--promote</argument>
                     <argument>--version</argument>
                     <argument>${maven.build.timestamp}</argument>
                   </arguments>
