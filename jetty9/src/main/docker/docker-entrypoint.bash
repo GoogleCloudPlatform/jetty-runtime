@@ -24,7 +24,9 @@ if [ ! -e "$ROOT_DIR" -a -d /app ]; then
 fi
 
 # Set working directory to the root application directory
-cd "$ROOT_DIR"
+if [ -d "$ROOT_DIR" ]; then
+  cd "$ROOT_DIR"
+fi
 
 # If the passed arguments start with the java command
 if [ "java" = "$1" -o "$(which java)" = "$1" ] ; then
