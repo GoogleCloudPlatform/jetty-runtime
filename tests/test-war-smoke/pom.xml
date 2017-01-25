@@ -203,15 +203,15 @@
                     <argument>app</argument>
                     <argument>deploy</argument>
                     <argument>app.yaml</argument>
+                    <argument>--promote</argument>
                     <argument>--version</argument>
                     <argument>${maven.build.timestamp}</argument>
                   </arguments>
                 </configuration>
               </execution>
-              <!-- remove the service from 'deploy-integration-test' -->
-              <!--
+              <!-- stop the service from 'deploy-remote-service' -->
               <execution>
-                <id>cleanup-remote-service</id>
+                <id>stop-remote-service</id>
                 <phase>post-integration-test</phase>
                 <goals>
                   <goal>exec</goal>
@@ -219,15 +219,32 @@
                 <configuration>
                   <executable>gcloud</executable>
                   <arguments>
-                    <argument>- -quiet</argument>
+                    <argument>--quiet</argument>
                     <argument>app</argument>
                     <argument>versions</argument>
-                    <argument>delete</argument>
-                    <argument>${maven.build.timestamp}</argument> // this needs to be sha value of image
+                    <argument>stop</argument>
+                    <argument>${maven.build.timestamp}</argument>
                   </arguments>
                 </configuration>
               </execution>
-              -->
+              <!-- remove the service from 'deploy-remote-service' -->
+              <execution>
+                <id>delete-remote-service</id>
+                <phase>post-integration-test</phase>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <configuration>
+                  <executable>gcloud</executable>
+                  <arguments>
+                    <argument>--quiet</argument>
+                    <argument>app</argument>
+                    <argument>versions</argument>
+                    <argument>delete</argument>
+                    <argument>${maven.build.timestamp}</argument>
+                  </arguments>
+                </configuration>
+              </execution>
             </executions>
           </plugin>
         </plugins>
@@ -298,14 +315,10 @@
                   <goal>exec</goal>
                 </goals>
                 <configuration>
-                  <executable>gcloud</executable>
+                  <executable>bash</executable>
                   <arguments>
-                    <argument>beta</argument>
-                    <argument>container</argument>
-                    <argument>images</argument>
-                    <argument>delete</argument>
-                    <argument>${jetty.test.image}</argument>
-                    <argument>-q</argument>
+                    <argument>-c</argument>
+                    <argument>gcloud beta container images delete `docker inspect --format='{{index .RepoDigests 0}}' ${jetty.test.image}` -q</argument>
                   </arguments>
                 </configuration>
               </execution>
