@@ -29,6 +29,10 @@ fileExistenceTests:
   path: '${jetty.base}/webapps'
   isDirectory: true
   shouldExist: true
+- name: 'app-env.bash exists'
+  path: '/app-env.bash'
+  isDirectory: false
+  shouldExist: true
 - name: 'docker entrypoint exists'
   path: '/docker-entrypoint.bash'
   isDirectory: false
