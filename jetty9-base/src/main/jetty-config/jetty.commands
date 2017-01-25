@@ -17,6 +17,3 @@ jetty.deploy.scanInterval=0
 
 # Disable support for RFC7239 header
 jetty.httpConfig.forwardedHeader=
-
-#TODO remove this.  Needed to fix configuration error in jetty-9.4.0, fixed in 9.4.1
-jetty.httpConfig.forwardedHttpsHeader=X-Forwarded-For
