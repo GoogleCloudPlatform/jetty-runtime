@@ -40,6 +40,11 @@ public class LocalRemoteTestRunner extends BlockJUnit4ClassRunner {
   private String mode;
 
 
+  /** 
+   * Constructor
+   * @param klass  The test class to run
+   * @throws InitializationError if tests cannot be initialized
+   */
   public LocalRemoteTestRunner(Class<?> klass) throws InitializationError {
     super(klass);
 

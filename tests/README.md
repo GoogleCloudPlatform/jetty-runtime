@@ -33,7 +33,7 @@ In order to make these images available for remote testing you can use the follo
 
 ```
 > docker tag jetty:9.4 gcr.io/{project}/jetty:9.4
-> gcloud docker push gcr.io/{project}/jetty:9.4 
+> gcloud docker -- push gcr.io/{project}/jetty:9.4 
 ```
 
 This will take the local artifacts and make them available for remote testing (or general usage for the given {project}).  Additionally when using test.remote the test.remote.deploy profile can perform the tag and push.
@@ -154,8 +154,8 @@ To interact with a local test under development the following docker command may
 
 ```
 > cd tests/test-war-smoke
-> mvn install
+> mvn package
 > docker run --rm -it -p 8088:8080 test-war-smoke:latest
 ```
 
-This will deploy the test-war-smoke container and you will be able to query the service with your browser by nagivating to (http://localhost:8088/).
+This will deploy the test-war-smoke container and you will be able to query the service with your browser by nagivating to (http://localhost:8088/). To run local tests against a manually deployed container, the System properties `-Dtest.mode=local -Dapp.deploy.port=8088` must be set.
