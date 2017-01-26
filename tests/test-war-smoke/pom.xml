@@ -291,7 +291,7 @@
             <executions>
               <execution>
                 <id>tag-image</id>
-                <phase>package</phase>
+                <phase>generate-resources</phase>
                 <goals>
                   <goal>tag</goal>
                 </goals>
@@ -309,7 +309,7 @@
               <!-- push a remote docker image to use with 'deploy-integration-test' -->
               <execution>
                 <id>deploy-remote-docker</id>
-                <phase>package</phase>
+                <phase>generate-resources</phase>
                 <goals>
                   <goal>exec</goal>
                 </goals>
