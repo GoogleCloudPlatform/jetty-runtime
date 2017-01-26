@@ -1,0 +1,3 @@
+[submodule "perf/jetty-load-generator"]
+	path = perf/jetty-load-generator
+	url = https://github.com/olamy/jetty-load-generator

@@ -263,4 +263,14 @@
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>perf</id>
+      <modules>
+        <module>perf</module>
+      </modules>
+    </profile>
+  </profiles>
+
 </project>
