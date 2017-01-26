@@ -9,6 +9,11 @@ jetty.httpConfig.sendDateHeader=false
 
 jetty.server.stopTimeout=30000
 
+# Configure secure port redirection to 443 (default 8443 for requests recevied on 8080)
 jetty.httpConfig.securePort=443
 
+# Disable hot deploy of webapps
 jetty.deploy.scanInterval=0
+
+# Disable support for RFC7239 header
+jetty.httpConfig.forwardedHeader=
