@@ -29,7 +29,8 @@
   <packaging>pom</packaging>
   <properties>
     <checkstyle.skip>false</checkstyle.skip>
-    <jetty.test.image>jetty:${docker.tag.short}</jetty.test.image>
+    <!-- default image name for local tests -->
+    <jetty.test.image>jetty:${docker.tag.long}</jetty.test.image>
   </properties>
   <modules>
     <module>gcloud-testing-core</module>
@@ -54,10 +55,50 @@
             <includes>
               <include>%regex[.*IntegrationTest.*]</include>
             </includes>
+            <systemPropertyVariables>
+              <app.deploy.port>${local.app.port}</app.deploy.port>
+            </systemPropertyVariables>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <configuration>
+            <excludes>
+              <exclude>**/*IntegrationTest.java</exclude>
+            </excludes>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>io.fabric8</groupId>
+          <artifactId>docker-maven-plugin</artifactId>
+          <version>0.19.0</version>
+          <configuration>
+            <images>
+              <image>
+                <name>${project.artifactId}:${project.version}</name>
+                <alias>${project.artifactId}</alias>
+                <run>
+                  <ports>
+                    <port>${local.app.port}:8080</port>
+                  </ports>
+                </run>
+              </image>
+            </images>
           </configuration>
         </plugin>
       </plugins>
     </pluginManagement>
+    <plugins>
+      <!-- ensure no artifacts are published during deploy -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-deploy-plugin</artifactId>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
+      </plugin>
+    </plugins>
     <resources>
       <resource>
         <directory>src/main/docker</directory>
@@ -70,6 +111,11 @@
         <targetPath>${project.build.directory}/appengine-staging</targetPath>
       </resource>
       <resource>
+        <directory>src/main/docker</directory>
+        <filtering>true</filtering>
+        <targetPath>${project.build.directory}/appengine-staging</targetPath>
+      </resource>
+      <resource>
         <directory>src/main/resources</directory>
         <filtering>true</filtering>
         <targetPath>
@@ -78,65 +124,4 @@
       </resource>
     </resources>
   </build>
-  <profiles>
-    <profile>
-      <id>test.local</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-        <property>
-          <name>test.mode</name>
-          <value>local</value>
-        </property>
-      </activation>
-      <!--
-      <properties>
-        <test.mode>local</test.mode>
-      </properties>
-      -->
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-failsafe-plugin</artifactId>
-            <version>2.19.1</version>
-            <configuration>
-              <skipTests>false</skipTests>
-              <systemPropertyVariables>
-                <test.mode>local</test.mode>
-              </systemPropertyVariables>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>test.remote</id>
-      <activation>
-        <property>
-          <name>test.mode</name>
-          <value>remote</value>
-        </property>
-      </activation>
-      <properties>
-        <maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>
-        <gcloud-projectId-file>${project.build.directory}/gcloud-projectid.properties
-        </gcloud-projectId-file>
-      </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-failsafe-plugin</artifactId>
-            <version>2.19.1</version>
-            <configuration>
-              <skipTests>false</skipTests>
-              <systemPropertyVariables>
-                <test.mode>remote</test.mode>
-              </systemPropertyVariables>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
 </project>

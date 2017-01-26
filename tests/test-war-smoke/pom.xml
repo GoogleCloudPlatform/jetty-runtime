@@ -22,6 +22,7 @@
     <groupId>com.google.cloud.runtimes.tests</groupId>
     <artifactId>tests-parent</artifactId>
     <version>0.1.0-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>test-war-smoke</artifactId>
   <packaging>war</packaging>
@@ -43,23 +44,31 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.5.1</version>
-        <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.19.1</version>
-        <configuration>
-          <excludes>
-            <exclude>**/*IntegrationTest.java</exclude>
-          </excludes>
-        </configuration>
+        <groupId>com.spotify</groupId>
+        <artifactId>docker-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>build</id>
+            <phase>package</phase>
+            <goals>
+              <goal>build</goal>
+            </goals>
+            <configuration>
+              <imageName>${project.artifactId}</imageName>
+              <imageTags>
+                <imageTag>${project.version}</imageTag>
+              </imageTags>
+              <dockerDirectory>${project.build.directory}/docker</dockerDirectory>
+              <resources>
+                <resource>
+                  <targetPath>/</targetPath>
+                  <directory>${project.build.directory}</directory>
+                  <include>${project.build.finalName}.war</include>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
@@ -68,68 +77,31 @@
       <id>test.local</id>
       <activation>
         <activeByDefault>true</activeByDefault>
-        <property>
-          <name>test.mode</name>
-          <value>local</value>
-        </property>
       </activation>
       <build>
         <plugins>
           <plugin>
-            <groupId>com.spotify</groupId>
-            <artifactId>docker-maven-plugin</artifactId>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
             <executions>
               <execution>
-                <id>build</id>
-                <phase>package</phase>
+                <id>local-integration-test</id>
                 <goals>
-                  <goal>build</goal>
+                  <goal>integration-test</goal>
+                  <goal>verify</goal>
                 </goals>
                 <configuration>
-                  <imageName>${project.artifactId}</imageName>
-                  <imageTags>
-                    <imageTag>${project.version}</imageTag>
-                  </imageTags>
-                  <dockerDirectory>${project.build.directory}/docker
-                  </dockerDirectory>
-                  <resources>
-                    <resource>
-                      <targetPath>/</targetPath>
-                      <directory>${project.build.directory}</directory>
-                      <include>${project.build.finalName}.war</include>
-                    </resource>
-                  </resources>
+                  <skipTests>false</skipTests>
+                  <systemPropertyVariables>
+                    <test.mode>local</test.mode>
+                  </systemPropertyVariables>
                 </configuration>
               </execution>
             </executions>
           </plugin>
           <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-failsafe-plugin</artifactId>
-            <version>2.19.1</version>
-            <configuration>
-              <systemPropertyVariables>
-                <app.deploy.port>${app.deploy.port}</app.deploy.port>
-              </systemPropertyVariables>
-            </configuration>
-          </plugin>
-          <plugin>
             <groupId>io.fabric8</groupId>
             <artifactId>docker-maven-plugin</artifactId>
-            <version>0.17.2</version>
-            <configuration>
-              <images>
-                <image>
-                  <name>${project.artifactId}:${project.version}</name>
-                  <alias>test-war-smoke</alias>
-                  <run>
-                    <ports>
-                      <port>${app.deploy.port}:8080</port>
-                    </ports>
-                  </run>
-                </image>
-              </images>
-            </configuration>
             <executions>
               <execution>
                 <id>start</id>
@@ -152,18 +124,20 @@
     </profile>
     <profile>
       <id>test.remote</id>
-      <activation>
-        <property>
-          <name>test.mode</name>
-          <value>remote</value>
-        </property>
-      </activation>
+      <properties>
+        <gcloud-projectId-file>${project.build.directory}/gcloud-projectid.properties
+        </gcloud-projectId-file>
+        <!--
+           ~ remote tests require image in gcr.io
+           ~ if local tests are enabled with remote, this image is used locally as well
+           -->
+        <jetty.test.image>gcr.io/${app.deploy.project}/jetty:${docker.tag.long}</jetty.test.image>
+      </properties>
       <build>
         <plugins>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-antrun-plugin</artifactId>
-            <version>1.8</version>
             <executions>
               <execution>
                 <id>find-app-deploy-project</id>
@@ -187,20 +161,15 @@
                 </configuration>
               </execution>
               <execution>
-                <id>cleanup-integration-test</id>
-                <phase>post-integration-test</phase>
+                <id>copy-deploy-artifact</id>
+                <phase>package</phase>
                 <goals>
                   <goal>run</goal>
                 </goals>
                 <configuration>
                   <target>
-                    <exec executable="gcloud">
-                      <arg value="--quiet"/>
-                      <arg value="app"/>
-                      <arg value="versions"/>
-                      <arg value="delete"/>
-                      <arg value="${maven.build.timestamp}"/>
-                    </exec>
+                    <copy file="${project.build.directory}/${project.build.finalName}.war"
+                          todir="${project.build.directory}/appengine-staging/"/>
                   </target>
                 </configuration>
               </execution>
@@ -209,7 +178,6 @@
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>properties-maven-plugin</artifactId>
-            <version>1.0.0</version>
             <executions>
               <execution>
                 <id>read-gcloud-properties</id>
@@ -228,35 +196,160 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
-            <version>2.19.1</version>
-            <configuration>
-              <systemPropertyVariables>
-                <app.deploy.project>${app.deploy.project}</app.deploy.project>
-                <app.deploy.version>${maven.build.timestamp}</app.deploy.version>
-              </systemPropertyVariables>
-            </configuration>
             <executions>
               <execution>
+                <id>remote-integration-test</id>
                 <phase>integration-test</phase>
+                <goals>
+                  <goal>integration-test</goal>
+                  <goal>verify</goal>
+                </goals>
+                <configuration>
+                  <skipTests>false</skipTests>
+                  <systemPropertyVariables>
+                    <test.mode>remote</test.mode>
+                    <app.deploy.project>${app.deploy.project}</app.deploy.project>
+                    <app.deploy.version>${maven.build.timestamp}</app.deploy.version>
+                  </systemPropertyVariables>
+                </configuration>
               </execution>
             </executions>
           </plugin>
           <plugin>
-            <groupId>com.google.cloud.tools</groupId>
-            <artifactId>appengine-maven-plugin</artifactId>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
             <executions>
+              <!-- deploy the service -->
               <execution>
-                <id>deploy-integration-test</id>
+                <id>deploy-remote-service</id>
                 <phase>pre-integration-test</phase>
                 <goals>
-                  <goal>deploy</goal>
+                  <goal>exec</goal>
                 </goals>
                 <configuration>
-                  <deploy.project>${app.deploy.project}</deploy.project>
-                  <deploy.version>${maven.build.timestamp}</deploy.version>
-                  <deploy.promote>false</deploy.promote>
-                  <dockerDirectory>${project.build.directory}/docker
-                  </dockerDirectory>
+                  <workingDirectory>${project.build.directory}/appengine-staging</workingDirectory>
+                  <executable>gcloud</executable>
+                  <arguments>
+                    <argument>--quiet</argument>
+                    <argument>app</argument>
+                    <argument>deploy</argument>
+                    <argument>app.yaml</argument>
+                    <argument>--version</argument>
+                    <argument>${maven.build.timestamp}</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+              <!-- stop the service from 'deploy-remote-service' -->
+              <execution>
+                <id>stop-remote-service</id>
+                <phase>post-integration-test</phase>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <configuration>
+                  <executable>gcloud</executable>
+                  <arguments>
+                    <argument>--quiet</argument>
+                    <argument>app</argument>
+                    <argument>versions</argument>
+                    <argument>stop</argument>
+                    <argument>${maven.build.timestamp}</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+              <!-- remove the service from 'deploy-remote-service' -->
+              <execution>
+                <id>delete-remote-service</id>
+                <phase>post-integration-test</phase>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <configuration>
+                  <executable>gcloud</executable>
+                  <arguments>
+                    <argument>--quiet</argument>
+                    <argument>app</argument>
+                    <argument>versions</argument>
+                    <argument>delete</argument>
+                    <argument>${maven.build.timestamp}</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>test.remote.deploy</id>
+      <build>
+        <plugins>
+          <!-- create tag for local docker image to push for remote use in test -->
+          <plugin>
+            <groupId>com.spotify</groupId>
+            <artifactId>docker-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>tag-image</id>
+                <phase>generate-resources</phase>
+                <goals>
+                  <goal>tag</goal>
+                </goals>
+                <configuration>
+                  <image>jetty:${docker.tag.long}</image>
+                  <newName>${jetty.test.image}</newName>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <executions>
+              <!-- push a remote docker image to use with 'deploy-integration-test' -->
+              <execution>
+                <id>deploy-remote-docker</id>
+                <phase>generate-resources</phase>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <configuration>
+                  <executable>gcloud</executable>
+                  <arguments>
+                    <argument>docker</argument>
+                    <argument>-q</argument>
+                    <argument>--</argument>
+                    <argument>push</argument>
+                    <argument>${jetty.test.image}</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>test.remote.clean</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <executions>
+              <!-- remove the remote image from 'deploy-remote-docker' -->
+              <execution>
+                <id>cleanup-remote-image</id>
+                <phase>post-integration-test</phase>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <configuration>
+                  <executable>bash</executable>
+                  <arguments>
+                    <argument>-c</argument>
+                    <argument>gcloud beta container images delete `docker inspect --format='{{index .RepoDigests 0}}' ${jetty.test.image}` -q</argument>
+                  </arguments>
                 </configuration>
               </execution>
             </executions>
