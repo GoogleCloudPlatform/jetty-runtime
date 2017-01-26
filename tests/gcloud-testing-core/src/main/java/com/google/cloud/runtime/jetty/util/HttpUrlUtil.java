@@ -87,6 +87,7 @@ public final class HttpUrlUtil {
     log.info("HttpUrlUtil.openTo(" + uri + ")");
     HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
     http.setRequestProperty("User-Agent", "jetty-runtime/gcloud-util-core");
+    http.setInstanceFollowRedirects(false);
     return http;
   }
 

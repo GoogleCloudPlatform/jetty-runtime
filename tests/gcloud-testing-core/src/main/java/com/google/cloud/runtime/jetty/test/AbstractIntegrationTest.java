@@ -85,13 +85,16 @@ public class AbstractIntegrationTest {
 
       // construct the remote uri
       StringBuilder uri = new StringBuilder();
-      uri.append("https://");
-      uri.append(version).append("-dot-");
+      uri.append("http://")
+        .append(version)
+        .append("-dot-");
       if (serviceId != null) {
         uri.append(serviceId).append("-dot-");
       }
-      uri.append(projectId);
-      uri.append(".appspot.com/");
+      uri.append(projectId)
+        .append(".")
+        .append(System.getProperty("app.deploy.host","appspot-preview.com"))
+        .append("/");
 
       TIMEOUT_SECONDS = DEFAULT_REMOTE_TIMEOUT_SECONDS;
       SERVER_URI = URI.create(uri.toString());
