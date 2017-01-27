@@ -1,0 +1,9 @@
+target/
+
+.idea
+*.iml
+
+jetty.local.port
+
+dependency-reduced-pom.xml
+

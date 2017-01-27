@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.google.cloud.runtimes.perf</groupId>
+		<artifactId>perf</artifactId>
+		<version>0.1.0-SNAPSHOT</version>
+	</parent>
+
+	<groupId>com.webtide.jetty.load.generator</groupId>
+	<artifactId>jetty-load-app</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<name>Jetty Runtime :: Perf :: Load App</name>
+	<description>Jetty Load Test project with embeded Jetty</description>
+
+	<properties>
+		<jetty.version>9.3.15-SNAPSHOT</jetty.version> <!--  9.3.13.v20161014 -->
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<java.version>1.8</java.version>
+		<alpn.version>8.1.9.v20160720</alpn.version>
+		<maven-war-plugin-version>3.0.0</maven-war-plugin-version>
+		<gcloud-maven-plugin-version>2.0.9.130.v20161013</gcloud-maven-plugin-version>
+		<jetty-maven-plugin-version>9.3.7.v20160115</jetty-maven-plugin-version>
+	</properties>
+
+	<modules>
+		<module>jetty-load-generator-app-base</module>
+		<module>jetty-load-generator-app-base-webapp</module>
+		<module>jetty-load-generator-app-gcloud</module>
+		<module>jetty-load-generator-app-appengine</module>
+	</modules>
+
+	<distributionManagement>
+		<snapshotRepository>
+			<id>local_tmp</id>
+			<url>file://${java.io.tmpdir}</url>
+		</snapshotRepository>
+	</distributionManagement>
+
+	<dependencyManagement>
+		<dependencies>
+
+			<dependency>
+				<groupId>com.webtide.jetty.load.generator</groupId>
+				<artifactId>jetty-load-generator-app-base</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.webtide.jetty.load.generator</groupId>
+				<artifactId>jetty-load-generator-app-base-webapp</artifactId>
+				<version>${project.version}</version>
+				<type>war</type>
+			</dependency>
+
+			<dependency>
+				<groupId>javax.servlet</groupId>
+				<artifactId>javax.servlet-api</artifactId>
+				<version>3.1.0</version>
+				<type>jar</type>
+				<scope>provided</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-api</artifactId>
+				<version>1.7.21</version>
+			</dependency>
+
+			<dependency>
+				<groupId>commons-io</groupId>
+				<artifactId>commons-io</artifactId>
+				<version>2.5</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.eclipse.jetty</groupId>
+				<artifactId>jetty-servlet</artifactId>
+				<version>${jetty.version}</version>
+			</dependency>
+
+		</dependencies>
+	</dependencyManagement>
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.5.1</version>
+					<configuration>
+						<target>1.8</target>
+						<source>1.8</source>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>com.google.appengine</groupId>
+					<artifactId>gcloud-maven-plugin</artifactId>
+					<version>${gcloud-maven-plugin-version}</version>
+				</plugin>
+				<plugin>
+					<groupId>com.spotify</groupId>
+					<artifactId>docker-maven-plugin</artifactId>
+					<version>0.4.13</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-resources-plugin</artifactId>
+					<version>3.0.1</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+
+	<repositories>
+		<repository>
+			<id>jetty.snapshot</id>
+			<url>https://oss.sonatype.org/content/repositories/jetty-snapshots</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+
+</project>

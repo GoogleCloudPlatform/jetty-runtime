@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.webtide.jetty.load.generator</groupId>
+    <artifactId>jetty-load-app</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+  </parent>
+
+  <groupId>com.webtide.jetty.load.generator</groupId>
+  <artifactId>jetty-load-generator-app-base-webapp</artifactId>
+  <packaging>war</packaging>
+
+  <name>Jetty :: Load App :: Base :: Webapp</name>
+  <description>Jetty Load Test project Base webapp</description>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>com.webtide.jetty.load.generator</groupId>
+      <artifactId>jetty-load-generator-app-base</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-servlet</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+  </dependencies>
+
+
+  <build>
+
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-war-plugin</artifactId>
+          <version>${maven-war-plugin-version}</version>
+          <configuration>
+            <failOnMissingWebXml>false</failOnMissingWebXml>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.eclipse.jetty</groupId>
+          <artifactId>jetty-maven-plugin</artifactId>
+          <version>${jetty-maven-plugin-version}</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+
+  </build>
+
+
+</project>
