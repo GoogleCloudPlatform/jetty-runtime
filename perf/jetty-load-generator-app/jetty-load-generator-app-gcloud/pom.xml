@@ -20,12 +20,7 @@
 
     <dependency>
       <groupId>com.webtide.jetty.load.generator</groupId>
-      <artifactId>jetty-load-generator-app-base</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>com.webtide.jetty.load.generator</groupId>
-      <artifactId>jetty-load-generator-app-base-webapp</artifactId>
+      <artifactId>jetty-load-generator-app-webapp</artifactId>
       <type>war</type>
     </dependency>
 

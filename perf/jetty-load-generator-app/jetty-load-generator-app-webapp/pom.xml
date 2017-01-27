@@ -10,11 +10,11 @@
   </parent>
 
   <groupId>com.webtide.jetty.load.generator</groupId>
-  <artifactId>jetty-load-generator-app-base-webapp</artifactId>
+  <artifactId>jetty-load-generator-app-webapp</artifactId>
   <packaging>war</packaging>
 
-  <name>Jetty :: Load App :: Base :: Webapp</name>
-  <description>Jetty Load Test project Base webapp</description>
+  <name>Jetty :: Load App :: Webapp</name>
+  <description>Jetty Load Test project webapp</description>
 
   <dependencies>
 
