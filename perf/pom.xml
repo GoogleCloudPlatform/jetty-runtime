@@ -28,7 +28,7 @@
   <name>Jetty Runtime :: Perf :: Parent</name>
   <packaging>pom</packaging>
   <modules>
-    <module>jetty-load-generator</module>
     <module>jetty-load-generator-app</module>
+    <module>jetty-load-generator</module>
   </modules>
 </project>
