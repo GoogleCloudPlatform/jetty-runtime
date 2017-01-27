@@ -19,19 +19,5 @@
     <servlet-name>StatsServlet</servlet-name>
     <url-pattern>/stats/*</url-pattern>
   </servlet-mapping>
-
-  <servlet>
-    <servlet-name>MonitorServlet</servlet-name>
-    <servlet-class>com.webtide.jetty.load.generator.web.MonitorServlet</servlet-class>
-    <init-param>
-      <param-name>restrictToLocalhost</param-name>
-      <param-value>false</param-value>
-    </init-param>
-  </servlet>
-
-  <servlet-mapping>
-    <servlet-name>MonitorServlet</servlet-name>
-    <url-pattern>/monitor/*</url-pattern>
-  </servlet-mapping>
-
+  
 </web-app>

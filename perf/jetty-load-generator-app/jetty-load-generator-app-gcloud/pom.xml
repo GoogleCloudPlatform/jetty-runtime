@@ -30,12 +30,14 @@
       <scope>provided</scope>
     </dependency>
 
+    <!--
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-distribution</artifactId>
-      <version>${jetty.version}</version>
+      <artifactId>jetty-home</artifactId>
+      <version>${jetty9.version}</version>
       <type>tar.gz</type>
     </dependency>
+    -->
 
   </dependencies>
 
@@ -101,13 +103,13 @@
               <artifactItems>
                 <artifactItem>
                   <groupId>com.webtide.jetty.load.generator</groupId>
-                  <artifactId>jetty-load-generator-app-base-webapp</artifactId>
+                  <artifactId>jetty-load-generator-app-webapp</artifactId>
                   <version>${project.version}</version>
                   <type>war</type>
                   <overWrite>true</overWrite>
                   <includes>**</includes>
                   <outputDirectory>${project.build.directory}/docker</outputDirectory>
-                  <destFileName>jetty-load-generator-app-base-webapp.war</destFileName>
+                  <destFileName>jetty-load-generator-app-webapp.war</destFileName>
                 </artifactItem>
               </artifactItems>
             </configuration>
@@ -122,13 +124,13 @@
               <artifactItems>
                 <artifactItem>
                   <groupId>com.webtide.jetty.load.generator</groupId>
-                  <artifactId>jetty-load-generator-app-base-webapp</artifactId>
+                  <artifactId>jetty-load-generator-app-webapp</artifactId>
                   <version>${project.version}</version>
                   <type>war</type>
                   <overWrite>true</overWrite>
                   <includes>**</includes>
                   <outputDirectory>${project.build.directory}/appengine-staging</outputDirectory>
-                  <destFileName>jetty-load-generator-app-base-webapp.war</destFileName>
+                  <destFileName>jetty-load-generator-app-webapp.war</destFileName>
                 </artifactItem>
               </artifactItems>
             </configuration>
@@ -143,13 +145,13 @@
               <artifactItems>
                 <artifactItem>
                   <groupId>org.eclipse.jetty</groupId>
-                  <artifactId>jetty-distribution</artifactId>
-                  <version>${jetty.version}</version>
+                  <artifactId>jetty-home</artifactId>
+                  <version>${jetty9.version}</version>
                   <type>tar.gz</type>
                   <overWrite>true</overWrite>
                   <includes>**</includes>
                   <outputDirectory>${project.build.directory}/docker</outputDirectory>
-                  <destFileName>jetty-distribution.tar.gz</destFileName>
+                  <destFileName>jetty-home.tar.gz</destFileName>
                 </artifactItem>
               </artifactItems>
             </configuration>
@@ -164,13 +166,13 @@
               <artifactItems>
                 <artifactItem>
                   <groupId>org.eclipse.jetty</groupId>
-                  <artifactId>jetty-distribution</artifactId>
-                  <version>${jetty.version}</version>
+                  <artifactId>jetty-home</artifactId>
+                  <version>${jetty9.version}</version>
                   <type>tar.gz</type>
                   <overWrite>true</overWrite>
                   <includes>**</includes>
                   <outputDirectory>${project.build.directory}/appengine-staging</outputDirectory>
-                  <destFileName>jetty-distribution.tar.gz</destFileName>
+                  <destFileName>jetty-home.tar.gz</destFileName>
                 </artifactItem>
               </artifactItems>
             </configuration>

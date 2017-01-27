@@ -18,7 +18,6 @@
 	<description>Jetty Load Test project with embeded Jetty</description>
 
 	<properties>
-		<jetty.version>9.3.16.v20170120</jetty.version> <!--  9.3.13.v20161014 -->
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>1.8</java.version>
@@ -73,7 +72,7 @@
 			<dependency>
 				<groupId>org.eclipse.jetty</groupId>
 				<artifactId>jetty-servlet</artifactId>
-				<version>${jetty.version}</version>
+				<version>${jetty9.version}</version>
 			</dependency>
 
 		</dependencies>
