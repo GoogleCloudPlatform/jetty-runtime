@@ -76,34 +76,32 @@ Once you have this configuration, you can use the Google Cloud SDK to deploy thi
      
 
 ## Entry Point Features
-The entry point for the image is [docker-entrypoint.bash](https://github.com/GoogleCloudPlatform/jetty-runtime/blob/master/jetty9/src/main/docker/docker-entrypoint.bash), which does the processing of the passed command line arguments to look for an executable alternative or arguments to the default command (java).
 
-If the default command (java) is used, then the entry point sources the [setup-env.bash](https://github.com/GoogleCloudPlatform/openjdk-runtime/blob/master/openjdk8/src/main/docker/setup-env.bash), which looks for supported features to be enabled and/or configured.  The following table indicates the environment variables that may be used to enable/disable/configure features, any default values if they are not set: 
+The [/docker-entrypoint.bash](https://github.com/GoogleCloudPlatform/openjdk-runtime/blob/master/openjdk8/src/main/docker/docker-entrypoint.bash)
+for the image is inherited from the openjdk-runtime and it's capabilities are described in the associated 
+[README](https://github.com/GoogleCloudPlatform/openjdk-runtime/blob/master/README.md)
 
-|Env Var           | Description         | Type     | Default                                     |
-|------------------|---------------------|----------|---------------------------------------------|
-|`DBG_ENABLE`      | Stackdriver Debugger| boolean  | `true`                                      |
-|`TMPDIR`          | Temporary Directory | dirname  |                                             |
-|`JAVA_TMP_OPTS`   | JVM tmpdir args     | JVM args | `-Djava.io.tmpdir=${TMPDIR}`                |
-|`GAE_MEMORY_MB`   | Available memory    | size     | Set by GAE or `/proc/meminfo`-400M          |
-|`HEAP_SIZE_MB`    | Available heap      | size     | 80% of `${GAE_MEMORY_MB}`                   |
-|`JAVA_HEAP_OPTS`  | JVM heap args       | JVM args | `-Xms${HEAP_SIZE_MB}M -Xmx${HEAP_SIZE_MB}M` |
-|`JAVA_GC_OPTS`    | JVM GC args         | JVM args | `-XX:+UseG1GC` plus configuration           |
-|`JAVA_GC_LOG`     | JVM GC log file     | filename |                                             |
-|`JAVA_GC_LOG_OPTS`| JVM GC args         | JVM args | Derived from `$JAVA_GC_LOG`                 |
-|`JAVA_USER_OPTS`  | JVM other args      | JVM args |                                             |
-|`JAVA_OPTS`       | JVM args            | JVM args | See below                                   |
+This image updates the docker `CMD` and appends to the
+[setup-env.bash](https://github.com/GoogleCloudPlatform/openjdk-runtime/blob/master/openjdk8/src/main/docker/setup-env.bash)
+script to include options and arguments to run the Jetty container, unless an executable argument is passed to the docker image.
+Addition environment variables are set including:
 
-If not explicitly set, `JAVA_OPTS` is defaulted to 
-```
-JAVA_OPTS:=-showversion \
-           ${JAVA_TMP_OPTS} \
-           ${DBG_AGENT} \
-           ${JAVA_HEAP_OPTS} \
-           ${JAVA_GC_OPTS} \
-           ${JAVA_GC_LOG_OPTS} \
-           ${JAVA_USER_OPTS}
-```
+|Env Var           | Maven Prop      | Value                                                |
+|------------------|-----------------|------------------------------------------------------|
+|`JETTY_VERSION`   |`jetty9.version` |                                                      |
+|`GAE_IMAGE_NAME`  |                 |`jetty`                                               |
+|`GAE_IMAGE_LABEL` |`docker.tag.long`|                                                      |
+|`JETTY_HOME`      |`jetty.home`     |`/opt/jetty-home`                                     |
+|`JETTY_BASE`      |`jetty.base`     |`/var/lib/jetty`                                      |
+|`TMPDIR`          |                 |`/tmp/jetty                                           |
+|`JETTY_ARGS`      |                 |`-Djetty.base=$JETTY_BASE -jar $JETTY_HOME/start.jar` |
+|`ROOT_WAR`        |                 |`$JETTY_BASE/webapps/root.war`                        |
+|`ROOT_DIR`        |                 |`$JETTY_BASE/webapps/root`                            |
+|`JAVA_OPTS`       |                 |`$JAVA_OPTS $JETTY_ARGS`                              |
+
+If a WAR file is found at `$ROOT_WAR`, it is unpacked to `$ROOT_DIR` if it is newer than the directory or the directory
+does not exist.  If there is no `$ROOT_WAR` or `$ROOT_DIR`, then `/app` is symbolic linked to `$ROOT_DIR`. If 
+a `$ROOT_DIR` is discovered or made by this script, then it is set as the working directory.
 
 The command line executed is effectively (where $@ are the args passed into the docker entry point):
 ```
@@ -111,6 +109,11 @@ java $JAVA_OPTS \
      -Djetty.base=$JETTY_BASE \
      -jar $JETTY_HOME/start.jar \
      "$@"
+```
+
+The configuration of the jetty container in this image can be viewed by running the image locally:
+```
+docker run --rm -it jetty:9.4 --list-config --list-modules
 ```
 
 # Contributing changes

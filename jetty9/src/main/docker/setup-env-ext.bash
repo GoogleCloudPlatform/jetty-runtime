@@ -31,5 +31,6 @@ fi
 # If the first argument is not executable
 if ! type "$1" &>/dev/null; then
   # then jetty is being used so add the JETTY_ARGS to the JAVA_OPTS
-  JAVA_OPTS="$JAVA_OPTS $JETTY_ARGS"
+  export JAVA_OPTS="$JAVA_OPTS $JETTY_ARGS"
 fi
+
