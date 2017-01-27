@@ -216,7 +216,7 @@
 
   <profiles>
     <profile>
-      <id>gcloud</id>
+      <id>gcloud-deploy</id>
       <build>
         <plugins>
           <plugin>
@@ -225,7 +225,7 @@
             <executions>
               <execution>
                 <id>gcloud-deploy</id>
-                <phase>deploy</phase>
+                <phase>install</phase>
                 <goals>
                   <goal>deploy</goal>
                 </goals>
