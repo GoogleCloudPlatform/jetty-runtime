@@ -88,6 +88,23 @@
         </executions>
       </plugin>
 
+      <plugin>
+        <groupId>com.spotify</groupId>
+        <artifactId>docker-maven-plugin</artifactId>
+        <configuration>
+          <imageName>webtide/${project.artifactId}:${project.version}</imageName>
+          <baseImage>gcr.io/google_appengine/jetty9</baseImage>
+          <dockerDirectory>${project.build.directory}/docker</dockerDirectory>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>build</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -218,32 +235,6 @@
         </plugins>
       </build>
     </profile>
-    <profile>
-      <id>docker</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>com.spotify</groupId>
-            <artifactId>docker-maven-plugin</artifactId>
-            <configuration>
-              <imageName>webtide/${project.artifactId}:${project.version}</imageName>
-              <baseImage>gcr.io/google_appengine/jetty9</baseImage>
-              <dockerDirectory>${project.build.directory}/docker</dockerDirectory>
-            </configuration>
-            <executions>
-              <execution>
-                <phase>package</phase>
-                <goals>
-                  <goal>build</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
   </profiles>
-
 
 </project>

@@ -19,5 +19,5 @@
     <servlet-name>StatsServlet</servlet-name>
     <url-pattern>/stats/*</url-pattern>
   </servlet-mapping>
-  
+
 </web-app>
