@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.google.cloud.runtimes.perf</groupId>
+		<artifactId>perf</artifactId>
+		<version>0.1.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>perf-runner</artifactId>
+	<packaging>jar</packaging>
+
+	<name>Jetty Runtime :: Perf :: Perf Runner</name>
+	<description>Running load testing</description>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.eclipse.jetty.loadgenerator</groupId>
+			<artifactId>jetty-load-generator-starter</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
+		<!-- just to be sure we build this module last -->
+		<dependency>
+			<groupId>com.google.cloud.runtimes.perf</groupId>
+			<artifactId>jetty-load-generator-app-webapp</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+			<type>war</type>
+			<scope>runtime</scope>
+		</dependency>
+	</dependencies>
+
+</project>
