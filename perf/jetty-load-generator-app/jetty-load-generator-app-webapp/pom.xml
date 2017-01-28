@@ -4,12 +4,11 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>com.webtide.jetty.load.generator</groupId>
+    <groupId>com.google.cloud.runtimes.perf</groupId>
     <artifactId>jetty-load-app</artifactId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
 
-  <groupId>com.webtide.jetty.load.generator</groupId>
   <artifactId>jetty-load-generator-app-webapp</artifactId>
   <packaging>war</packaging>
 
