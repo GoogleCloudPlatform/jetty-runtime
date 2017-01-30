@@ -27,9 +27,26 @@
   <artifactId>perf</artifactId>
   <name>Jetty Runtime :: Perf :: Parent</name>
   <packaging>pom</packaging>
+
   <modules>
     <module>jetty-load-generator-app</module>
     <module>jetty-load-generator</module>
     <module>perf-runner</module>
   </modules>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <!-- we don't want to deploy that -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-deploy-plugin</artifactId>
+          <configuration>
+            <skip>true</skip>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+
 </project>

@@ -228,6 +228,9 @@
                 <goals>
                   <goal>deploy</goal>
                 </goals>
+                <configuration>
+
+                </configuration>
               </execution>
             </executions>
           </plugin>

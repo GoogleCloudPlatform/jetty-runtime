@@ -22,21 +22,14 @@
 		<java.version>1.8</java.version>
 		<alpn.version>8.1.9.v20160720</alpn.version>
 		<maven-war-plugin-version>3.0.0</maven-war-plugin-version>
-		<gcloud-maven-plugin-version>2.0.9.130.v20161013</gcloud-maven-plugin-version>
-		<jetty-maven-plugin-version>9.3.7.v20160115</jetty-maven-plugin-version>
+		<gcloud-maven-plugin-version>2.0.9.133.v201611104</gcloud-maven-plugin-version>
+		<jetty-maven-plugin-version>${jetty9.version}</jetty-maven-plugin-version>
 	</properties>
 
 	<modules>
 		<module>jetty-load-generator-app-webapp</module>
 		<module>jetty-load-generator-app-gcloud</module>
 	</modules>
-
-	<distributionManagement>
-		<snapshotRepository>
-			<id>local_tmp</id>
-			<url>file://${java.io.tmpdir}</url>
-		</snapshotRepository>
-	</distributionManagement>
 
 	<dependencyManagement>
 		<dependencies>

@@ -1,6 +1,6 @@
 runtime: custom
 vm: true
-service: load-generator-app
+service: jetty-runtime-perf-app
 resources:
   cpu: 2
   memory_gb: 8
