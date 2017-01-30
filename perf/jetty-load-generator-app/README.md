@@ -1,15 +1,8 @@
-## Docker - gcloud
+## Perf app
 
-Build the docker image using `mvn clean install -pl :jetty-load-generator-app-gcloud -am -Pdocker`
+`mvn clean install -Pperf -Prun-perf -DskipTests -Drunning.time.unit=s -Dwarmup.number=5 -Drunning.time=30 -Dusers=20`
 
-Run the image using `docker run -it -p 8080:8080  webtide/jetty-load-generator-app-gcloud:0.0.1-SNAPSHOT`
-
-Build and deploy to gcloud: `mvn clean deploy -pl :jetty-load-generator-app-gcloud -am -Pgcloud`
-
-Build: `mvn clean package -pl :jetty-load-generator-app-embedded -am -DskipTests -Djetty9.version=9.4.0.v20161208`
-
-Note: it works only for 9.4+ versions
-
+To deploy new version add the profile '-Pgcloud-deploy'
 
 
 
