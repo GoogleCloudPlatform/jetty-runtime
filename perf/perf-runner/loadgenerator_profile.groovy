@@ -1,3 +1,6 @@
+import org.webtide.jetty.load.generator.profile.Resource
+import org.webtide.jetty.load.generator.profile.ResourceProfile
+
 return new ResourceProfile(new Resource( "index.html",
                                          new Resource( "/css/bootstrap.css",
                                                        new Resource( "/css/bootstrap-theme.css" ),
