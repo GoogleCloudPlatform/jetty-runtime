@@ -78,13 +78,13 @@ Once you have this configuration, you can use the Google Cloud SDK to deploy thi
 ## Entry Point Features
 
 The [/docker-entrypoint.bash](https://github.com/GoogleCloudPlatform/openjdk-runtime/blob/master/openjdk8/src/main/docker/docker-entrypoint.bash)
-for the image is inherited from the openjdk-runtime and it's capabilities are described in the associated 
+for the image is inherited from the openjdk-runtime and its capabilities are described in the associated 
 [README](https://github.com/GoogleCloudPlatform/openjdk-runtime/blob/master/README.md)
 
 This image updates the docker `CMD` and appends to the
 [setup-env.bash](https://github.com/GoogleCloudPlatform/openjdk-runtime/blob/master/openjdk8/src/main/docker/setup-env.bash)
 script to include options and arguments to run the Jetty container, unless an executable argument is passed to the docker image.
-Addition environment variables are set including:
+Additional environment variables are set including:
 
 |Env Var           | Maven Prop      | Value                                                |
 |------------------|-----------------|------------------------------------------------------|
@@ -101,7 +101,9 @@ Addition environment variables are set including:
 
 If a WAR file is found at `$ROOT_WAR`, it is unpacked to `$ROOT_DIR` if it is newer than the directory or the directory
 does not exist.  If there is no `$ROOT_WAR` or `$ROOT_DIR`, then `/app` is symbolic linked to `$ROOT_DIR`. If 
-a `$ROOT_DIR` is discovered or made by this script, then it is set as the working directory.
+a `$ROOT_DIR` is discovered or made by this script, then it is set as the working directory. 
+See [Extending the image](#extending-the-image) below for some examples of adding an application as a WAR file or directory.
+
 
 The command line executed is effectively (where $@ are the args passed into the docker entry point):
 ```
@@ -114,6 +116,43 @@ java $JAVA_OPTS \
 The configuration of the jetty container in this image can be viewed by running the image locally:
 ```
 docker run --rm -it jetty:9.4 --list-config --list-modules
+```
+
+## Extending the image
+
+The image produce by this project may be automatically used/extended by the gcloud SDK and/or gcloud maven plugin. 
+Alternately it may be explicitly extended with a custom Dockerfile.  
+
+The latest released verion of this image is available at `gcr.io/google_appengine/jetty`, alternately you may 
+build and push your own version with the shell commands:
+```bash
+mvn clean install
+docker tag jetty:latest gcr.io/your-project-name/jetty:your-label
+gcloud docker -- push gcr.io/your-project-name/jetty:your-label
+```
+
+### Adding the root WAR application to an image
+A standard war file may be deployed as the root context in an extended image by placing the war file 
+in the docker build directory and using a `Dockerfile` like:
+```dockerfile
+FROM gcr.io/google_appengine/jetty
+COPY your-application.war $JETTY_BASE/webapps/root.war
+```
+
+### Adding the root application to an image
+If the application exists as directory (i.e. an expanded war file), then directory must
+be placed in the docker build directory and using a `Dockerfile` like: 
+```dockerfile
+FROM gcr.io/google_appengine/jetty
+COPY your-application-dir $JETTY_BASE/webapps/root
+```
+
+### Mounting the root application at local runtime
+If no root WAR or root directory is found, the `docker-entrypoint.bash` script will link the 
+`/app` directory as the root applicatoin. Thus the root application can be added to the 
+image via a runtime mount:
+```bash
+docker run -v /some-path/your-application:/app gcr.io/google_appengine/jetty  
 ```
 
 # Contributing changes
