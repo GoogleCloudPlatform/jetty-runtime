@@ -1,4 +1,4 @@
-#!/bin/bash
+# The script below is from setup-env-ext.bash, which is appended to /setup-env.bash
 
 # default jetty arguments
 export JETTY_ARGS="-Djetty.base=$JETTY_BASE -jar $JETTY_HOME/start.jar"
@@ -34,3 +34,4 @@ if ! type "$1" &>/dev/null; then
   export JAVA_OPTS="$JAVA_OPTS $JETTY_ARGS"
 fi
 
+# End setup-env-ext.bash

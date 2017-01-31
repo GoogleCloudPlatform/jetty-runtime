@@ -37,6 +37,7 @@ fileExistenceTests:
   path: '/docker-entrypoint.bash'
   isDirectory: false
   shouldExist: true
+  expectedContents: ['.*from setup-env-ext.bash.*End setup-env-ext.bash.*']
 
 licenseTests:
 - debian: true

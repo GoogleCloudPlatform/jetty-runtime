@@ -1,6 +1,6 @@
 # Google Cloud Platform Jetty Docker Image
 
-This repository contains the source for the `gcr.io/google_appengine/jetty` [docker](https://docker.com) image. This image can be used as the base image for running Java web applications on [Google App Engine Flexible Environment](https://cloud.google.com/appengine/docs/flexible/java/) and [Google Container Engine](https://cloud.google.com/container-engine). It provides the Jetty Servlet container on top of the [OpenJDK image](https://github.com/GoogleCloudPlatform/openjdk-runtime).
+This repository contains the source for the `gcr.io/google-appengine/jetty` [docker](https://docker.com) image. This image can be used as the base image for running Java web applications on [Google App Engine Flexible Environment](https://cloud.google.com/appengine/docs/flexible/java/) and [Google Container Engine](https://cloud.google.com/container-engine). It provides the Jetty Servlet container on top of the [OpenJDK image](https://github.com/GoogleCloudPlatform/openjdk-runtime).
 
 The layout of this image is intended to mostly mimic the official [docker-jetty](https://github.com/appropriate/docker-jetty) image and unless otherwise noted, the official [docker-jetty documentation](https://github.com/docker-library/docs/tree/master/jetty) should apply.
 
@@ -120,10 +120,10 @@ docker run --rm -it jetty:9.4 --list-config --list-modules
 
 ## Extending the image
 
-The image produce by this project may be automatically used/extended by the gcloud SDK and/or gcloud maven plugin. 
+The image produced by this project may be automatically used/extended by the Cloud SDK and/or App Engine maven plugin. 
 Alternately it may be explicitly extended with a custom Dockerfile.  
 
-The latest released verion of this image is available at `gcr.io/google_appengine/jetty`, alternately you may 
+The latest released verion of this image is available at `gcr.io/google-appengine/jetty`, alternately you may 
 build and push your own version with the shell commands:
 ```bash
 mvn clean install
@@ -135,7 +135,7 @@ gcloud docker -- push gcr.io/your-project-name/jetty:your-label
 A standard war file may be deployed as the root context in an extended image by placing the war file 
 in the docker build directory and using a `Dockerfile` like:
 ```dockerfile
-FROM gcr.io/google_appengine/jetty
+FROM gcr.io/google-appengine/jetty
 COPY your-application.war $JETTY_BASE/webapps/root.war
 ```
 
@@ -143,16 +143,16 @@ COPY your-application.war $JETTY_BASE/webapps/root.war
 If the application exists as directory (i.e. an expanded war file), then directory must
 be placed in the docker build directory and using a `Dockerfile` like: 
 ```dockerfile
-FROM gcr.io/google_appengine/jetty
+FROM gcr.io/google-appengine/jetty
 COPY your-application-dir $JETTY_BASE/webapps/root
 ```
 
 ### Mounting the root application at local runtime
 If no root WAR or root directory is found, the `docker-entrypoint.bash` script will link the 
-`/app` directory as the root applicatoin. Thus the root application can be added to the 
+`/app` directory as the root application. Thus the root application can be added to the 
 image via a runtime mount:
 ```bash
-docker run -v /some-path/your-application:/app gcr.io/google_appengine/jetty  
+docker run -v /some-path/your-application:/app gcr.io/google-appengine/jetty  
 ```
 
 # Contributing changes
