@@ -17,12 +17,12 @@
 package com.google.cloud.runtime.jetty.perf;
 
 import com.beust.jcommander.JCommander;
-import org.webtide.jetty.load.generator.CollectorInformations;
-import org.webtide.jetty.load.generator.report.GlobalSummaryListener;
-import org.webtide.jetty.load.generator.report.SummaryReport;
-import org.webtide.jetty.load.generator.responsetime.ResponseTimeListener;
-import org.webtide.jetty.load.generator.starter.LoadGeneratorStarter;
-import org.webtide.jetty.load.generator.starter.LoadGeneratorStarterArgs;
+import org.mortbay.jetty.load.generator.CollectorInformations;
+import org.mortbay.jetty.load.generator.report.GlobalSummaryListener;
+import org.mortbay.jetty.load.generator.report.SummaryReport;
+import org.mortbay.jetty.load.generator.responsetime.ResponseTimeListener;
+import org.mortbay.jetty.load.generator.starter.LoadGeneratorStarter;
+import org.mortbay.jetty.load.generator.starter.LoadGeneratorStarterArgs;
 
 import java.util.Arrays;
 

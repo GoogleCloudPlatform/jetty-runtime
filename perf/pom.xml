@@ -30,7 +30,6 @@
 
   <modules>
     <module>jetty-load-generator-app</module>
-    <module>jetty-load-generator</module>
     <module>perf-runner</module>
   </modules>
 
