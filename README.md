@@ -112,6 +112,42 @@ java $JAVA_OPTS \
      -jar $JETTY_HOME/start.jar \
      "$@"
 ```
+### Extending logging
+The `java.util.logging` configuration may be changed at runtime by providing an alternate
+properties file. This can be done either by extending the image and replacing the
+default configuration at `$JETTY_BASE/etc/java-util-logging.properties`, or a new
+configuration can be provided as part of the application (eg `WEB-INF/logging.properties`)
+and setting the Java System Property `java.util.logging.config.file` to point to it.
+System properties can be set by setting the unix environment variable `JAVA_USER_OPTS`.
+
+An example of running the image locally with a mounted application is:
+```bash
+docker run \
+  -e JAVA_USER_OPTS=-Djava.util.logging.config.file=WEB-INF/logging.properties \
+  -v /some-path/your-application:/app gcr.io/google_appengine/jetty
+```
+
+When deploying via the gcloud SDK and/or pluging, the `JAVA_USER_OPTS` may be set in
+the `app.yaml` file:
+```yaml
+env_variables:
+  JAVA_USER_OPTS: -Djava.util.logging.config.file=WEB-INF/logging.properties
+```
+
+The default logging.properties file contains the following to configure `java.util.logging`
+to use the gcloud stackdriver logging mechanism:
+```
+.level=INFO
+
+handlers=com.google.cloud.logging.LoggingHandler
+com.google.cloud.logging.LoggingHandler.level=FINE
+com.google.cloud.logging.LoggingHandler.log=gae_app.log
+com.google.cloud.logging.LoggingHandler.resourceType=gae_app
+com.google.cloud.logging.LoggingHandler.enhancers=com.google.cloud.logging.GaeFlexLoggingEnhancer
+com.google.cloud.logging.LoggingHandler.formatter=java.util.logging.SimpleFormatter
+java.util.logging.SimpleFormatter.format=%3$s: %5$s%6$s
+```
+
 
 # Contributing changes
 
