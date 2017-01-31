@@ -1,3 +1,0 @@
-[submodule "perf/jetty-load-generator"]
-	path = perf/jetty-load-generator
-	url = https://github.com/webtide/jetty-load-generator.git
