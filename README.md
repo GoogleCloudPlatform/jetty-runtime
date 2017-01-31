@@ -127,7 +127,7 @@ docker run \
   -v /some-path/your-application:/app gcr.io/google_appengine/jetty
 ```
 
-When deploying via the gcloud SDK and/or pluging, the `JAVA_USER_OPTS` may be set in
+When deploying via the Cloud SDK and/or plugin, the `JAVA_USER_OPTS` may be set in
 the `app.yaml` file:
 ```yaml
 env_variables:
@@ -147,7 +147,6 @@ com.google.cloud.logging.LoggingHandler.enhancers=com.google.cloud.logging.GaeFl
 com.google.cloud.logging.LoggingHandler.formatter=java.util.logging.SimpleFormatter
 java.util.logging.SimpleFormatter.format=%3$s: %5$s%6$s
 ```
-
 
 # Contributing changes
 
