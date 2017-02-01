@@ -24,7 +24,7 @@
 		<transaction_rate>3</transaction_rate>
 		<transport>https</transport>
 		<users>2</users>
-		<profile.json>${basedir}/loadgenerator_profile.groovy</profile.json>
+		<profile.json>${basedir}/src/main/resources/loadgenerator_profile.groovy</profile.json>
 		<warmup.number>10</warmup.number>
 	</properties>
 
@@ -68,6 +68,32 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-resources</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/docker</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${basedir}/src/main/docker</directory>
+									<filtering>true</filtering>
+									<includes>
+										<include>*</include>
+									</includes>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+
 		</plugins>
 	</build>
 
@@ -121,6 +147,49 @@
 				</plugins>
 			</build>
 		</profile>
+
+		<profile>
+			<id>docker</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>com.spotify</groupId>
+						<artifactId>docker-maven-plugin</artifactId>
+						<configuration>
+							<imageName>jetty-perf-runner:${project.version}</imageName>
+							<baseImage>${docker.openjdk.image}</baseImage>
+							<cmd>java -jar /${project.build.finalName}-uber.jar -Dwarmup.number=${warmup.number} -h ${host} --port ${port} --running-time ${running.time} --running-time-unit ${running.time.unit} --transaction-rate ${transaction_rate}  --transport ${transport} --users ${users} --profile-groovy-path /loadgenerator_profile.groovy</cmd>
+							<resources>
+								<resource>
+									<targetPath>/</targetPath>
+									<directory>${project.build.directory}</directory>
+									<include>${project.build.finalName}-uber.jar</include>
+								</resource>
+								<resource>
+									<targetPath>/</targetPath>
+									<directory>${basedir}/src/main/resources</directory>
+									<include>loadgenerator_profile.groovy</include>
+								</resource>
+
+							</resources>
+						</configuration>
+						<executions>
+							<execution>
+								<phase>package</phase>
+								<goals>
+									<goal>build</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+
+				</plugins>
+			</build>
+		</profile>
+
 	</profiles>
 
 </project>
