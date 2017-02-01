@@ -61,7 +61,11 @@ public class PerfRunner {
     }
     runner.run( warmupNumber );
 
-    runner.run( runnerArgs.getRunIteration(), false );
+    if (runnerArgs.getRunningTime() > 0 && runnerArgs.getRunningTimeUnit() != null) {
+      runner.run( runnerArgs.getRunningTime(), runnerArgs.getRunningTimeUnit(), false );
+    }  else {
+      runner.run( runnerArgs.getRunIteration(), false );
+    }
 
     CollectorInformations collectorInformations = runner.getResponseTimeSummary();
 
