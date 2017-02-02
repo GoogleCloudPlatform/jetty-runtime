@@ -60,8 +60,7 @@ public class PerfRunner {
       System.out.println( "error parsing warmup number arg '" + warmupNumberArg
                               + "' so use default " + warmupNumber  );
     }
-    if (warmupNumber>0)
-    {
+    if ( warmupNumber>0 ) {
       runner.run( warmupNumber );
       System.out.println( "warmup done" );
     } else {
