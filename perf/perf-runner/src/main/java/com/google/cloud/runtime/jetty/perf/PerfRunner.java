@@ -18,6 +18,7 @@ package com.google.cloud.runtime.jetty.perf;
 
 import com.beust.jcommander.JCommander;
 import org.mortbay.jetty.load.generator.CollectorInformations;
+import org.mortbay.jetty.load.generator.latency.LatencyTimeListener;
 import org.mortbay.jetty.load.generator.report.GlobalSummaryListener;
 import org.mortbay.jetty.load.generator.report.SummaryReport;
 import org.mortbay.jetty.load.generator.responsetime.ResponseTimeListener;
@@ -61,6 +62,10 @@ public class PerfRunner {
     }
     runner.run( warmupNumber );
 
+    // reset the global recorder
+    runner.globalSummaryListener = new GlobalSummaryListener();
+    System.out.println( "warmup done" );
+
     if (runnerArgs.getRunningTime() > 0 && runnerArgs.getRunningTimeUnit() != null) {
       runner.run( runnerArgs.getRunningTime(), runnerArgs.getRunningTimeUnit(), false );
     }  else {
@@ -93,6 +98,11 @@ public class PerfRunner {
     @Override
     public ResponseTimeListener[] getResponseTimeListeners() {
       return new ResponseTimeListener[]{globalSummaryListener};
+    }
+
+    @Override
+    public LatencyTimeListener[] getLatencyTimeListeners() {
+      return new LatencyTimeListener[0];
     }
 
     public CollectorInformations getResponseTimeSummary() {
