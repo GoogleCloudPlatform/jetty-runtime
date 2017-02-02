@@ -35,7 +35,7 @@
 		<dependencies>
 
 			<dependency>
-				<groupId>com.webtide.jetty.load.generator</groupId>
+		              	<groupId>com.google.cloud.runtimes.perf</groupId>
 				<artifactId>jetty-load-generator-app-webapp</artifactId>
 				<version>${project.version}</version>
 				<type>war</type>
