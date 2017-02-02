@@ -216,7 +216,7 @@
                   <goal>deploy</goal>
                 </goals>
                 <configuration>
-                  <version>${maven.build.timestamp}</version>
+                  <!--version>${maven.build.timestamp}</version-->
                 </configuration>
               </execution>
             </executions>
