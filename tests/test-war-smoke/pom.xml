@@ -66,6 +66,7 @@
                   <include>${project.build.finalName}.war</include>
                 </resource>
               </resources>
+              <forceTags>true</forceTags>
             </configuration>
           </execution>
         </executions>
