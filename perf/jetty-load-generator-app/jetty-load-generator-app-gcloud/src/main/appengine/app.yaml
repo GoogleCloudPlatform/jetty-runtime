@@ -12,3 +12,5 @@ handlers:
 - url: /.*
   script: this field is required, but ignored
   secure: always
+health_check:
+  enable_health_check: False
