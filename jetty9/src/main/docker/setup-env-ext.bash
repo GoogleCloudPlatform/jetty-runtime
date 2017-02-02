@@ -1,10 +1,7 @@
-#!/bin/bash
+# The script below is from setup-env-ext.bash, which is appended to /setup-env.bash
 
-# source the supported feature JVM arguments
-source /setup-env.bash
-  
 # default jetty arguments
-export DEFAULT_ARGS="-Djetty.base=$JETTY_BASE -jar $JETTY_HOME/start.jar"
+export JETTY_ARGS="-Djetty.base=$JETTY_BASE -jar $JETTY_HOME/start.jar"
 
 # Unpack a WAR app (if present) beforehand so that Stackdriver Debugger
 # can load it. This should be done before the JVM for Jetty starts up.
@@ -32,16 +29,14 @@ fi
 if [ "java" = "$1" -o "$(which java)" = "$1" ] ; then
   # ignore the java command as it is the default
   shift
-  # clear the default args, use the passed args
-  DEFAULT_ARGS=
+  # clear the JETTY args as the java command has been explicitly set
+  JETTY_ARGS=
 fi
 
 # If the first argument is not executable
 if ! type "$1" &>/dev/null; then
-  # then treat all arguments as arguments to the java command
-  
-  # set the command line to java with the feature arguments and passed arguments
-  set -- java $JAVA_OPTS $DEFAULT_ARGS "$@"
+  # then jetty is being used so add the JETTY_ARGS to the JAVA_OPTS
+  export JAVA_OPTS="$JAVA_OPTS $JETTY_ARGS"
 fi
 
-exec "$@"
+# End setup-env-ext.bash
