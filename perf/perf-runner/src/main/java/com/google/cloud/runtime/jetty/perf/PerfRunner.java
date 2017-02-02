@@ -60,11 +60,16 @@ public class PerfRunner {
       System.out.println( "error parsing warmup number arg '" + warmupNumberArg
                               + "' so use default " + warmupNumber  );
     }
-    runner.run( warmupNumber );
-
+    if (warmupNumber>0)
+    {
+      runner.run( warmupNumber );
+      System.out.println( "warmup done" );
+    } else {
+      System.out.println( "NO warmup" );
+    }
     // reset the global recorder
     runner.globalSummaryListener = new GlobalSummaryListener();
-    System.out.println( "warmup done" );
+
 
     if (runnerArgs.getRunningTime() > 0 && runnerArgs.getRunningTimeUnit() != null) {
       runner.run( runnerArgs.getRunningTime(), runnerArgs.getRunningTimeUnit(), false );
