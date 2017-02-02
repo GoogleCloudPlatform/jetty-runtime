@@ -39,8 +39,9 @@ RUN mkdir webapps $TMPDIR \
  && chown -R jetty:jetty $JETTY_BASE $TMPDIR
 
 # Start Jetty directly
-COPY docker-entrypoint.bash /
-RUN chmod +rx /docker-entrypoint.bash
+COPY setup-env-ext.bash /tmp/
+RUN cat /tmp/setup-env-ext.bash >> /setup-env.bash \
+ && rm /tmp/setup-env-ext.bash
 
 EXPOSE 8080
 CMD ["java","-Djetty.base=${jetty.base}","-jar","${jetty.home}/start.jar"]

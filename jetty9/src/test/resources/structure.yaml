@@ -29,10 +29,15 @@ fileExistenceTests:
   path: '${jetty.base}/webapps'
   isDirectory: true
   shouldExist: true
+- name: 'setup-env.bash exists'
+  path: '/setup-env.bash'
+  isDirectory: false
+  shouldExist: true
 - name: 'docker entrypoint exists'
   path: '/docker-entrypoint.bash'
   isDirectory: false
   shouldExist: true
+  expectedContents: ['.*from setup-env-ext.bash.*End setup-env-ext.bash.*']
 
 licenseTests:
 - debian: true
