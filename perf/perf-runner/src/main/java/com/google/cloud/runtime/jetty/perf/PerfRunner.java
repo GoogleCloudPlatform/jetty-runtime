@@ -87,7 +87,11 @@ public class PerfRunner {
     System.out.println( "----------------------------------------------------");
     System.out.println(  );
 
-    System.exit( 0 );
+    // well it's only for test
+    String noSysExit = runnerArgs.getParams().get( "noSysExit" );
+    if (!Boolean.parseBoolean( noSysExit )) {
+      System.exit( 0 );
+    }
     return;
   }
 
