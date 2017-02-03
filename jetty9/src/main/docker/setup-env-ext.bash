@@ -1,5 +1,18 @@
 # The script below is from setup-env-ext.bash, which is appended to /setup-env.bash
 
+# Instantiate session modules user selected
+cd $JETTY_BASE
+case "${SESSIONS:=local}" in
+  memcached-datastore)
+            java -jar $JETTY_HOME/start.jar --approve-all-licenses --add-to-start=session-cache-null,gae-datastore,session-store-gcloud,gae-xmemcached,session-store-cache
+           ;;
+  datastore)
+            java -jar $JETTY_HOME/start.jar --approve-all-licenses --add-to-start=session-cache-null,gae-datastore,session-store-gcloud
+           ;;
+  *)
+           ;;
+esac
+
 # default jetty arguments
 export JETTY_ARGS="-Djetty.base=$JETTY_BASE -jar $JETTY_HOME/start.jar"
 
@@ -39,20 +52,5 @@ if ! type "$1" &>/dev/null; then
   export JAVA_OPTS="$JAVA_OPTS $JETTY_ARGS"
 fi
 
-
-
-# Remove unwanted session managers - TODO only instantiate modules we want in jetty.commands
-case "${SESSIONS:=local}" in
-  memcached-datastore)
-           ;;
-  datastore)
-           rm -f $JETTY_BASE/start.d/session-store-cache.ini
-           ;;
-  *)
-           rm -f $JETTY_BASE/start.d/session-store-cache.ini
-           rm -f $JETTY_BASE/start.d/session-store-gcloud.ini
-           rm -f $JETTY_BASE/start.d/slf4j-jul.ini
-           ;;
-esac
 
 # End setup-env-ext.bash

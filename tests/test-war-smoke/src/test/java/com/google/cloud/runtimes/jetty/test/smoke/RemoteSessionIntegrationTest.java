@@ -52,8 +52,8 @@ public class RemoteSessionIntegrationTest extends AbstractIntegrationTest {
 
   @Before
   public void setUp() throws Exception {
-    datastore = DatastoreOptions.defaultInstance().service();
-    keyFactory = datastore.newKeyFactory().kind("GCloudSession");
+    datastore = DatastoreOptions.getDefaultInstance().getService();
+    keyFactory = datastore.newKeyFactory().setKind("GCloudSession");
   }
   
   
@@ -82,7 +82,7 @@ public class RemoteSessionIntegrationTest extends AbstractIntegrationTest {
     String sessionCookie = http.getHeaderField("Set-Cookie");
     assertThat(sessionCookie, containsString("JSESSIONID"));
     assertThat(sessionCookie, containsString(id));
-  
+ 
     Entity entity = datastore.get(keyFactory.newKey("_0.0.0.0_" + id));
     assertNotNull(entity);
     

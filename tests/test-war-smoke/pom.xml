@@ -43,7 +43,7 @@
     <dependency>
       <groupId>com.google.cloud</groupId>
       <artifactId>google-cloud-datastore</artifactId>
-      <version>0.7.0</version>
+      <version>${gcloud.api.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

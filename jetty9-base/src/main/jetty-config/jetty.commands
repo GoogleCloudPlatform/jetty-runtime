@@ -1,6 +1,6 @@
 --create-startd
 --approve-all-licenses
---add-to-start=server,webapp,http,deploy,jsp,jstl,http-forwarded,resources,logging-jul,gae
+--add-to-start=server,webapp,http,deploy,jsp,jstl,http-forwarded,resources,logging-jul,jcl-slf4j,gae
 
 jetty.httpConfig.outputAggregationSize=32768
 jetty.httpConfig.headerCacheSize=512
