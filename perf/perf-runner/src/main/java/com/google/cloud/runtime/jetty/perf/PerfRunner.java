@@ -17,23 +17,28 @@
 package com.google.cloud.runtime.jetty.perf;
 
 import com.beust.jcommander.JCommander;
+import org.eclipse.jetty.util.log.Log;
+import org.eclipse.jetty.util.log.Logger;
 import org.mortbay.jetty.load.generator.CollectorInformations;
+import org.mortbay.jetty.load.generator.LoadGenerator;
 import org.mortbay.jetty.load.generator.latency.LatencyTimeListener;
 import org.mortbay.jetty.load.generator.report.GlobalSummaryListener;
-import org.mortbay.jetty.load.generator.report.SummaryReport;
 import org.mortbay.jetty.load.generator.responsetime.ResponseTimeListener;
 import org.mortbay.jetty.load.generator.starter.LoadGeneratorStarter;
 import org.mortbay.jetty.load.generator.starter.LoadGeneratorStarterArgs;
 
 import java.util.Arrays;
+import java.util.Map;
 
 /**
  * Runner performance testing
  */
 public class PerfRunner {
-  public static void main(String[] args) throws Exception {
-    System.out.println( "args:" + Arrays.asList(args) );
 
+  private static final Logger LOGGER = Log.getLogger( PerfRunner.class );  
+  
+  public static void main(String[] args) throws Exception {
+    
     LoadGeneratorStarterArgs runnerArgs = new LoadGeneratorStarterArgs();
 
     try {
@@ -49,6 +54,8 @@ public class PerfRunner {
       return;
     }
 
+    getValuesFromEnvVar( runnerArgs );
+    LOGGER.info( "runnerArgs:" + runnerArgs.toString() );
     LoadGeneratorRunner runner = new LoadGeneratorRunner( runnerArgs );
 
     String warmupNumberArg = runnerArgs.getParams().get( "warmup.number" );
@@ -57,14 +64,14 @@ public class PerfRunner {
       warmupNumber = Integer.parseInt( warmupNumberArg );
     } catch ( NumberFormatException e ) {
       // ignore and use default
-      System.out.println( "error parsing warmup number arg '" + warmupNumberArg
+      LOGGER.info( "error parsing warmup number arg '" + warmupNumberArg
                               + "' so use default " + warmupNumber  );
     }
     if ( warmupNumber > 0 ) {
       runner.run( warmupNumber );
-      System.out.println( "warmup done" );
+      LOGGER.info( "warmup done" );
     } else {
-      System.out.println( "NO warmup" );
+      LOGGER.info( "NO warmup" );
     }
     // reset the global recorder
     runner.globalSummaryListener = new GlobalSummaryListener();
@@ -78,14 +85,14 @@ public class PerfRunner {
 
     CollectorInformations collectorInformations = runner.getResponseTimeSummary();
 
-    System.out.println(  );
-    System.out.println(  );
-    System.out.println( "----------------------------------------------------");
-    System.out.println( "-----------    Result Summary     ------------------");
-    System.out.println( "----------------------------------------------------");
-    System.out.println( "" + collectorInformations.toString() );
-    System.out.println( "----------------------------------------------------");
-    System.out.println(  );
+    LOGGER.info( "" );
+    LOGGER.info( "" );
+    LOGGER.info( "----------------------------------------------------");
+    LOGGER.info( "-----------    Result Summary     ------------------");
+    LOGGER.info( "----------------------------------------------------");
+    LOGGER.info( "" + collectorInformations.toString() );
+    LOGGER.info( "----------------------------------------------------");
+    LOGGER.info( "" );
 
     // well it's only for test
     String noSysExit = runnerArgs.getParams().get( "noSysExit" );
@@ -115,6 +122,54 @@ public class PerfRunner {
 
     public CollectorInformations getResponseTimeSummary() {
       return new CollectorInformations( globalSummaryListener.getResponseTimeHistogram() );
+    }
+
+  }
+
+  /**
+   * as we can get values from envvar with Docker using -e
+   * @param runnerArgs the args to enhance
+   */
+  private static void getValuesFromEnvVar(LoadGeneratorStarterArgs runnerArgs) {
+    Map<String,String> env = System.getenv();
+    String host = env.get( "PERF_HOST" );
+    if (host != null ) {
+      runnerArgs.setHost(host);
+    }
+
+    String port = env.get( "PERF_PORT" );
+    if (port != null ) {
+      runnerArgs.setPort(Integer.parseInt( port ));
+    }
+
+    String users = env.get( "PERF_USERS" );
+    if (users != null ) {
+      runnerArgs.setUsers(Integer.parseInt( users ));
+    }
+
+    String transactionRate = env.get( "PERF_TRANSACTION_RATE" );
+    if (transactionRate != null ) {
+      runnerArgs.setTransactionRate(Integer.parseInt( transactionRate ));
+    }
+
+    String transport = env.get( "PERF_TRANSPORT" );
+    if (transport != null ) {
+      runnerArgs.setTransport(transport);
+    }
+
+    String runningTime = env.get( "PERF_RUNNING_TIME" );
+    if (runningTime != null ) {
+      runnerArgs.setRunningTime(Integer.parseInt( runningTime ));
+    }
+
+    String runningTimeUnit = env.get( "PERF_RUNNING_TIME_UNIT" );
+    if (runningTimeUnit != null ) {
+      runnerArgs.setRunningTimeUnit(runningTimeUnit);
+    }
+
+    String runIteration = env.get( "PERF_RUN_ITERATION" );
+    if (runIteration != null ) {
+      runnerArgs.setRunIteration(Integer.parseInt( runIteration ));
     }
 
   }
