@@ -240,9 +240,9 @@
                   </arguments>
                 </configuration>
               </execution>
-              <!-- stop the service from 'deploy-remote-service' -->
+              <!-- remove the service -->
               <execution>
-                <id>stop-remote-service</id>
+                <id>remove-remote-service</id>
                 <phase>post-integration-test</phase>
                 <goals>
                   <goal>exec</goal>
@@ -252,27 +252,9 @@
                   <arguments>
                     <argument>--quiet</argument>
                     <argument>app</argument>
-                    <argument>versions</argument>
-                    <argument>stop</argument>
-                    <argument>${maven.build.timestamp}</argument>
-                  </arguments>
-                </configuration>
-              </execution>
-              <!-- remove the service from 'deploy-remote-service' -->
-              <execution>
-                <id>delete-remote-service</id>
-                <phase>post-integration-test</phase>
-                <goals>
-                  <goal>exec</goal>
-                </goals>
-                <configuration>
-                  <executable>gcloud</executable>
-                  <arguments>
-                    <argument>--quiet</argument>
-                    <argument>app</argument>
-                    <argument>versions</argument>
+                    <argument>services</argument>
                     <argument>delete</argument>
-                    <argument>${maven.build.timestamp}</argument>
+                    <argument>smoke</argument>
                   </arguments>
                 </configuration>
               </execution>
