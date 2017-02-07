@@ -12,7 +12,7 @@
   <artifactId>jetty-load-generator-app-webapp</artifactId>
   <packaging>war</packaging>
 
-  <name>Jetty :: Load App :: Webapp</name>
+  <name>Jetty Runtime :: Load App :: Webapp</name>
   <description>Jetty Load Test project webapp</description>
 
   <dependencies>

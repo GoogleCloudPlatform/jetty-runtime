@@ -12,7 +12,7 @@
   <artifactId>jetty-load-generator-app-gcloud</artifactId>
   <packaging>pom</packaging>
 
-  <name>Jetty :: Load App :: Gcloud</name>
+  <name>Jetty Runtime :: Load App :: Gcloud</name>
   <description>Jetty Load Test project GCloud package</description>
 
   <dependencies>
