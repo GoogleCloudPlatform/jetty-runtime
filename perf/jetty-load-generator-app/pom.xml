@@ -10,7 +10,6 @@
 	</parent>
 
 	<artifactId>jetty-load-app</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>Jetty Runtime :: Perf :: Load App</name>
@@ -35,7 +34,7 @@
 		<dependencies>
 
 			<dependency>
-		              	<groupId>com.google.cloud.runtimes.perf</groupId>
+	      <groupId>com.google.cloud.runtimes.perf</groupId>
 				<artifactId>jetty-load-generator-app-webapp</artifactId>
 				<version>${project.version}</version>
 				<type>war</type>
