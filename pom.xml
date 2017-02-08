@@ -33,14 +33,14 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <maven.build.timestamp.format>yyyy-MM-dd-HH-mm</maven.build.timestamp.format>
-    <gcloud.api.version>0.8.2-beta</gcloud.api.version>
+    <gcloud.api.version>0.8.3-beta</gcloud.api.version>
     <jetty9.minor.version>4</jetty9.minor.version>
     <jetty9.dot.version>2</jetty9.dot.version>
     <jetty9.version>9.${jetty9.minor.version}.${jetty9.dot.version}-SNAPSHOT</jetty9.version>
     <docker.tag.prefix></docker.tag.prefix>
     <docker.tag.short>${docker.tag.prefix}9.${jetty9.minor.version}</docker.tag.short>
     <docker.tag.long>${docker.tag.prefix}9.${jetty9.minor.version}-${maven.build.timestamp}</docker.tag.long>
-    <docker.openjdk.image>gcr.io/google-appengine/openjdk:8-2017-01-26_21_19</docker.openjdk.image>
+    <docker.openjdk.image>gcr.io/google-appengine/openjdk:8-2017-02-02_16_03</docker.openjdk.image>
   </properties>
 
   <developers>

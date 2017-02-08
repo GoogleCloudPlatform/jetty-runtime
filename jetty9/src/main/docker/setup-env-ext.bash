@@ -52,5 +52,4 @@ if ! type "$1" &>/dev/null; then
   export JAVA_OPTS="$JAVA_OPTS $JETTY_ARGS"
 fi
 
-
 # End setup-env-ext.bash

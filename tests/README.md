@@ -29,14 +29,16 @@ jetty                             9.4-2016-12-13-17-02       b6cbab53c076       
 jetty                             latest                     b6cbab53c076        47 hours ago        359.2 MB
 ```
 
-In order to make these images available for remote testing you can use the following commands:
+In order to manually make these images available for remote testing you can use the following commands:
 
 ```
 > docker tag jetty:9.4 gcr.io/{project}/jetty:9.4
 > gcloud docker -- push gcr.io/{project}/jetty:9.4 
 ```
 
-This will take the local artifacts and make them available for remote testing (or general usage for the given {project}).  Additionally when using test.remote the test.remote.deploy profile can perform the tag and push.
+This will take the local artifacts and make them available for remote testing (or general usage for the given {project}).  
+
+If you would like to automatically deploy images for remote testing the following combination of profiles will take care of everything needed for remote testing.
 
 ```
 > mvn -Ptest.remote,test.remote.deploy install
@@ -70,19 +72,23 @@ The tests activated under this profile will make use of the locally installed im
 Remote Testing
 =====
 
+Remote testing is disabled by default but can be enabled to work in conjuction with local testing.
+
 Again from the jetty-runtime/tests directory:
 
 ```
-> mvn install -Ptest.remote -Djetty.test.image=gcr.io/{project}/jetty:9.4
+> mvn install -Ptest.remote,test.remote.deploy,test.remote.clean
 ```
 
 This will activate the remote testing profile. Under this scenario, for each test artifact the appengine-maven-plugin is used to deploy an instance of the application to the Google Flexible environment and then run appropriate test cases.  The containers for each webapp will be built through using the cloud builder mechanism available in GCP.  This means the image to be tested (as referenced in the jetty.test.image property) will need to be deployed to the appropriate gcr.io location.  Remote testing can make use of the entire scope of services available to Google Flex.  
 
-It is possible to run local and remote testing at the same time by using -Ptest.remote,test.local however it is important to note that the jetty.test.image is required to point to an image in gcr.io and local testing will use this same image.
+It is possible to run local and remote testing at the same time by using -Ptest.remote,test.local however it is important to note that the jetty.test.image is required to point to an image in gcr.io and when remote testing is enabled, local testing will use this same image.
 
 The default value for the jetty.test.image property when using the test.remote property is 'gcr.io/{project}/jetty:{docker.tag.long}'.
 
 The test.remote.clean profile will remove the remote container that is deployed via the test.remote.deploy profile.
+
+Note: should the build fail a remote deployed artifact may remain deployed and need to be manually removed through the cloud console or the gcloud cli.
 
 Test Case Requirements and Conventions
 ===
