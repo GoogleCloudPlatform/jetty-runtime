@@ -25,12 +25,12 @@
   </parent>
   <groupId>com.google.cloud.runtimes.perf</groupId>
   <artifactId>perf</artifactId>
-  <name>Jetty Runtime :: Perf :: Parent</name>
+  <name>Jetty Runtime :: Perf</name>
   <packaging>pom</packaging>
 
   <modules>
-    <module>jetty-load-generator-app</module>
-    <module>perf-runner</module>
+    <module>perf-server</module>
+    <module>perf-client</module>
   </modules>
 
   <build>

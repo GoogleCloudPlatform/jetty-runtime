@@ -12,7 +12,7 @@
 	<artifactId>perf-runner</artifactId>
 	<packaging>jar</packaging>
 
-	<name>Jetty Runtime :: Perf :: Perf Runner</name>
+	<name>Jetty Runtime :: Perf :: Perf Client</name>
 	<description>Running load testing</description>
 
 	<properties>

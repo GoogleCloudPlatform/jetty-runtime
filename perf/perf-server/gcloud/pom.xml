@@ -5,21 +5,21 @@
 
   <parent>
     <groupId>com.google.cloud.runtimes.perf</groupId>
-    <artifactId>jetty-load-app</artifactId>
+    <artifactId>perf-server</artifactId>
     <version>0.1.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>jetty-load-generator-app-gcloud</artifactId>
+  <artifactId>gcloud</artifactId>
   <packaging>pom</packaging>
 
-  <name>Jetty Runtime :: Load App :: Gcloud</name>
+  <name>Jetty Runtime :: Perf :: Server :: GCloud</name>
   <description>Jetty Load Test project GCloud package</description>
 
   <dependencies>
 
     <dependency>
       <groupId>com.google.cloud.runtimes.perf</groupId>
-      <artifactId>jetty-load-generator-app-webapp</artifactId>
+      <artifactId>webapp</artifactId>
       <type>war</type>
     </dependency>
 

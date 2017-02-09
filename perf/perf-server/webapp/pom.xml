@@ -5,14 +5,14 @@
 
   <parent>
     <groupId>com.google.cloud.runtimes.perf</groupId>
-    <artifactId>jetty-load-app</artifactId>
+    <artifactId>perf-server</artifactId>
     <version>0.1.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>jetty-load-generator-app-webapp</artifactId>
+  <artifactId>webapp</artifactId>
   <packaging>war</packaging>
 
-  <name>Jetty Runtime :: Load App :: Webapp</name>
+  <name>Jetty Runtime :: Perf :: Server :: Webapp</name>
   <description>Jetty Load Test project webapp</description>
 
   <dependencies>
