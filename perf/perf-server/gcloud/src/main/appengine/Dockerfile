@@ -5,7 +5,7 @@ ADD jetty-home.tar.gz /usr/local/
 RUN mv /usr/local/jetty-home-* $JETTY_HOME \
  && chown -R jetty:jetty $JETTY_HOME
 
-ADD jetty-load-generator-app-webapp.war $JETTY_BASE/webapps/root.war
+ADD webapp.war $JETTY_BASE/webapps/root.war
 
 RUN java  -Djetty.base=/var/lib/jetty -jar /usr/local/jetty/start.jar --approve-all-licenses --add-to-start=stats,servlet
 

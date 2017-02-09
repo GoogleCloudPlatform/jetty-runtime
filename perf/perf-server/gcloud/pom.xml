@@ -119,13 +119,13 @@
               <artifactItems>
                 <artifactItem>
                   <groupId>${project.groupId}</groupId>
-                  <artifactId>jetty-load-generator-app-webapp</artifactId>
+                  <artifactId>webapp</artifactId>
                   <version>${project.version}</version>
                   <type>war</type>
                   <overWrite>true</overWrite>
                   <includes>**</includes>
                   <outputDirectory>${project.build.directory}/docker</outputDirectory>
-                  <destFileName>jetty-load-generator-app-webapp.war</destFileName>
+                  <destFileName>webapp.war</destFileName>
                 </artifactItem>
               </artifactItems>
             </configuration>
@@ -140,13 +140,13 @@
               <artifactItems>
                 <artifactItem>
                   <groupId>${project.groupId}</groupId>
-                  <artifactId>jetty-load-generator-app-webapp</artifactId>
+                  <artifactId>webapp</artifactId>
                   <version>${project.version}</version>
                   <type>war</type>
                   <overWrite>true</overWrite>
                   <includes>**</includes>
                   <outputDirectory>${project.build.directory}/appengine-staging</outputDirectory>
-                  <destFileName>jetty-load-generator-app-webapp.war</destFileName>
+                  <destFileName>webapp.war</destFileName>
                 </artifactItem>
               </artifactItems>
             </configuration>

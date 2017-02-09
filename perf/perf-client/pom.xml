@@ -37,7 +37,7 @@
 		<!-- just to be sure we build this module last -->
 		<dependency>
 			<groupId>com.google.cloud.runtimes.perf</groupId>
-			<artifactId>jetty-load-generator-app-webapp</artifactId>
+			<artifactId>webapp</artifactId>
 			<version>0.1.0-SNAPSHOT</version>
 			<type>war</type>
 			<scope>runtime</scope>
