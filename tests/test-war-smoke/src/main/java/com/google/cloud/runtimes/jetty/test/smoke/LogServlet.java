@@ -32,6 +32,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+/**
+ * A servlet to query the Stackdriver logging for the gae_app smoke module.
+ * An ID string is passed as the pathInfo and is used to filter the textPayload
+ * and all log records found are included in the text response.
+ */
 @WebServlet(urlPatterns = {"/log/*"})
 public class LogServlet extends HttpServlet {
   @Override

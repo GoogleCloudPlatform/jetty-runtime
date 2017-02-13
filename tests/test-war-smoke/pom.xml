@@ -39,6 +39,7 @@
       <artifactId>google-cloud-logging</artifactId>
       <version>${gcloud.api.version}</version>
       <exclusions>
+        <!-- TODO remove once https://github.com/google/google-oauth-java-client/issues/145 is fixed -->
         <exclusion>
           <groupId>javax.servlet</groupId>
           <artifactId>servlet-api</artifactId>

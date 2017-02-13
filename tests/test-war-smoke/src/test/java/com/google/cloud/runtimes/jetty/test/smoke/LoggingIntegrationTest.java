@@ -30,24 +30,33 @@ import java.io.BufferedReader;
 import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
-import java.util.concurrent.TimeUnit;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class LoggingIntegrationTest extends AbstractIntegrationTest {
+  
+  
   @Test
   @RemoteOnly
-  public void testForwardedIgnored() throws Exception {
-    String id = Long.toHexString(System.nanoTime());
-    URI target = getUri().resolve("/dump/info/" + id);
-    assertThat(target.getPath(), containsString("/dump/info/" + id));
+  public void testLogging() throws Exception {
 
+    // Create unique ID to relate request with log entries
+    String id = Long.toHexString(System.nanoTime());
+
+    // Hit the DumpServlet that will log the request path
+    URI target = getUri().resolve("/dump/info/" + id);
     HttpURLConnection http = HttpUrlUtil.openTo(target);
     assertThat(http.getResponseCode(), is(200));
     String responseBody = HttpUrlUtil.getResponseBody(http);
+
+    List<String> lines =
+        new BufferedReader(new StringReader(responseBody)).lines().collect(Collectors.toList());
+    assertThat(lines.stream().filter(s -> s.startsWith("requestURI=")).findFirst().get(),
+        containsString(id));
+    String traceId = lines.stream().filter(s -> s.startsWith("X-Cloud-Trace-Context: "))
+        .findFirst().get().split("[ /]")[1];
     
-    assertThat(responseBody, containsString(id));
-    
-    TimeUnit.SECONDS.sleep(1);
-    
+    // Hit the LogServlet to query the resulting log entries
     target = getUri().resolve("/log/" + id);
 
     http = HttpUrlUtil.openTo(target);
@@ -61,8 +70,13 @@ public class LoggingIntegrationTest extends AbstractIntegrationTest {
     
     line = in.readLine();
     assertThat(line,containsString("JUL.info:/dump/info/" + id));
+    assertThat(line,containsString("appengine.googleapis.com/trace_id=" + traceId));
+    // TODO check zone once google-cloud-logging is updated to >= 0.8.4
     
     line = in.readLine();
     assertThat(line,containsString("ServletContext.log:/dump/info/" + id));
+    assertThat(line,containsString("appengine.googleapis.com/trace_id=" + traceId));
+    // TODO check zone once google-cloud-logging is updated to >= 0.8.4
+    
   }
 }
