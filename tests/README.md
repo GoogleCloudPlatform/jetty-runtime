@@ -62,7 +62,7 @@ All tests are located under a `/tests` directory in the `jetty-runtime` project.
 Local Testing
 =====
 
-Tests can be run independently of the of the build for the entire project from the `jetty-runtime/tests` directory. When running tests from `jetty-runtime/tests` users are required to define what image they would like to run the tests against as, unlike building the project from the root directory, the test directory has no means by which to determine the image on it's own.
+Tests can be run independently of the build for the entire project from the `jetty-runtime/tests` directory. When running tests from `jetty-runtime/tests` users are required to define what image they would like to run the tests against as, unlike building the project from the root directory, the test directory has no means by which to determine the image on it's own.
 
 ```
 > mvn install -Djetty.test.image={repository}:{tag}
