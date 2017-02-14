@@ -62,13 +62,13 @@ All tests are located under a `/tests` directory in the `jetty-runtime` project.
 Local Testing
 =====
 
-From the `jetty-runtime/tests` directory:
+Tests can be run independently of the of the build for the entire project from the `jetty-runtime/tests` directory. When running tests from `jetty-runtime/tests` users are required to define what image they would like to run the tests against as, unlike building the project from the root directory, the test directory has no means by which to determine the image on it's own.
 
 ```
 > mvn install -Djetty.test.image={repository}:{tag}
 ```
 
-The tests activated under this profile will make use of the locally installed image and tag referenced in the `jetty.test.image` property.  The spotify `docker-maven-plugin` is used to build the test docker container and the `io.fabric8` docker plugin is used to manage the integration test lifecycle. Local tests may have a smaller scope as they are not intended to the complete Google Flexible environment.  Local testing is intended to test and validate configuration of Jetty and basic environment.
+The spotify `docker-maven-plugin` is used to build the test docker container and the `io.fabric8` docker plugin is used to manage the integration test lifecycle. Local tests may have a smaller scope as they are not intended to the complete Google Flexible environment.  Local testing is intended to test and validate configuration of Jetty and basic environment.
 
 Remote Testing
 =====
@@ -143,7 +143,7 @@ Local Test Process:
 * By default `failsafe-maven-plugin` processes `@LocalOnly` annotations
 * `com.spotify:docker-maven-plugin` builds target container based on value of *`jetty.test.image`*
 * `io.fabric8:docker-maven-plugin` starts the target container in pre-integration-test phase
-  * Random local port mapped to 8080 of container and available to test case as system property *`app.deploy.port`*
+* Random local port mapped to 8080 of container and available to test case as system property *`app.deploy.port`*
 * `failsafe-maven-plugin` runs in `integration-test` phase
 * `io.fabric8:docker-maven-plugin` stops the target container in `post-integration-test` phase
 
