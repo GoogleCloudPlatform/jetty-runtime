@@ -48,7 +48,7 @@ public class LoggingIntegrationTest extends AbstractIntegrationTest {
     HttpURLConnection http = HttpUrlUtil.openTo(target);
     assertThat(http.getResponseCode(), is(200));
     String responseBody = HttpUrlUtil.getResponseBody(http);
-
+    
     List<String> lines =
         new BufferedReader(new StringReader(responseBody)).lines().collect(Collectors.toList());
     assertThat(lines.stream().filter(s -> s.startsWith("requestURI=")).findFirst().get(),
@@ -62,7 +62,7 @@ public class LoggingIntegrationTest extends AbstractIntegrationTest {
     http = HttpUrlUtil.openTo(target);
     assertThat(http.getResponseCode(), is(200));
     responseBody = HttpUrlUtil.getResponseBody(http);
-        
+            
     BufferedReader in = new BufferedReader(new StringReader(responseBody));
     String line = in.readLine();
     assertThat(line,containsString("Log Entries "));
@@ -71,12 +71,12 @@ public class LoggingIntegrationTest extends AbstractIntegrationTest {
     line = in.readLine();
     assertThat(line,containsString("JUL.info:/dump/info/" + id));
     assertThat(line,containsString("appengine.googleapis.com/trace_id=" + traceId));
-    // TODO check zone once google-cloud-logging is updated to >= 0.8.4
+    // TODO assertThat(line,containsString("zone="));
     
     line = in.readLine();
     assertThat(line,containsString("ServletContext.log:/dump/info/" + id));
     assertThat(line,containsString("appengine.googleapis.com/trace_id=" + traceId));
-    // TODO check zone once google-cloud-logging is updated to >= 0.8.4
+    // TODO assertThat(line,containsString("zone="));
     
   }
 }
