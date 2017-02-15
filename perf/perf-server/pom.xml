@@ -21,22 +21,15 @@
 		<maven-war-plugin-version>3.0.0</maven-war-plugin-version>
 		<gcloud-maven-plugin-version>2.0.9.133.v201611104</gcloud-maven-plugin-version>
 		<jetty-maven-plugin-version>${jetty9.version}</jetty-maven-plugin-version>
+		<jetty.test.image>jetty:${docker.tag.short}</jetty.test.image>
 	</properties>
 
 	<modules>
 		<module>webapp</module>
-		<module>gcloud</module>
 	</modules>
 
 	<dependencyManagement>
 		<dependencies>
-
-			<dependency>
-	      <groupId>com.google.cloud.runtimes.perf</groupId>
-				<artifactId>webapp</artifactId>
-				<version>${project.version}</version>
-				<type>war</type>
-			</dependency>
 
 			<dependency>
 				<groupId>javax.servlet</groupId>
@@ -73,7 +66,6 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.5.1</version>
 					<configuration>
 						<target>1.8</target>
 						<source>1.8</source>

@@ -37,6 +37,8 @@
     <docker.tag.short>${docker.tag.prefix}9.${jetty9.minor.version}</docker.tag.short>
     <docker.tag.long>${docker.tag.prefix}9.${jetty9.minor.version}-${maven.build.timestamp}</docker.tag.long>
     <docker.openjdk.image>gcr.io/google-appengine/openjdk:8-2017-05-22_14_38</docker.openjdk.image>
+    <jetty.home>/opt/jetty-home</jetty.home>
+    <jetty.base>/var/lib/jetty</jetty.base>
   </properties>
 
   <licenses>
@@ -180,6 +182,13 @@
             <localCheckout>true</localCheckout>
           </configuration>
         </plugin>
+
+        <plugin>
+          <groupId>com.google.cloud.tools</groupId>
+          <artifactId>appengine-maven-plugin</artifactId>
+          <version>1.2.0</version>
+        </plugin>
+
       </plugins>
     </pluginManagement>
     <plugins>
