@@ -71,12 +71,11 @@ public class LoggingIntegrationTest extends AbstractIntegrationTest {
     line = in.readLine();
     assertThat(line,containsString("JUL.info:/dump/info/" + id));
     assertThat(line,containsString("appengine.googleapis.com/trace_id=" + traceId));
-    // TODO assertThat(line,containsString("zone="));
+    assertThat(line,containsString("zone="));
     
     line = in.readLine();
     assertThat(line,containsString("ServletContext.log:/dump/info/" + id));
     assertThat(line,containsString("appengine.googleapis.com/trace_id=" + traceId));
-    // TODO assertThat(line,containsString("zone="));
-    
+    assertThat(line,containsString("zone="));
   }
 }
