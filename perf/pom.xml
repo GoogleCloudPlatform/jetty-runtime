@@ -30,7 +30,7 @@
 
   <modules>
     <module>perf-server</module>
-    <module>perf-client</module>
+    <module>perf-runner</module>
   </modules>
 
   <build>
