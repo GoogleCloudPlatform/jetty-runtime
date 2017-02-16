@@ -24,10 +24,6 @@
   <version>0.1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Google App Engine Jetty Runtime Parent</name>
-  <scm>
-    <connection>scm:git:https://github.com/GoogleCloudPlatform/appengine-runtime-java-docker-image.git</connection>
-    <tag>HEAD</tag>
-  </scm>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -42,15 +38,6 @@
     <docker.openjdk.image>gcr.io/google-appengine/openjdk:8-2017-02-02_16_03</docker.openjdk.image>
   </properties>
 
-  <developers>
-    <developer>
-      <id>ludo</id>
-      <name>Ludovic Champenois</name>
-      <organization>Google</organization>
-      <email>ludo at google dot com</email>
-    </developer>
-  </developers>
-
   <licenses>
     <license>
       <name>Apache License 2.0</name>
@@ -58,27 +45,6 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
-
-  <repositories>
-    <repository>
-      <id>sonatype-google-releases</id>
-      <name>Sonatype Google Releases</name>
-      <url>https://oss.sonatype.org/service/local/repositories/google-releases/content</url>
-    </repository>
-  </repositories>
-
-  <distributionManagement>
-    <repository>
-      <id>sonatype-nexus-staging</id>
-      <name>Sonatype Nexus Staging</name>
-      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-    </repository>
-    <snapshotRepository>
-      <id>sonatype-nexus-snapshots</id>
-      <name>Sonatype Nexus Snapshots</name>
-      <url>https://oss.sonatype.org/content/repositories/google-snapshots/</url>
-    </snapshotRepository>
-  </distributionManagement>
 
   <modules>
     <module>jetty9-base</module>
@@ -277,32 +243,4 @@
       </plugin>
     </plugins>
   </build>
-
-  <profiles>
-    <profile>
-      <id>sonatype-oss-release</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-gpg-plugin</artifactId>
-            <version>1.5</version>
-            <executions>
-              <execution>
-                <id>sign-artifacts</id>
-                <phase>verify</phase>
-                <goals>
-                  <goal>sign</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-javadoc-plugin</artifactId>
-          </plugin>
-       </plugins>
-      </build>
-    </profile>
-  </profiles>
 </project>
