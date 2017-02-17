@@ -24,7 +24,7 @@
 		<transaction_rate>3</transaction_rate>
 		<transport>https</transport>
 		<users>2</users>
-		<profile.json>${basedir}/src/main/resources/loadgenerator_profile.groovy</profile.json>
+		<profile.json>${basedir}/src/main/appengine/loadgenerator_profile.groovy</profile.json>
 		<warmup.number>10</warmup.number>
 	</properties>
 
@@ -75,13 +75,13 @@
 							<goal>copy-resources</goal>
 						</goals>
 						<configuration>
-							<outputDirectory>${project.build.directory}/docker</outputDirectory>
+							<outputDirectory>${project.build.directory}</outputDirectory>
 							<resources>
 								<resource>
-									<directory>${basedir}/src/main/docker</directory>
+									<directory>${basedir}/src/main/appengine</directory>
 									<filtering>true</filtering>
 									<includes>
-										<include>*</include>
+										<include>**</include>
 									</includes>
 								</resource>
 							</resources>
@@ -167,10 +167,9 @@
 								</resource>
 								<resource>
 									<targetPath>/</targetPath>
-									<directory>${basedir}/src/main/resources</directory>
+									<directory>${basedir}/src/main/appengine</directory>
 									<include>loadgenerator_profile.groovy</include>
 								</resource>
-
 							</resources>
 						</configuration>
 						<executions>
@@ -183,6 +182,62 @@
 						</executions>
 					</plugin>
 
+				</plugins>
+			</build>
+		</profile>
+
+		<profile>
+			<id>docker-deploy</id>
+			<build>
+				<plugins>
+					<!--
+					<plugin>
+						<groupId>com.google.appengine</groupId>
+						<artifactId>gcloud-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>gcloud-deploy</id>
+								<phase>install</phase>
+								<goals>
+									<goal>deploy</goal>
+								</goals>
+								<configuration>
+									<gcloud_directory>${gcloud.sdk.path}</gcloud_directory>
+									<cloudSdkPath>${gcloud.sdk.path}</cloudSdkPath>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					-->
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<version>1.5.0</version>
+						<executions>
+							<execution>
+								<id>gcloud-deploy</id>
+								<phase>install</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>python</executable>
+
+									<!-- workingDirectory>/tmp</workingDirectory -->
+									<arguments>
+										<argument>-S</argument>
+										<argument>${gcloud.sdk.path}/lib/gcloud.py</argument>
+										<argument>--quiet</argument>
+										<argument>app</argument>
+										<argument>deploy</argument>
+										<argument>${project.build.directory}/app.yaml</argument>
+										<argument>--promote</argument>
+									</arguments>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<!-- Dockerfile app.yaml perf-runner-0.1.0-SNAPSHOT.jar -->
 				</plugins>
 			</build>
 		</profile>
