@@ -15,6 +15,6 @@ ENV JETTY_HOME ${jetty.home}
 ADD ${project.build.finalName}.war ${jetty.base}/webapps/root.war
 RUN chown -R jetty:jetty ${jetty.base}
 
-RUN java  -Djetty.base=${jetty.base} -jar ${jetty.home}/start.jar --approve-all-licenses --add-to-start=stats,servlet
+#RUN java  -Djetty.base=${jetty.base} -jar ${jetty.home}/start.jar --approve-all-licenses --add-to-start=stats,servlet
 
 #CMD ["java", "-XX:+PrintGCDetails", "-XX:+PrintGCTimeStamps","-Djetty.base=${jetty.base}","-jar","${jetty.home}/start.jar"]

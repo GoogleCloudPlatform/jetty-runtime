@@ -2,12 +2,12 @@ runtime: custom
 vm: true
 service: jetty-runtime-perf-app
 resources:
-  cpu: 2
-  memory_gb: 8
-  disk_size_gb: 10
+  cpu: ${resources.cpu}
+  memory_gb: ${resources.memory_gb}
+  disk_size_gb: ${resources.disk_size_gb}
 automatic_scaling:
-  min_num_instances: 1
-  max_num_instances: 1
+  min_num_instances: ${automatic_scaling.min_num_instances}
+  max_num_instances: ${automatic_scaling.max_num_instances}
 handlers:
 - url: /.*
   script: this field is required, but ignored

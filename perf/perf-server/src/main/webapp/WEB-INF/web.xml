@@ -7,6 +7,7 @@
   <display-name>Jetty Runtime Load Test</display-name>
 
 
+  <!--
   <servlet>
     <servlet-name>StatsServlet</servlet-name>
     <servlet-class>org.eclipse.jetty.servlet.StatisticsServlet</servlet-class>
@@ -20,5 +21,6 @@
     <servlet-name>StatsServlet</servlet-name>
     <url-pattern>/stats/*</url-pattern>
   </servlet-mapping>
+  -->
 
 </web-app>
