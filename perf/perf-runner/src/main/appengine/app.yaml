@@ -6,8 +6,8 @@ resources:
   memory_gb: 8
   disk_size_gb: 10
 automatic_scaling:
-  min_num_instances: 2
-  max_num_instances: 2
+  min_num_instances: ${runner.instances}
+  max_num_instances: ${runner.instances}
 handlers:
 - url: /.*
   script: this field is required, but ignored

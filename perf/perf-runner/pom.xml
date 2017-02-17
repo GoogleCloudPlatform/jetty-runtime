@@ -26,6 +26,7 @@
 		<users>2</users>
 		<profile.json>${basedir}/src/main/appengine/loadgenerator_profile.groovy</profile.json>
 		<warmup.number>10</warmup.number>
+		<runner.instances>2</runner.instances>
 	</properties>
 
 	<dependencies>
