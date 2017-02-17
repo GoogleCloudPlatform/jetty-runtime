@@ -307,8 +307,8 @@
 									<deploy.project>${app.deploy.project}</deploy.project>
 									<deploy.version>${maven.build.timestamp}</deploy.version>
 									<deploy.promote>false</deploy.promote>
-									<dockerDirectory>${project.build.directory}/docker
-									</dockerDirectory>
+									<dockerDirectory>${project.build.directory}/docker</dockerDirectory>
+									<cloudSdkPath>${gcloud.sdk.path}</cloudSdkPath>
 								</configuration>
 							</execution>
 						</executions>
