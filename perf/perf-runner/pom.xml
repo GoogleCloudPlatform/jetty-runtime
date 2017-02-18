@@ -215,30 +215,34 @@
 						<artifactId>exec-maven-plugin</artifactId>
 						<version>1.5.0</version>
 						<executions>
+							<!-- deploy the service -->
 							<execution>
-								<id>gcloud-deploy</id>
+								<id>deploy-remote-perf-runner</id>
 								<phase>install</phase>
 								<goals>
 									<goal>exec</goal>
 								</goals>
 								<configuration>
-									<executable>python</executable>
-
-									<!-- workingDirectory>/tmp</workingDirectory -->
+									<workingDirectory>${project.build.directory}/</workingDirectory>
+									<executable>gcloud</executable>
 									<arguments>
-										<argument>-S</argument>
-										<argument>${gcloud.sdk.path}/lib/gcloud.py</argument>
 										<argument>--quiet</argument>
 										<argument>app</argument>
 										<argument>deploy</argument>
-										<argument>${project.build.directory}/app.yaml</argument>
-										<argument>--promote</argument>
+										<argument>app.yaml</argument>
+										<!--
+										because having this error???
+	ERROR: (gcloud.app.deploy) argument -v: Bad value [2017-02-17_23_36]: May only contain lowercase letters, digits, and hyphens. Must begin and end with a letter or digit. Must not exceed 63 characters.
+	-->
+										<!--
+										<argument>-v</argument>
+										<argument>${maven.build.timestamp}</argument>
+										-->
 									</arguments>
 								</configuration>
 							</execution>
 						</executions>
 					</plugin>
-					<!-- Dockerfile app.yaml perf-runner-0.1.0-SNAPSHOT.jar -->
 				</plugins>
 			</build>
 		</profile>
