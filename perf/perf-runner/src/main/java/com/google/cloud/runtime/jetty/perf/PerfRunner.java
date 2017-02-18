@@ -67,8 +67,9 @@ public class PerfRunner {
       LOGGER.info( "error parsing warmup number arg '" + warmupNumberArg
                               + "' so use default " + warmupNumber  );
     }
+    LOGGER.info( "warmup number {}", warmupNumber );
     if ( warmupNumber > 0 ) {
-      runner.run( warmupNumber );
+      runner.run( warmupNumber, false );
       LOGGER.info( "warmup done" );
     } else {
       LOGGER.info( "NO warmup" );
@@ -78,13 +79,18 @@ public class PerfRunner {
 
 
     if (runnerArgs.getRunningTime() > 0 && runnerArgs.getRunningTimeUnit() != null) {
-      runner.run( runnerArgs.getRunningTime(), runnerArgs.getRunningTimeUnit(), false );
+      LOGGER.info( "starting load for {} {}", //
+                   runnerArgs.getRunningTime(), //
+                   runnerArgs.getRunningTimeUnit());
+      runner.run( runnerArgs.getRunningTime(), runnerArgs.getRunningTimeUnit(), true );
     }  else {
-      runner.run( runnerArgs.getRunIteration(), false );
+      LOGGER.info( "starting load for {} iterations", runnerArgs.getRunIteration());
+      runner.run( runnerArgs.getRunIteration(), true );
     }
 
-    CollectorInformations collectorInformations = runner.getResponseTimeSummary();
+    LOGGER.info( "load test done" );
 
+    CollectorInformations collectorInformations = runner.getResponseTimeSummary();
     LOGGER.info( "" );
     LOGGER.info( "" );
     LOGGER.info( "----------------------------------------------------");
@@ -96,9 +102,11 @@ public class PerfRunner {
 
     // well it's only for test
     String noSysExit = runnerArgs.getParams().get( "noSysExit" );
-    if (!Boolean.parseBoolean( noSysExit )) {
+    if (noSysExit == null || !Boolean.parseBoolean( noSysExit )) {
+      LOGGER.info( "System.exit(0)" );
       System.exit( 0 );
     }
+    LOGGER.info( "no System.exit" );
     return;
   }
 

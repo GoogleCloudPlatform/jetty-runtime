@@ -27,6 +27,7 @@
 		<profile.json>${basedir}/src/main/appengine/loadgenerator_profile.groovy</profile.json>
 		<warmup.number>10</warmup.number>
 		<runner.instances>2</runner.instances>
+		<debug.args></debug.args>
 	</properties>
 
 	<dependencies>
@@ -157,9 +158,15 @@
 						<groupId>com.spotify</groupId>
 						<artifactId>docker-maven-plugin</artifactId>
 						<configuration>
-							<imageName>jetty-perf-runner:${project.version}</imageName>
+							<imageName>jetty-runtime-perf/${project.artifactId}</imageName>
 							<baseImage>${docker.openjdk.image}</baseImage>
-							<cmd>java -jar /${project.build.finalName}-uber.jar -Dwarmup.number=${warmup.number} -h ${host} --port ${port} --running-time ${running.time} --running-time-unit ${running.time.unit} --transaction-rate ${transaction_rate}  --transport ${transport} --users ${users} --profile-groovy-path /loadgenerator_profile.groovy</cmd>
+							<!--
+							<cmd>java -jar /${project.build.finalName}-uber.jar -Dwarmup.number=${warmup.number} -h ${host} -port ${port} -rt ${running.time} -rtu ${running.time.unit} -tr ${transaction_rate}  -t ${transport} -u ${users} -pgp /loadgenerator_profile.groovy</cmd>
+							-->
+							<dockerDirectory>${project.build.directory}</dockerDirectory>
+							<imageTags>
+								<imageTag>${project.version}</imageTag>
+							</imageTags>
 							<resources>
 								<resource>
 									<targetPath>/</targetPath>
@@ -245,6 +252,12 @@
 					</plugin>
 				</plugins>
 			</build>
+		</profile>
+		<profile>
+			<id>debug_args</id>
+			<properties>
+				<debug.args>,"-Xdebug","-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005"</debug.args>
+			</properties>
 		</profile>
 
 	</profiles>
