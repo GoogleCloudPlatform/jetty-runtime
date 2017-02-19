@@ -2,8 +2,8 @@ runtime: custom
 vm: true
 service: jetty-runtime-perf-runner
 resources:
-  cpu: 2
-  memory_gb: 8
+  cpu: ${resources.cpu}
+  memory_gb: ${resources.memory_gb}
   disk_size_gb: 10
 automatic_scaling:
   min_num_instances: ${runner.instances}

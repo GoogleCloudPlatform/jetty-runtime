@@ -28,6 +28,8 @@
 		<warmup.number>10</warmup.number>
 		<runner.instances>2</runner.instances>
 		<debug.args></debug.args>
+		<resources.cpu>2</resources.cpu>
+		<resources.memory_gb>8</resources.memory_gb>
 	</properties>
 
 	<dependencies>
