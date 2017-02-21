@@ -250,11 +250,12 @@
                 <configuration>
                   <executable>gcloud</executable>
                   <arguments>
-                    <argument>--quiet</argument>
                     <argument>app</argument>
                     <argument>services</argument>
                     <argument>delete</argument>
                     <argument>smoke</argument>
+                    <argument>--log-http</argument>
+                    <argument>--quiet</argument>
                   </arguments>
                 </configuration>
               </execution>
