@@ -18,11 +18,30 @@ set -e
 
 projectRoot=`dirname $0`/..
 
-DOCKER_NAMESPACE='gcr.io/$PROJECT_ID'
-RUNTIME_NAME="jetty"
-CANDIDATE_NAME="9-`date +%Y-%m-%d_%H_%M`"
+read_xml () {
+  local IFS=\>
+  read -d \< ENTITY CONTENT
+}
 
-export IMAGE="${DOCKER_NAMESPACE}/${RUNTIME_NAME}:${CANDIDATE_NAME}"
+parse_maven_property () {
+  propertyName=$1
+
+  # read all lines of pom.xml until the desired property name is encountered
+  while read_xml; do
+    if [[ $ENTITY = $propertyName ]] ; then
+      echo $CONTENT
+      break
+    fi
+  done < pom.xml
+}
+
+DOCKER_NAMESPACE='gcr.io/$PROJECT_ID'
+RUNTIME_NAME='jetty'
+JETTY9_MINOR_VERSION=$(parse_maven_property "jetty9.minor.version")
+JETTY9_VERSION="9.${JETTY9_MINOR_VERSION}"
+DOCKER_TAG_LONG="${JETTY9_VERSION}-`date +%Y-%m-%d-%H-%M`"
+
+export IMAGE="${DOCKER_NAMESPACE}/${RUNTIME_NAME}:${DOCKER_TAG_LONG}"
 echo "IMAGE: $IMAGE"
 
 envsubst < $projectRoot/cloudbuild.yaml.in > $projectRoot/target/cloudbuild.yaml
