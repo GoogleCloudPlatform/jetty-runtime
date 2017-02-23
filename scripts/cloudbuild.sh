@@ -26,7 +26,7 @@ read_xml () {
 parse_maven_property () {
   propertyName=$1
 
-  # read all lines of pom.xml until the desired property name is encountered
+  # read all lines of pom.xml until we reach the desired property tag
   while read_xml; do
     if [[ $ENTITY = $propertyName ]] ; then
       echo $CONTENT
@@ -44,6 +44,7 @@ DOCKER_TAG_LONG="${JETTY9_VERSION}-`date -u +%Y-%m-%d-%H-%M`"
 export IMAGE="${DOCKER_NAMESPACE}/${RUNTIME_NAME}:${DOCKER_TAG_LONG}"
 echo "IMAGE: $IMAGE"
 
+mkdir -p $projectRoot/target
 envsubst < $projectRoot/cloudbuild.yaml.in > $projectRoot/target/cloudbuild.yaml
 
 gcloud container builds submit --config=$projectRoot/target/cloudbuild.yaml .
