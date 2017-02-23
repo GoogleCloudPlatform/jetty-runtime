@@ -1,0 +1,8 @@
+# Cloud build pipeline
+
+steps:
+- name: gcr.io/gcp-runtimes/integration_test
+  args: [
+    '-d', ''
+    '--no-deploy'
+  ]

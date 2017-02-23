@@ -50,6 +50,7 @@
     <module>jetty9-base</module>
     <module>jetty9</module>
     <module>tests</module>
+    <module>runtimes-common-testing</module>
   </modules>
 
   <dependencyManagement>
