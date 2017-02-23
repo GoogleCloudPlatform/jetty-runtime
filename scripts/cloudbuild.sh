@@ -39,7 +39,7 @@ DOCKER_NAMESPACE='gcr.io/$PROJECT_ID'
 RUNTIME_NAME='jetty'
 JETTY9_MINOR_VERSION=$(parse_maven_property "jetty9.minor.version")
 JETTY9_VERSION="9.${JETTY9_MINOR_VERSION}"
-DOCKER_TAG_LONG="${JETTY9_VERSION}-`date +%Y-%m-%d-%H-%M`"
+DOCKER_TAG_LONG="${JETTY9_VERSION}-`date -u +%Y-%m-%d-%H-%M`"
 
 export IMAGE="${DOCKER_NAMESPACE}/${RUNTIME_NAME}:${DOCKER_TAG_LONG}"
 echo "IMAGE: $IMAGE"
