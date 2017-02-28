@@ -141,6 +141,7 @@
 										<argument>--transport</argument><argument>${transport}</argument>
 										<argument>--users</argument><argument>${users}</argument>
 										<argument>--profile-groovy-path</argument><argument>${profile.json}</argument>
+                    <argument>-s</argument><argument>${httpClientSelectors}</argument>
 									</arguments>
 								</configuration>
 							</execution>
