@@ -115,7 +115,7 @@
 									<goal>exec</goal>
 								</goals>
 								<configuration>
-									<executable>java</executable>
+									<executable>${java.home}/bin/java</executable>
 									<arguments>
 										<argument>-showversion</argument>
 										<argument>-Xmx2048m</argument>
