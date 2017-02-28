@@ -17,7 +17,7 @@
 set -e
 
 projectRoot=`dirname $0`/..
-buildProperties=$projectRoot/target/classes/build.properties
+buildProperties=$projectRoot/target/build.properties
 
 # reads a property value from a .properties file
 function read_prop {

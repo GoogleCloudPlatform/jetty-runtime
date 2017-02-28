@@ -246,13 +246,15 @@
         <artifactId>properties-maven-plugin</artifactId>
         <executions>
           <execution>
+            <!-- Used to output all build properties to be used by other build systems,
+            such as Cloud Container Builder. -->
             <phase>generate-resources</phase>
             <goals>
               <goal>write-project-properties</goal>
             </goals>
             <configuration>
               <outputFile>
-                ${project.build.outputDirectory}/build.properties
+                ${project.build.directory}/build.properties
               </outputFile>
             </configuration>
           </execution>
