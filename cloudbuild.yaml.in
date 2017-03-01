@@ -4,7 +4,7 @@
 steps:
 # Perform maven build, omitting local docker operations
 - name: 'maven:3.3.9-jdk-8'
-  args: ['mvn', '-P-local-docker-build', '-P-test.local', 'clean', 'install']
+  args: ['mvn', '-P-local-docker-build', '-P-test.local', '-Ddocker.tag.long=$DOCKER_TAG_LONG', 'clean', 'install']
 # Build the runtime container
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '--tag=${IMAGE}', '--no-cache', 'jetty9/target/docker']

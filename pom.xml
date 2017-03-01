@@ -248,7 +248,7 @@
           <execution>
             <!-- Used to output all build properties to be used by other build systems,
             such as Cloud Container Builder. -->
-            <phase>generate-resources</phase>
+            <id>build-properties</id>
             <goals>
               <goal>write-project-properties</goal>
             </goals>
