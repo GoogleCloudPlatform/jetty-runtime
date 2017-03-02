@@ -1,5 +1,5 @@
 runtime: custom
-vm: true
+env: flex
 service: jetty-runtime-perf-runner
 resources:
   cpu: ${resources.cpu}
