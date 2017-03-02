@@ -11,6 +11,9 @@ commandTests:
 - name: 'JETTY_BASE is set'
   command: ['env']
   expectedOutput: ['JETTY_BASE=${jetty.base}']
+- name: 'GAE_IMAGE_LABEL is set'
+  command: ['env']
+  expectedOutput: ['GAE_IMAGE_LABEL=${docker.tag.long}']
 
 fileExistenceTests:
 - name: 'jetty start.jar exists'
