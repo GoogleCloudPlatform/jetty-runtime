@@ -138,7 +138,7 @@ public class PerfRunner {
     }
 
     public CollectorInformations getResponseTimeSummary() {
-      return new CollectorInformations( globalSummaryListener.getResponseTimeHistogram() );
+      return new CollectorInformations( globalSummaryListener.getResponseTimeHistogram().getIntervalHistogram() );
     }
 
 
