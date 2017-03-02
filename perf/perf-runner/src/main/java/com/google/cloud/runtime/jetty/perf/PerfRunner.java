@@ -17,10 +17,12 @@
 package com.google.cloud.runtime.jetty.perf;
 
 import com.beust.jcommander.JCommander;
+import org.eclipse.jetty.client.api.Request;
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.Logger;
 import org.mortbay.jetty.load.generator.CollectorInformations;
 import org.mortbay.jetty.load.generator.LoadGenerator;
+import org.mortbay.jetty.load.generator.QpsListenerDisplay;
 import org.mortbay.jetty.load.generator.latency.LatencyTimeListener;
 import org.mortbay.jetty.load.generator.report.GlobalSummaryListener;
 import org.mortbay.jetty.load.generator.responsetime.ResponseTimeListener;
@@ -29,6 +31,7 @@ import org.mortbay.jetty.load.generator.starter.LoadGeneratorStarterArgs;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Runner performance testing
@@ -119,6 +122,12 @@ public class PerfRunner {
     }
 
     @Override
+    protected Request.Listener[] getListeners() {
+      // FIXME those values need to be configurable!!
+      return new Request.Listener[]{new QpsListenerDisplay( 5, 30, TimeUnit.SECONDS)};
+    }
+
+    @Override
     public ResponseTimeListener[] getResponseTimeListeners() {
       return new ResponseTimeListener[]{globalSummaryListener};
     }
@@ -131,6 +140,8 @@ public class PerfRunner {
     public CollectorInformations getResponseTimeSummary() {
       return new CollectorInformations( globalSummaryListener.getResponseTimeHistogram() );
     }
+
+
 
   }
 
