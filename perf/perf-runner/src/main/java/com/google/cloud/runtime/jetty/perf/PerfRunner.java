@@ -94,12 +94,25 @@ public class PerfRunner {
     LOGGER.info( "load test done" );
 
     CollectorInformations collectorInformations = runner.getResponseTimeSummary();
+
+    long totalRequestCommitted = collectorInformations.getTotalCount();
+    long start = collectorInformations.getStartTimeStamp();
+    long end = collectorInformations.getEndTimeStamp();
+
     LOGGER.info( "" );
     LOGGER.info( "" );
     LOGGER.info( "----------------------------------------------------");
     LOGGER.info( "-----------    Result Summary     ------------------");
     LOGGER.info( "----------------------------------------------------");
     LOGGER.info( "" + collectorInformations.toString() );
+    LOGGER.info( "----------------------------------------------------");
+    LOGGER.info( "" );
+    LOGGER.info( "----------------------------------------------------");
+    LOGGER.info( "-----------     Estimated QPS     ------------------");
+    LOGGER.info( "----------------------------------------------------");
+    long timeInSeconds = TimeUnit.SECONDS.convert( end - start, TimeUnit.MILLISECONDS );
+    long qps = totalRequestCommitted / timeInSeconds;
+    LOGGER.info( "estimated QPS : " + qps  );
     LOGGER.info( "----------------------------------------------------");
     LOGGER.info( "" );
 
