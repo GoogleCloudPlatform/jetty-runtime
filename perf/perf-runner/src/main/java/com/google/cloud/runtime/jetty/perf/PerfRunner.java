@@ -29,6 +29,7 @@ import org.mortbay.jetty.load.generator.responsetime.ResponseTimeListener;
 import org.mortbay.jetty.load.generator.starter.LoadGeneratorStarter;
 import org.mortbay.jetty.load.generator.starter.LoadGeneratorStarterArgs;
 
+import java.net.InetAddress;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -99,6 +100,13 @@ public class PerfRunner {
     long start = collectorInformations.getStartTimeStamp();
     long end = collectorInformations.getEndTimeStamp();
 
+    String hostname = "";
+    try {
+      hostname = InetAddress.getLocalHost().getHostName();
+    } catch ( Exception e ) {
+      LOGGER.info( "ignore cannot get hostname:" + e.getMessage() );
+    }
+
     LOGGER.info( "" );
     LOGGER.info( "" );
     LOGGER.info( "----------------------------------------------------");
@@ -112,7 +120,7 @@ public class PerfRunner {
     LOGGER.info( "----------------------------------------------------");
     long timeInSeconds = TimeUnit.SECONDS.convert( end - start, TimeUnit.MILLISECONDS );
     long qps = totalRequestCommitted / timeInSeconds;
-    LOGGER.info( "estimated QPS : " + qps  );
+    LOGGER.info( "host '" + hostname + "' estimated QPS : " + qps );
     LOGGER.info( "----------------------------------------------------");
     LOGGER.info( "" );
 
