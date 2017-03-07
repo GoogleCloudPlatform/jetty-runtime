@@ -4,20 +4,6 @@ This repository contains the source for the `gcr.io/google-appengine/jetty` [doc
 
 The layout of this image is intended to mostly mimic the official [docker-jetty](https://github.com/appropriate/docker-jetty) image and unless otherwise noted, the official [docker-jetty documentation](https://github.com/docker-library/docs/tree/master/jetty) should apply.
 
-## Building the Jetty image
-To build the image you need git, docker and maven installed:
-```console
-git clone https://github.com/GoogleCloudPlatform/jetty-runtime.git
-cd jetty-runtime
-mvn clean install
-```
-
-## Running the Jetty image
-The resulting image is called jetty (with more specific tags also created)
-and can be run with:
-```console
-docker run jetty
-```
 ## Google Modules & Configuration
 The jetty base in this image has some additional google specific modules:
 
@@ -37,13 +23,13 @@ The request log also defaults to log into `/var/log/app_engine/` by the
 Arguments passed to the docker run command are passed to Jetty, so the 
 configuration of the jetty server can be seen with a command like:
 ```console
-docker run jetty --list-config
+docker run gcr.io/google-appengine/jetty --list-config
 ```
 
 Alternate commands can also be passed to the docker run command, so the
 image can be explored with 
 ```console
-docker run -it --rm jetty bash
+docker run -it --rm gcr.io/google-appengine/jetty bash
 ```
 
 To update the server configuration in a derived Docker image, the `Dockerfile` may
@@ -150,7 +136,7 @@ java.util.logging.SimpleFormatter.format=%3$s: %5$s%6$s
 
 The configuration of the jetty container in this image can be viewed by running the image locally:
 ```
-docker run --rm -it jetty:9.4 --list-config --list-modules
+docker run --rm -it gcr.io/google-appengine/jetty --list-config --list-modules
 ```
 
 ## Extending the image
@@ -189,6 +175,10 @@ image via a runtime mount:
 ```bash
 docker run -v /some-path/your-application:/app gcr.io/google-appengine/jetty  
 ```
+
+# Development Guide
+
+* See [instructions](DEVELOPING.md) on how to build and test this image.
 
 # Contributing changes
 
