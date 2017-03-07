@@ -23,13 +23,13 @@ The request log also defaults to log into `/var/log/app_engine/` by the
 Arguments passed to the docker run command are passed to Jetty, so the 
 configuration of the jetty server can be seen with a command like:
 ```console
-docker run jetty --list-config
+docker run gcr.io/google-appengine/jetty --list-config
 ```
 
 Alternate commands can also be passed to the docker run command, so the
 image can be explored with 
 ```console
-docker run -it --rm jetty bash
+docker run -it --rm gcr.io/google-appengine/jetty bash
 ```
 
 To update the server configuration in a derived Docker image, the `Dockerfile` may
@@ -101,7 +101,7 @@ java $JAVA_OPTS \
 
 The configuration of the jetty container in this image can be viewed by running the image locally:
 ```
-docker run --rm -it jetty:9.4 --list-config --list-modules
+docker run --rm -it gcr.io/google-appengine/jetty --list-config --list-modules
 ```
 
 ## Extending the image
