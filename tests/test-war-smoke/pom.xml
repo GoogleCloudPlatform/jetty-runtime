@@ -237,12 +237,13 @@
                   <workingDirectory>${project.build.directory}/appengine-staging</workingDirectory>
                   <executable>gcloud</executable>
                   <arguments>
-                    <argument>--quiet</argument>
                     <argument>app</argument>
                     <argument>deploy</argument>
                     <argument>app.yaml</argument>
                     <argument>--version</argument>
                     <argument>${maven.build.timestamp}</argument>
+                    <argument>--no-stop-previous-version</argument>
+                    <argument>--quiet</argument>
                   </arguments>
                 </configuration>
               </execution>
