@@ -4,28 +4,6 @@ This repository contains the source for the `gcr.io/google-appengine/jetty` [doc
 
 The layout of this image is intended to mostly mimic the official [docker-jetty](https://github.com/appropriate/docker-jetty) image and unless otherwise noted, the official [docker-jetty documentation](https://github.com/docker-library/docs/tree/master/jetty) should apply.
 
-## Building the Jetty image
-### Local build
-To build the image you need git, docker and maven installed:
-```console
-git clone https://github.com/GoogleCloudPlatform/jetty-runtime.git
-cd jetty-runtime
-mvn clean install
-```
-
-### Cloud build
-To build using the [Google Cloud Container Builder](https://cloud.google.com/container-builder/docs/overview), you need to have git, maven, and the [Google Cloud SDK](https://cloud.google.com/sdk/) installed locally.
-```console
-git clone https://github.com/GoogleCloudPlatform/jetty-runtime.git
-./scripts/cloudbuild.sh
-```
-
-## Running the Jetty image
-The resulting image is called jetty (with more specific tags also created)
-and can be run with:
-```console
-docker run jetty
-```
 ## Google Modules & Configuration
 The jetty base in this image has some additional google specific modules:
 
@@ -162,6 +140,10 @@ image via a runtime mount:
 ```bash
 docker run -v /some-path/your-application:/app gcr.io/google-appengine/jetty  
 ```
+
+# Development Guide
+
+* See [instructions](DEVELOPING.md) on how to build and test this image.
 
 # Contributing changes
 
