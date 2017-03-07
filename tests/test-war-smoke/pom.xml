@@ -261,7 +261,6 @@
                     <argument>services</argument>
                     <argument>delete</argument>
                     <argument>smoke</argument>
-                    <argument>--log-http</argument>
                     <argument>--quiet</argument>
                   </arguments>
                 </configuration>
