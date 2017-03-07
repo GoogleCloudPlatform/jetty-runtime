@@ -16,7 +16,7 @@ configuration of the jetty server can be seen with a command like:
 docker run gcr.io/google-appengine/jetty --list-config
 ```
 
-Alternate commands can also be passed to the docker run command, so the
+Alternate commands can also be passed to the `docker run` command, so the
 image can be explored with 
 ```console
 docker run -it --rm gcr.io/google-appengine/jetty bash
@@ -61,7 +61,7 @@ FROM gcr.io/google-appengine/jetty
 COPY your-application.war $JETTY_BASE/webapps/root.war
 ```
 You can then build the docker container using `docker build` or [Google Cloud Container Builder](https://cloud.google.com/container-builder/docs/).
-By default, the CMD is set to start the Jetty server. You can change this by specifying your own CMD or ENTRYPOINT.
+By default, the CMD is set to start the Jetty server. You can change this by specifying your own `CMD` or `ENTRYPOINT`.
 
 ## Entry Point Features
 The [/docker-entrypoint.bash](https://github.com/GoogleCloudPlatform/openjdk-runtime/blob/master/openjdk8/src/main/docker/docker-entrypoint.bash)
