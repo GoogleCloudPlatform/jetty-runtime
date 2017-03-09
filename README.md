@@ -1,32 +1,22 @@
 # Google Cloud Platform Jetty Docker Image
 
-This repository contains the source for the `gcr.io/google-appengine/jetty` [docker](https://docker.com) image. This image can be used as the base image for running Java web applications on [Google App Engine Flexible Environment](https://cloud.google.com/appengine/docs/flexible/java/) and [Google Container Engine](https://cloud.google.com/container-engine). It provides the Jetty Servlet container on top of the [OpenJDK image](https://github.com/GoogleCloudPlatform/openjdk-runtime).
+This repository contains the source for the `gcr.io/google-appengine/jetty` [docker](https://docker.com) image.
+This image can be used as the base image for running Java web applications on
+[Google App Engine Flexible Environment](https://cloud.google.com/appengine/docs/flexible/java/)
+and [Google Container Engine](https://cloud.google.com/container-engine).
+It provides the Jetty Servlet container on top of the
+[OpenJDK image](https://github.com/GoogleCloudPlatform/openjdk-runtime).
 
 The layout of this image is intended to mostly mimic the official [docker-jetty](https://github.com/appropriate/docker-jetty) image and unless otherwise noted, the official [docker-jetty documentation](https://github.com/docker-library/docs/tree/master/jetty) should apply.
 
-## Google Modules & Configuration
-The jetty base in this image has some additional google specific modules:
-
-Module | Description | enabled
--------|-------------|------- 
- gae   | enables JSON formatted server logging; enables request log; | true  
-
-The `$JETTY_BASE/resources/jetty-logging.properties` file configures the
-jetty logging mechanism to use `java.util.logging'.  This is configured
-using `$JETTY_BASE/etc/java-util-logging.properties` which set a JSON formatter
-for logging to `/var/log/app_engine/app.%g.log.json`.  
-
-The request log also defaults to log into `/var/log/app_engine/` by the 
-`gae` module
-
 ## Configuring the Jetty image
-Arguments passed to the docker run command are passed to Jetty, so the 
+Arguments passed to the `docker run` command are passed to Jetty, so the 
 configuration of the jetty server can be seen with a command like:
 ```console
 docker run gcr.io/google-appengine/jetty --list-config
 ```
 
-Alternate commands can also be passed to the docker run command, so the
+Alternate commands can also be passed to the `docker run` command, so the
 image can be explored with 
 ```console
 docker run -it --rm gcr.io/google-appengine/jetty bash
@@ -34,35 +24,46 @@ docker run -it --rm gcr.io/google-appengine/jetty bash
 
 To update the server configuration in a derived Docker image, the `Dockerfile` may
 enable additional modules with `RUN` commands like:
-```
+```dockerfile
 WORKDIR $JETTY_BASE
 RUN java -jar "$JETTY_HOME/start.jar" --add-to-startd=jmx,stats
 ```
 Modules may be configured in a `Dockerfile` by editing the properties in the corresponding mod files in `/var/lib/jetty/start.d/` or the module can be deactivated by removing that file.
 
 ## App Engine Flexible Environment
-This image works with App Engine Flexible Environment as a custom runtime.
-In order to use it, you need to build the image (let's call it `YOUR_BUILT_IMAGE`), (and optionally push it to a Docker registery like gcr.io). Then, you can add to any pure Java EE 7 Web Application projects these 2 configuration files next to the exploded WAR directory:
+When using App Engine Flexible, you can use the runtime without worrying about Docker by specifying `runtime: java` in your `app.yaml`:
+```yaml
+runtime: java
+env: flex
+```
+The runtime image `gcr.io/google-appenine/jetty` will be automatically selected if you are attempting to deploy a WAR (`*.war` file).
 
-`Dockerfile` file would be:
+If you want to use the image as a base for a custom runtime, you can specify `runtime: custom` in your `app.yaml` and then
+write the Dockerfile like this:
+
+```dockerfile
+FROM gcr.io/google-appengine/jetty
+ADD your-application.war $JETTY_BASE/webapps/root.war
+```
       
-      FROM YOUR_BUILT_IMAGE
-      add . /app
+That will add the WAR in the correct location for the Docker container.
       
-That will add the Web App Archive directory in the correct location for the Docker container.
+Once you have this configuration, you can use the Google Cloud SDK to deploy this directory containing the 2 configuration files and the WAR using:
+```
+gcloud app deploy app.yaml
+```
 
-Then, an `app.yaml` file to configure the App Engine Flexible Environment product:
+##Container Engine & other Docker hosts
+For other Docker hosts, you'll need to create a Dockerfile based on this image that copies your application code and installs dependencies. For example:
 
-      runtime: custom
-      vm: true
-      
-Once you have this configuration, you can use the Google Cloud SDK to deploy this directory containing the 2 configuration files and the Web App directory using:
-
-     gcloud app deploy app.yaml
-     
+```dockerfile
+FROM gcr.io/google-appengine/jetty
+COPY your-application.war $JETTY_BASE/webapps/root.war
+```
+You can then build the docker container using `docker build` or [Google Cloud Container Builder](https://cloud.google.com/container-builder/docs/).
+By default, the CMD is set to start the Jetty server. You can change this by specifying your own `CMD` or `ENTRYPOINT`.
 
 ## Entry Point Features
-
 The [/docker-entrypoint.bash](https://github.com/GoogleCloudPlatform/openjdk-runtime/blob/master/openjdk8/src/main/docker/docker-entrypoint.bash)
 for the image is inherited from the openjdk-runtime and its capabilities are described in the associated 
 [README](https://github.com/GoogleCloudPlatform/openjdk-runtime/blob/master/README.md)
@@ -79,7 +80,7 @@ Additional environment variables are set including:
 |`GAE_IMAGE_LABEL` |`docker.tag.long`|                                                      |
 |`JETTY_HOME`      |`jetty.home`     |`/opt/jetty-home`                                     |
 |`JETTY_BASE`      |`jetty.base`     |`/var/lib/jetty`                                      |
-|`TMPDIR`          |                 |`/tmp/jetty                                           |
+|`TMPDIR`          |                 |`/tmp/jetty`                                          |
 |`JETTY_ARGS`      |                 |`-Djetty.base=$JETTY_BASE -jar $JETTY_HOME/start.jar` |
 |`ROOT_WAR`        |                 |`$JETTY_BASE/webapps/root.war`                        |
 |`ROOT_DIR`        |                 |`$JETTY_BASE/webapps/root`                            |
@@ -140,11 +141,10 @@ docker run --rm -it gcr.io/google-appengine/jetty --list-config --list-modules
 ```
 
 ## Extending the image
-
 The image produced by this project may be automatically used/extended by the Cloud SDK and/or App Engine maven plugin. 
 Alternately it may be explicitly extended with a custom Dockerfile.  
 
-The latest released verion of this image is available at `gcr.io/google-appengine/jetty`, alternately you may 
+The latest released version of this image is available at `gcr.io/google-appengine/jetty`, alternately you may 
 build and push your own version with the shell commands:
 ```bash
 mvn clean install
