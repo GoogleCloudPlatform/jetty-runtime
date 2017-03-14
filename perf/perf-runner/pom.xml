@@ -19,19 +19,19 @@
 		<mainClass>com.google.cloud.runtime.jetty.perf.PerfRunner</mainClass>
 	  <host>jetty-runtime-perf-app-dot-jetty9-work.appspot.com</host>
 		<port>443</port>
-		<running.time>30</running.time>
+		<running.time>120</running.time>
 		<running.time.unit>m</running.time.unit>
-		<transaction_rate>3</transaction_rate>
+		<transaction_rate>250</transaction_rate>
 		<scheme>https</scheme>
-		<users>2</users>
+		<users>5</users>
 		<profile.json>${basedir}/src/main/appengine/loadgenerator_profile.groovy</profile.json>
 		<warmup.number>10</warmup.number>
 		<runner.instances>2</runner.instances>
 		<debug.args></debug.args>
-		<resources.cpu>2</resources.cpu>
-		<resources.memory_gb>6</resources.memory_gb>
-		<httpClientSelectors>2</httpClientSelectors>
-		<maxRequestsQueued>180000</maxRequestsQueued>
+		<resources.cpu>12</resources.cpu>
+		<resources.memory_gb>16</resources.memory_gb>
+		<httpClientSelectors>3</httpClientSelectors>
+		<maxRequestsQueued>210000</maxRequestsQueued>
 	</properties>
 
 	<dependencies>
