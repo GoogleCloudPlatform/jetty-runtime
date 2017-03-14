@@ -110,7 +110,7 @@ public class PerfRunnerTest {
     args.add( "3");
     args.add( "--profile-groovy-path");
     args.add( "src/test/resources/loadgenerator_profile.groovy");
-    args.add( "-DnoSysExit=true" );
+    args.add( "-DreturnExit=false" );
 
     PerfRunner.main( args.toArray( new String[args.size()]) );
 

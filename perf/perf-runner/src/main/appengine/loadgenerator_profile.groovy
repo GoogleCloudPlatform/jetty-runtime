@@ -1,4 +1,4 @@
-import org.mortbay.jetty.load.generator.profile.Resource
+import org.mortbay.jetty.load.generator.Resource
 
 return new Resource( "index.html",
                        new Resource( "/css/bootstrap.css"),
@@ -9,6 +9,6 @@ return new Resource( "index.html",
                        new Resource( "/dump.jsp?wine=foo&foo=bar" ),
                        new Resource( "/not_here.html" ),
                        new Resource( "/hello?name=foo" ),
-                       new Resource( "/upload" ).method("PUT").size(8192),
+                       new Resource( "/upload" ).method("PUT").requestLength(8192),
                        )
 ;

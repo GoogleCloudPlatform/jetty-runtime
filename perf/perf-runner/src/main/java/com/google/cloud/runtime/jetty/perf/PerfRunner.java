@@ -20,17 +20,18 @@ import com.beust.jcommander.JCommander;
 import org.eclipse.jetty.client.api.Request;
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.Logger;
+
 import org.mortbay.jetty.load.generator.CollectorInformations;
+
 import org.mortbay.jetty.load.generator.LoadGenerator;
 import org.mortbay.jetty.load.generator.QpsListenerDisplay;
-import org.mortbay.jetty.load.generator.latency.LatencyTimeListener;
+
+import org.mortbay.jetty.load.generator.Resource;
 import org.mortbay.jetty.load.generator.report.GlobalSummaryListener;
-import org.mortbay.jetty.load.generator.responsetime.ResponseTimeListener;
 import org.mortbay.jetty.load.generator.starter.LoadGeneratorStarter;
 import org.mortbay.jetty.load.generator.starter.LoadGeneratorStarterArgs;
 
 import java.net.InetAddress;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -42,7 +43,7 @@ public class PerfRunner {
   private static final Logger LOGGER = Log.getLogger( PerfRunner.class );  
   
   public static void main(String[] args) throws Exception {
-    
+
     LoadGeneratorStarterArgs runnerArgs = new LoadGeneratorStarterArgs();
 
     try {
@@ -61,37 +62,8 @@ public class PerfRunner {
     getValuesFromEnvVar( runnerArgs );
     LOGGER.info( "runnerArgs:" + runnerArgs.toString() );
     LoadGeneratorRunner runner = new LoadGeneratorRunner( runnerArgs );
-
-    String warmupNumberArg = runnerArgs.getParams().get( "warmup.number" );
-    int warmupNumber = 5;
-    try {
-      warmupNumber = Integer.parseInt( warmupNumberArg );
-    } catch ( NumberFormatException e ) {
-      // ignore and use default
-      LOGGER.info( "error parsing warmup number arg '" + warmupNumberArg
-                              + "' so use default " + warmupNumber  );
-    }
-    LOGGER.info( "warmup number {}", warmupNumber );
-    if ( warmupNumber > 0 ) {
-      runner.run( warmupNumber, false );
-      LOGGER.info( "warmup done" );
-    } else {
-      LOGGER.info( "NO warmup" );
-    }
-    // reset the global recorder
-    runner.globalSummaryListener = new GlobalSummaryListener();
-
-
-    if (runnerArgs.getRunningTime() > 0 && runnerArgs.getRunningTimeUnit() != null) {
-      LOGGER.info( "starting load for {} {}", //
-                   runnerArgs.getRunningTime(), //
-                   runnerArgs.getRunningTimeUnit());
-      runner.run( runnerArgs.getRunningTime(), runnerArgs.getRunningTimeUnit(), true );
-    }  else {
-      LOGGER.info( "starting load for {} iterations", runnerArgs.getRunIteration());
-      runner.run( runnerArgs.getRunIteration(), true );
-    }
-
+    LOGGER.info( "start load test" );
+    runner.run();
     LOGGER.info( "load test done" );
 
     CollectorInformations collectorInformations = runner.getResponseTimeSummary();
@@ -125,18 +97,25 @@ public class PerfRunner {
     LOGGER.info( "" );
 
     // well it's only for test
-    String noSysExit = runnerArgs.getParams().get( "noSysExit" );
-    if (noSysExit == null || !Boolean.parseBoolean( noSysExit )) {
-      LOGGER.info( "System.exit(0)" );
-      System.exit( 0 );
+    String returnExit = runnerArgs.getParams().get( "returnExit" );
+    if (returnExit != null || Boolean.parseBoolean( returnExit )) {
+      LOGGER.info( "returnExit" );
+      return;
     }
-    LOGGER.info( "no System.exit" );
-    return;
+
+    while ( true ) {
+      Thread.sleep( 60000 );
+    }
+
+
   }
 
   private static class LoadGeneratorRunner extends LoadGeneratorStarter {
 
     private GlobalSummaryListener globalSummaryListener = new GlobalSummaryListener();
+
+    private QpsListenerDisplay qpsListenerDisplay =
+        new QpsListenerDisplay( 10, 30, TimeUnit.SECONDS);
 
     public LoadGeneratorRunner( LoadGeneratorStarterArgs runnerArgs ) {
       super( runnerArgs );
@@ -145,26 +124,23 @@ public class PerfRunner {
     @Override
     protected Request.Listener[] getListeners() {
       // FIXME those values need to be configurable!!
-      return new Request.Listener[]{new QpsListenerDisplay( 5, 30, TimeUnit.SECONDS)};
+      return new Request.Listener[]{qpsListenerDisplay};
     }
 
     @Override
-    public ResponseTimeListener[] getResponseTimeListeners() {
-      return new ResponseTimeListener[]{globalSummaryListener};
+    protected LoadGenerator.Listener[] getLoadGeneratorListeners() {
+      return new LoadGenerator.Listener[]{qpsListenerDisplay};
     }
 
     @Override
-    public LatencyTimeListener[] getLatencyTimeListeners() {
-      return new LatencyTimeListener[0];
+    protected Resource.Listener[] getResourceListeners() {
+      return new Resource.Listener[]{globalSummaryListener};
     }
 
     public CollectorInformations getResponseTimeSummary() {
       return new CollectorInformations( globalSummaryListener.getResponseTimeHistogram() //
                                             .getIntervalHistogram() );
     }
-
-
-
   }
 
   /**
