@@ -21,13 +21,11 @@ import org.eclipse.jetty.client.api.Request;
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.Logger;
 
-import org.mortbay.jetty.load.generator.CollectorInformations;
-
 import org.mortbay.jetty.load.generator.LoadGenerator;
-import org.mortbay.jetty.load.generator.QpsListenerDisplay;
-
 import org.mortbay.jetty.load.generator.Resource;
-import org.mortbay.jetty.load.generator.report.GlobalSummaryListener;
+import org.mortbay.jetty.load.generator.listeners.CollectorInformations;
+import org.mortbay.jetty.load.generator.listeners.QpsListenerDisplay;
+import org.mortbay.jetty.load.generator.listeners.report.GlobalSummaryListener;
 import org.mortbay.jetty.load.generator.starter.LoadGeneratorStarter;
 import org.mortbay.jetty.load.generator.starter.LoadGeneratorStarterArgs;
 
