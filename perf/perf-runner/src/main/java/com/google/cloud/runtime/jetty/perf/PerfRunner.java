@@ -25,6 +25,7 @@ import org.mortbay.jetty.load.generator.LoadGenerator;
 import org.mortbay.jetty.load.generator.Resource;
 import org.mortbay.jetty.load.generator.listeners.CollectorInformations;
 import org.mortbay.jetty.load.generator.listeners.QpsListenerDisplay;
+import org.mortbay.jetty.load.generator.listeners.RequestQueuedListenerDisplay;
 import org.mortbay.jetty.load.generator.listeners.report.GlobalSummaryListener;
 import org.mortbay.jetty.load.generator.starter.LoadGeneratorStarter;
 import org.mortbay.jetty.load.generator.starter.LoadGeneratorStarterArgs;
@@ -112,8 +113,13 @@ public class PerfRunner {
 
     private GlobalSummaryListener globalSummaryListener = new GlobalSummaryListener();
 
-    private QpsListenerDisplay qpsListenerDisplay =
-        new QpsListenerDisplay( 10, 30, TimeUnit.SECONDS);
+    private QpsListenerDisplay qpsListenerDisplay = //
+        // FIXME those values need to be configurable!! //
+        new QpsListenerDisplay(10, 30, TimeUnit.SECONDS);
+
+    private RequestQueuedListenerDisplay requestQueuedListenerDisplay = //
+        // FIXME those values need to be configurable!! //
+        new RequestQueuedListenerDisplay(10, 30, TimeUnit.SECONDS);
 
     public LoadGeneratorRunner( LoadGeneratorStarterArgs runnerArgs ) {
       super( runnerArgs );
@@ -121,13 +127,13 @@ public class PerfRunner {
 
     @Override
     protected Request.Listener[] getListeners() {
-      // FIXME those values need to be configurable!!
-      return new Request.Listener[]{qpsListenerDisplay};
+
+      return new Request.Listener[]{qpsListenerDisplay, requestQueuedListenerDisplay};
     }
 
     @Override
     protected LoadGenerator.Listener[] getLoadGeneratorListeners() {
-      return new LoadGenerator.Listener[]{qpsListenerDisplay};
+      return new LoadGenerator.Listener[]{qpsListenerDisplay, requestQueuedListenerDisplay};
     }
 
     @Override
