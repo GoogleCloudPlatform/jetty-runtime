@@ -1,11 +1,13 @@
 # Google Cloud Platform Jetty Docker Image
 
-This repository contains the source for the `gcr.io/google-appengine/jetty` [docker](https://docker.com) image.
+This repository contains the source for the Google-maintained Jetty [docker](https://docker.com) image.
 This image can be used as the base image for running Java web applications on
 [Google App Engine Flexible Environment](https://cloud.google.com/appengine/docs/flexible/java/)
 and [Google Container Engine](https://cloud.google.com/container-engine).
 It provides the Jetty Servlet container on top of the
 [OpenJDK image](https://github.com/GoogleCloudPlatform/openjdk-runtime).
+
+This image is mirrored at both `launcher.gcr.io/google/jetty` and `gcr.io/google-appengine/jetty`.
 
 The layout of this image is intended to mostly mimic the official [docker-jetty](https://github.com/appropriate/docker-jetty) image and unless otherwise noted, the official [docker-jetty documentation](https://github.com/docker-library/docs/tree/master/jetty) should apply.
 
@@ -13,13 +15,13 @@ The layout of this image is intended to mostly mimic the official [docker-jetty]
 Arguments passed to the `docker run` command are passed to Jetty, so the 
 configuration of the jetty server can be seen with a command like:
 ```console
-docker run gcr.io/google-appengine/jetty --list-config
+docker run launcher.gcr.io/google/jetty --list-config
 ```
 
 Alternate commands can also be passed to the `docker run` command, so the
 image can be explored with 
 ```console
-docker run -it --rm gcr.io/google-appengine/jetty bash
+docker run -it --rm launcher.gcr.io/google/jetty bash
 ```
 
 To update the server configuration in a derived Docker image, the `Dockerfile` may
@@ -36,7 +38,7 @@ When using App Engine Flexible, you can use the runtime without worrying about D
 runtime: java
 env: flex
 ```
-The runtime image `gcr.io/google-appenine/jetty` will be automatically selected if you are attempting to deploy a WAR (`*.war` file).
+The runtime image `gcr.io/google-appengine/jetty` will be automatically selected if you are attempting to deploy a WAR (`*.war` file).
 
 If you want to use the image as a base for a custom runtime, you can specify `runtime: custom` in your `app.yaml` and then
 write the Dockerfile like this:
@@ -57,7 +59,7 @@ gcloud app deploy app.yaml
 For other Docker hosts, you'll need to create a Dockerfile based on this image that copies your application code and installs dependencies. For example:
 
 ```dockerfile
-FROM gcr.io/google-appengine/jetty
+FROM launcher.gcr.io/google/jetty
 COPY your-application.war $JETTY_BASE/webapps/root.war
 ```
 You can then build the docker container using `docker build` or [Google Cloud Container Builder](https://cloud.google.com/container-builder/docs/).
@@ -137,14 +139,14 @@ java.util.logging.SimpleFormatter.format=%3$s: %5$s%6$s
 
 The configuration of the jetty container in this image can be viewed by running the image locally:
 ```
-docker run --rm -it gcr.io/google-appengine/jetty --list-config --list-modules
+docker run --rm -it launcher.gcr.io/google/jetty --list-config --list-modules
 ```
 
 ## Extending the image
 The image produced by this project may be automatically used/extended by the Cloud SDK and/or App Engine maven plugin. 
 Alternately it may be explicitly extended with a custom Dockerfile.  
 
-The latest released version of this image is available at `gcr.io/google-appengine/jetty`, alternately you may 
+The latest released version of this image is available at `launcher.gcr.io/google/jetty`, alternately you may 
 build and push your own version with the shell commands:
 ```bash
 mvn clean install
@@ -156,7 +158,7 @@ gcloud docker -- push gcr.io/your-project-name/jetty:your-label
 A standard war file may be deployed as the root context in an extended image by placing the war file 
 in the docker build directory and using a `Dockerfile` like:
 ```dockerfile
-FROM gcr.io/google-appengine/jetty
+FROM launcher.gcr.io/google/jetty
 COPY your-application.war $JETTY_BASE/webapps/root.war
 ```
 
@@ -164,7 +166,7 @@ COPY your-application.war $JETTY_BASE/webapps/root.war
 If the application exists as directory (i.e. an expanded war file), then directory must
 be placed in the docker build directory and using a `Dockerfile` like: 
 ```dockerfile
-FROM gcr.io/google-appengine/jetty
+FROM launcher.gcr.io/google/jetty
 COPY your-application-dir $JETTY_BASE/webapps/root
 ```
 
@@ -173,7 +175,7 @@ If no root WAR or root directory is found, the `docker-entrypoint.bash` script w
 `/app` directory as the root application. Thus the root application can be added to the 
 image via a runtime mount:
 ```bash
-docker run -v /some-path/your-application:/app gcr.io/google-appengine/jetty  
+docker run -v /some-path/your-application:/app launcher.gcr.io/google/jetty  
 ```
 
 # Development Guide
