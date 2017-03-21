@@ -21,9 +21,9 @@
 		<port>443</port>
 		<running.time>120</running.time>
 		<running.time.unit>m</running.time.unit>
-		<transaction_rate>250</transaction_rate>
+		<transaction_rate>500</transaction_rate>
 		<scheme>https</scheme>
-		<users>5</users>
+		<users>10</users>
 		<profile.json>${basedir}/src/main/appengine/loadgenerator_profile.groovy</profile.json>
 		<warmup.number>10</warmup.number>
 		<runner.instances>2</runner.instances>
@@ -204,33 +204,38 @@
 		</profile>
 
 		<profile>
-			<id>docker-deploy</id>
+			<id>gcloud-deploy</id>
 			<build>
 				<plugins>
-					<!--
-					<plugin>
-						<groupId>com.google.appengine</groupId>
-						<artifactId>gcloud-maven-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>gcloud-deploy</id>
-								<phase>install</phase>
-								<goals>
-									<goal>deploy</goal>
-								</goals>
-								<configuration>
-									<gcloud_directory>${gcloud.sdk.path}</gcloud_directory>
-									<cloudSdkPath>${gcloud.sdk.path}</cloudSdkPath>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-					-->
 					<plugin>
 						<groupId>org.codehaus.mojo</groupId>
 						<artifactId>exec-maven-plugin</artifactId>
 						<version>1.6.0</version>
 						<executions>
+							<!-- delete the service first -->
+							<execution>
+								<id>delete-remote-perf-runner</id>
+								<phase>install</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<workingDirectory>${project.build.directory}/</workingDirectory>
+									<executable>gcloud</executable>
+									<!-- we accept 1 as the service may not exist already -->
+									<successCodes>
+										<successCode>0</successCode>
+										<successCode>1</successCode>
+									</successCodes>
+									<arguments>
+										<argument>--quiet</argument>
+										<argument>app</argument>
+										<argument>services</argument>
+										<argument>delete</argument>
+										<argument>jetty-runtime-perf-runner</argument>
+									</arguments>
+								</configuration>
+							</execution>
 							<!-- deploy the service -->
 							<execution>
 								<id>deploy-remote-perf-runner</id>
@@ -246,14 +251,6 @@
 										<argument>app</argument>
 										<argument>deploy</argument>
 										<argument>app.yaml</argument>
-										<!--
-										because having this error???
-	ERROR: (gcloud.app.deploy) argument -v: Bad value [2017-02-17_23_36]: May only contain lowercase letters, digits, and hyphens. Must begin and end with a letter or digit. Must not exceed 63 characters.
-	-->
-										<!--
-										<argument>-v</argument>
-										<argument>${maven.build.timestamp}</argument>
-										-->
 									</arguments>
 								</configuration>
 							</execution>

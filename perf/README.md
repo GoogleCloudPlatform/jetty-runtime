@@ -20,4 +20,4 @@ To deploy new version add the profile `-Pgcloud-deploy`
 
 You can deploy Docker images running Load testing using:
 
-` mvn clean install -Pperf -pl :perf-runner -am  -Pdocker-deploy -DskipTests -Drunner.instances=2 -Drunning.time=5 -Dusers=50 -Dtransaction_rate=40  `
+` mvn clean install -Pperf -pl :perf-runner -am  -P-Pgcloud-deploy -DskipTests -DskipTests -Drunner.instances=2 -Drunning.time=5 -Dusers=25 -Dtransaction_rate=300  `

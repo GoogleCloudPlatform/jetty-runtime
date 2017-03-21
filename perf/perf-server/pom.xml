@@ -211,6 +211,30 @@
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>exec-maven-plugin</artifactId>
 						<executions>
+							<!-- delete the service first -->
+							<execution>
+								<id>delete-remote-perf-app</id>
+								<phase>install</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<workingDirectory>${project.build.directory}/</workingDirectory>
+									<executable>gcloud</executable>
+									<!-- we accept 1 as the service may not exist already -->
+									<successCodes>
+										<successCode>0</successCode>
+										<successCode>1</successCode>
+									</successCodes>
+									<arguments>
+										<argument>--quiet</argument>
+										<argument>app</argument>
+										<argument>services</argument>
+										<argument>delete</argument>
+										<argument>jetty-runtime-perf-app</argument>
+									</arguments>
+								</configuration>
+							</execution>
 							<!-- deploy the service -->
 							<execution>
 								<id>deploy-remote-perf-app</id>
@@ -226,14 +250,6 @@
 										<argument>app</argument>
 										<argument>deploy</argument>
 										<argument>app.yaml</argument>
-										<!--
-										because having this error???
-	ERROR: (gcloud.app.deploy) argument -v: Bad value [2017-02-17_23_36]: May only contain lowercase letters, digits, and hyphens. Must begin and end with a letter or digit. Must not exceed 63 characters.
-	-->
-										<!--
-										<argument>-v</argument>
-										<argument>${maven.build.timestamp}</argument>
-										-->
 									</arguments>
 								</configuration>
 							</execution>
