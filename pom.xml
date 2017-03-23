@@ -29,7 +29,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <maven.build.timestamp.format>yyyy-MM-dd-HH-mm</maven.build.timestamp.format>
-    <gcloud.api.version>0.9.2-beta</gcloud.api.version>
+    <gcloud.api.version>0.10.0-beta</gcloud.api.version>
     <jetty9.minor.version>4</jetty9.minor.version>
     <jetty9.dot.version>1</jetty9.dot.version>
     <jetty9.version>9.${jetty9.minor.version}.${jetty9.dot.version}.v20170120</jetty9.version>
