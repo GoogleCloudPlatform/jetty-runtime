@@ -34,4 +34,9 @@ if ! type "$1" &>/dev/null; then
   export JAVA_OPTS="$JAVA_OPTS $JETTY_ARGS"
 fi
 
+# If we are deployed on a GAE platform, enable the gae module
+if [ -n "$GAE_INSTANCE" -a ! -e "$JETTY_BASE/start.d/gae.ini" ]; then
+  echo "--module=gae" > $JETTY_BASE/start.d/gae.ini
+fi
+
 # End setup-env-ext.bash

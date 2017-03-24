@@ -1,6 +1,6 @@
 --create-startd
 
---add-to-start=server,webapp,http,deploy,jsp,jstl,http-forwarded,resources,gae
+--add-to-start=server,webapp,http,deploy,jsp,jstl,http-forwarded,resources
 
 jetty.httpConfig.outputAggregationSize=32768
 jetty.httpConfig.headerCacheSize=512

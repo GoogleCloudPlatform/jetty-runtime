@@ -22,6 +22,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.not;
 
 import com.google.cloud.runtime.jetty.test.AbstractIntegrationTest;
+import com.google.cloud.runtime.jetty.test.annotation.RemoteOnly;
 import com.google.cloud.runtime.jetty.util.HttpUrlUtil;
 
 import org.hamcrest.Matchers;
@@ -39,6 +40,7 @@ public class ConfigurationIntegrationTest extends AbstractIntegrationTest {
    * @throws IOException test in error
    */
   @Test
+  @RemoteOnly
   public void testNoDirectoryListing() throws IOException {
 
     URI target = getUri().resolve("/directory/");
