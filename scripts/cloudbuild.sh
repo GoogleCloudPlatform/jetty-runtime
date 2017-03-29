@@ -16,19 +16,28 @@
 
 set -e
 
-projectRoot=`dirname $0`/..
+dir=`dirname $0`
+projectRoot=$dir/..
 buildProperties=$projectRoot/target/build.properties
+
+RUNTIME_NAME="jetty"
+DOCKER_NAMESPACE=$1
+if [ -z "${DOCKER_NAMESPACE}" ]; then
+  echo "Usage: ${0} <docker_namespace> [--local]"
+  exit 1
+fi
+if [ "$2" == "--local" ]; then
+  LOCAL_BUILD=true
+fi
 
 # reads a property value from a .properties file
 function read_prop {
   grep "${1}" $buildProperties | cut -d'=' -f2
 }
 
-# invoke local maven to generate build properties file
-mvn properties:write-project-properties@build-properties
+# invoke local maven to output build properties file
+mvn clean --non-recursive properties:write-project-properties@build-properties
 
-DOCKER_NAMESPACE='gcr.io/$PROJECT_ID'
-RUNTIME_NAME='jetty'
 export DOCKER_TAG_LONG=$(read_prop "docker.tag.long")
 export IMAGE="${DOCKER_NAMESPACE}/${RUNTIME_NAME}:${DOCKER_TAG_LONG}"
 echo "IMAGE: $IMAGE"
@@ -36,5 +45,10 @@ echo "IMAGE: $IMAGE"
 mkdir -p $projectRoot/target
 envsubst < $projectRoot/cloudbuild.yaml.in > $projectRoot/target/cloudbuild.yaml
 
-gcloud container builds submit --config=$projectRoot/target/cloudbuild.yaml .
+# build and test the runtime image
+if [ "$LOCAL_BUILD" = "true" ]; then
+  source $dir/cloudbuild_local.sh --config=$projectRoot/target/cloudbuild.yaml
+else
+  gcloud container builds submit --config=$projectRoot/target/cloudbuild.yaml .
+fi
 
