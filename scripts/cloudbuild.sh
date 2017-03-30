@@ -38,17 +38,19 @@ function read_prop {
 # invoke local maven to output build properties file
 mvn clean --non-recursive properties:write-project-properties@build-properties
 
-export DOCKER_TAG_LONG=$(read_prop "docker.tag.long")
-export IMAGE="${DOCKER_NAMESPACE}/${RUNTIME_NAME}:${DOCKER_TAG_LONG}"
+DOCKER_TAG=$(read_prop "docker.tag.long")
+IMAGE="${DOCKER_NAMESPACE}/${RUNTIME_NAME}:${DOCKER_TAG}"
 echo "IMAGE: $IMAGE"
-
-mkdir -p $projectRoot/target
-envsubst < $projectRoot/cloudbuild.yaml.in > $projectRoot/target/cloudbuild.yaml
 
 # build and test the runtime image
 if [ "$LOCAL_BUILD" = "true" ]; then
-  source $dir/cloudbuild_local.sh --config=$projectRoot/target/cloudbuild.yaml
+  source $dir/cloudbuild_local.sh \
+    --config=$projectRoot/cloudbuild.yaml \
+    --substitutions="_IMAGE=$IMAGE,_DOCKER_TAG=$DOCKER_TAG"
 else
-  gcloud container builds submit --config=$projectRoot/target/cloudbuild.yaml .
+  gcloud container builds submit \
+    --config=$projectRoot/cloudbuild.yaml \
+    --substitutions="_IMAGE=$IMAGE,_DOCKER_TAG=$DOCKER_TAG" \
+    $projectRoot
 fi
 
