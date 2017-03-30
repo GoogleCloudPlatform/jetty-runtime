@@ -3,8 +3,8 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
-    <groupId>com.google.cloud.runtimes</groupId>
-    <artifactId>jetty-parent</artifactId>
+    <groupId>com.google.cloud.runtimes.tests</groupId>
+    <artifactId>tests-parent</artifactId>
     <version>0.1.0-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
@@ -12,7 +12,7 @@
   <artifactId>runtimes-common-testing</artifactId>
   <packaging>war</packaging>
 
-  <name>Jetty-Runtime :: runtimes-common tests</name>
+  <name>Jetty-Runtime :: Tests :: runtimes-common tests</name>
   <dependencies>
     <dependency>
       <groupId>javax.servlet</groupId>

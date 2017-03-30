@@ -20,7 +20,7 @@ set -e
 
 dir=`dirname $0`
 projectRoot=$dir/..
-testAppDir=$projectRoot/runtimes-common-testing
+testAppDir=$projectRoot/tests/runtimes-common-testing
 deployDir=$testAppDir/target/deploy
 
 imageUnderTest=$1
