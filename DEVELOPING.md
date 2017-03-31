@@ -18,14 +18,15 @@ To build using the [Google Cloud Container Builder](https://cloud.google.com/con
 git clone https://github.com/GoogleCloudPlatform/jetty-runtime.git
 cd jetty-runtime
 
-# initiate the cloud build, passing it the docker namespace for the resulting image
+# initiate the cloud build, passing in the docker namespace and tag for the resulting image
 PROJECT_ID=my-project
-./scripts/cloudbuild.sh gcr.io/$PROJECT_ID
+TAG=my-tag
+./scripts/build.sh gcr.io/$PROJECT_ID $TAG
 ```
 
 If you would like to simulate the cloud build locally, pass in the `--local` argument.
 ```
-./scripts/cloudbuild.sh gcr.io/$PROJECT_ID --local
+./scripts/build.sh gcr.io/$PROJECT_ID $TAG --local
 ```
 
 ## Running the Jetty image
