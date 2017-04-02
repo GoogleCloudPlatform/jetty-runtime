@@ -21,17 +21,18 @@
 		<port>443</port>
 		<running.time>120</running.time>
 		<running.time.unit>m</running.time.unit>
-		<transaction_rate>500</transaction_rate>
+		<transaction_rate>1500</transaction_rate>
 		<scheme>https</scheme>
-		<users>10</users>
+		<users>14</users>
 		<profile.json>${basedir}/src/main/appengine/loadgenerator_profile.groovy</profile.json>
 		<warmup.number>10</warmup.number>
 		<runner.instances>2</runner.instances>
+		<threads>1</threads>
 		<debug.args></debug.args>
 		<resources.cpu>12</resources.cpu>
 		<resources.memory_gb>16</resources.memory_gb>
-		<httpClientSelectors>3</httpClientSelectors>
-		<maxRequestsQueued>210000</maxRequestsQueued>
+		<httpClientSelectors>2</httpClientSelectors>
+		<maxRequestsQueued>410000</maxRequestsQueued>
 	</properties>
 
 	<dependencies>

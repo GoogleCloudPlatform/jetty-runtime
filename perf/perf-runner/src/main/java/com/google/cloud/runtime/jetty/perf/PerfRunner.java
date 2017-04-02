@@ -17,15 +17,19 @@
 package com.google.cloud.runtime.jetty.perf;
 
 import com.beust.jcommander.JCommander;
+import org.eclipse.jetty.client.HttpClient;
+import org.eclipse.jetty.client.api.ContentResponse;
 import org.eclipse.jetty.client.api.Request;
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.Logger;
 
+import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.mortbay.jetty.load.generator.LoadGenerator;
 import org.mortbay.jetty.load.generator.Resource;
 import org.mortbay.jetty.load.generator.listeners.CollectorInformations;
 import org.mortbay.jetty.load.generator.listeners.QpsListenerDisplay;
 import org.mortbay.jetty.load.generator.listeners.RequestQueuedListenerDisplay;
+import org.mortbay.jetty.load.generator.listeners.Utils;
 import org.mortbay.jetty.load.generator.listeners.report.GlobalSummaryListener;
 import org.mortbay.jetty.load.generator.starter.LoadGeneratorStarter;
 import org.mortbay.jetty.load.generator.starter.LoadGeneratorStarterArgs;
@@ -60,6 +64,8 @@ public class PerfRunner {
 
     getValuesFromEnvVar( runnerArgs );
     LOGGER.info( "runnerArgs:" + runnerArgs.toString() );
+    ensureNetwork(runnerArgs,20);
+
     LoadGeneratorRunner runner = new LoadGeneratorRunner( runnerArgs );
     LOGGER.info( "start load test" );
     runner.run();
@@ -144,6 +150,32 @@ public class PerfRunner {
     public CollectorInformations getResponseTimeSummary() {
       return new CollectorInformations( globalSummaryListener.getResponseTimeHistogram() //
                                             .getIntervalHistogram() );
+    }
+  }
+
+  public static void ensureNetwork(LoadGeneratorStarterArgs runnerArgs, int trynumber)
+      throws Exception {
+    // we do one request until we are sure the network is here
+    // olamy: for some reasons the target network can be unreachable
+    int connectTry = 0;
+    while (connectTry < trynumber) {
+      HttpClient httpClient = new HttpClient( new SslContextFactory( true ) );
+      try {
+        httpClient.start();
+        httpClient //
+            .newRequest( runnerArgs.getHost(), runnerArgs.getPort() ) //
+            .scheme( runnerArgs.getScheme() ) //
+            .path( "/" ) //
+            .send();
+        LOGGER.info( "connect to target host ok" );
+        return;
+      } catch ( Exception e ) {
+        LOGGER.warn("cannot query target:" + Utils.toString( e ) );
+        if (httpClient != null) {
+          httpClient.stop();
+        }
+        throw e;
+      }
     }
   }
 
