@@ -21,7 +21,7 @@
 		<port>443</port>
 		<running.time>120</running.time>
 		<running.time.unit>m</running.time.unit>
-		<transaction_rate>3200</transaction_rate>
+		<transaction_rate>1800</transaction_rate>
 		<scheme>https</scheme>
 		<users>14</users>
 		<profile.json>${basedir}/src/main/appengine/loadgenerator_profile.groovy</profile.json>
