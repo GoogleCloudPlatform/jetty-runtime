@@ -1,11 +1,27 @@
 ## Perf app
 
+The idea is to run all load test components within gcloud infrastructure.
+
+The webapp (module perf-server) will run in gcloud with a flex env.
+
+The load runner (module perf-runner) will run as a docker image deployed in gcloud env. 
+
 ### Test webapp
 The submodule `perf-server` contains a simple webapp which can be deploy to gcloud using with activating the `gcloud-deploy` profile `-Pgcloud-deploy`:
 
 `mvn install -Pgcloud-deploy -Dgcloud.sdk.path=<path to your gcloud sdk directory>`  
 
 This contains a very simple webapp with static resources and a basic servlet.
+
+The docker image will be based on the jetty image containing the war file.
+
+The app.yaml contains some configuration which can be overriden with command line:
+* resources.cpu: number of cpu (default 2)
+* resources.memory_gb: memory to user (default 8gb)
+* resources.disk_size_gb: disk size (default: 10gb)
+* automatic_scaling.min_num_instances: minimum number of instances (default: 1)
+* automatic_scaling.max_num_instances: maximum number of instances (default: 1)
+`
 
 ### Load testing
 Load testing can be performed using the following command:

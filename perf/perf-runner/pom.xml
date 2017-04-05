@@ -21,9 +21,9 @@
 		<port>443</port>
 		<running.time>120</running.time>
 		<running.time.unit>m</running.time.unit>
-		<transaction_rate>2100</transaction_rate>
+		<transaction_rate>2300</transaction_rate>
 		<scheme>https</scheme>
-		<users>14</users>
+		<users>10</users>
 		<profile.json>${basedir}/src/main/appengine/loadgenerator_profile.groovy</profile.json>
 		<warmup.number>10</warmup.number>
 		<runner.instances>2</runner.instances>
