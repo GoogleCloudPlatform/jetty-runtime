@@ -55,7 +55,8 @@ The app.yaml contains some configuration which can be overridden with command li
 * automatic_scaling.max_num_instances: maximum number of instances (default: 1)
 `
 
-### Load testing
+### perf-runner (local)
+
 Load testing can be performed using the following command:
 
 `mvn clean install -Pperf -Prun-perf -DskipTests -Drunning.time.unit=s -Dwarmup.number=5 -Drunning.time=30 -Dusers=20`
@@ -64,13 +65,13 @@ You can define a number of parameters for the testing including the numbers of u
 
 To deploy new version add the profile `-Pgcloud-deploy`
 
-### Remote Load testing
+### perf-runner (remote)
 
 You can deploy Docker images running Load testing using:
 
 ` mvn clean install -Pperf -pl :perf-runner -am  -P-Pgcloud-deploy -DskipTests -DskipTests`
 
-#### Load Testing Parameters
+### Load Testing Parameters
 
 The load testing is done using the [load generator library](https://github.com/jetty-project/jetty-load-generator).
 
@@ -91,3 +92,11 @@ Some parameters are available to configure the load:
 * resources.memory_gb: total memory (defaut: 16) (see app.yaml file)
 * httpClientSelectors: number of selector per http client transport/client (default: 2)
 * maxRequestsQueued: (default: 410000) 
+
+## Example Loads:
+
+The following are some configurations and their results from our testing.
+
+[width="100%", frame="topbot", options="header"]
+| perf-server | perf-runner | qps | latency |
+| resources.cpu=2, resources.memory_gb=8 | users=?, runner.instances=2, etc | 8-9k | ? |
