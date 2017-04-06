@@ -26,7 +26,34 @@ On the Stackdriver side of things we are interested in:
 
 Within the perf-runner the following information may be found in the streaming logs:
 
-<insert example here>
+* estimated qps every 30s for each hosts (grep log on INFO) format:
+`
+2017-04-05 02:25:22.713:INFO:omjlgl.QpsListenerDisplay:pool-1-thread-1: ----------------------------------------
+2017-04-05 02:25:22.713:INFO:omjlgl.QpsListenerDisplay:pool-1-thread-1: --------    QPS estimation    ----------
+2017-04-05 02:25:22.713:INFO:omjlgl.QpsListenerDisplay:pool-1-thread-1: ---------------------------------------- 
+2017-04-05 02:25:22.713:INFO:omjlgl.QpsListenerDisplay:pool-1-thread-1: host 'cced3cb67b60' estimated QPS : 5534
+
+`
+* request currently in queue (grep log on INFO) format:
+`
+2017-04-05 02:30:22.733:INFO:omjlgl.RequestQueuedListenerDisplay:pool-2-thread-1: ----------------------------------------
+2017-04-05 02:30:22.733:INFO:omjlgl.RequestQueuedListenerDisplay:pool-2-thread-1:   Requests in queue: 35631
+2017-04-05 02:30:22.733:INFO:omjlgl.RequestQueuedListenerDisplay:pool-2-thread-1: ----------------------------------------
+`
+
+* end summary of total QPS and response time (TODO change it to latency?) (grep log on INFO) format:
+`
+2017-03-31 11:41:23.714:INFO:cgcrjp.PerfRunner:main: ----------------------------------------------------
+2017-03-31 11:41:23.714:INFO:cgcrjp.PerfRunner:main: -----------    Result Summary     ------------------
+2017-03-31 11:41:23.714:INFO:cgcrjp.PerfRunner:main: ----------------------------------------------------
+2017-03-31 11:41:23.714:INFO:cgcrjp.PerfRunner:main: CollectorInformations millis:totalCount=4948895, minValue=0, maxValue=40231, mean=3855, 
+stdDeviation=5501, value 50%=899, value 90%=2147, startTimeStamp=2017-03-31T11:26:02 UTC, endTimeStamp=2017-03-31T11:41:23 UTC
+2017-03-31 11:41:23.714:INFO:cgcrjp.PerfRunner:main: ---------------------------------------------------- 
+2017-03-31 11:41:23.714:INFO:cgcrjp.PerfRunner:main: -----------     Estimated QPS     ------------------
+2017-03-31 11:41:23.714:INFO:cgcrjp.PerfRunner:main: ----------------------------------------------------
+2017-03-31 11:41:23.714:INFO:cgcrjp.PerfRunner:main: host '2e0ce9d008e0' estimated QPS : 5373
+2017-03-31 11:41:23.714:INFO:cgcrjp.PerfRunner:main: ----------------------------------------------------
+` 
 
 Within the perf-server the following information may be found in the streaming logs:
 
