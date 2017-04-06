@@ -27,14 +27,15 @@ On the Stackdriver side of things we are interested in:
 Within the perf-runner the following information may be found in the streaming logs:
 
 * estimated qps every 30s for each hosts (grep log on INFO) format:
+
 `
 2017-04-05 02:25:22.713:INFO:omjlgl.QpsListenerDisplay:pool-1-thread-1: ----------------------------------------
 2017-04-05 02:25:22.713:INFO:omjlgl.QpsListenerDisplay:pool-1-thread-1: --------    QPS estimation    ----------
 2017-04-05 02:25:22.713:INFO:omjlgl.QpsListenerDisplay:pool-1-thread-1: ---------------------------------------- 
 2017-04-05 02:25:22.713:INFO:omjlgl.QpsListenerDisplay:pool-1-thread-1: host 'cced3cb67b60' estimated QPS : 5534
-
 `
 * request currently in queue (grep log on INFO) format:
+
 `
 2017-04-05 02:30:22.733:INFO:omjlgl.RequestQueuedListenerDisplay:pool-2-thread-1: ----------------------------------------
 2017-04-05 02:30:22.733:INFO:omjlgl.RequestQueuedListenerDisplay:pool-2-thread-1:   Requests in queue: 35631
@@ -42,6 +43,7 @@ Within the perf-runner the following information may be found in the streaming l
 `
 
 * end summary of total QPS and response time (TODO change it to latency?) (grep log on INFO) format:
+
 `
 2017-03-31 11:41:23.714:INFO:cgcrjp.PerfRunner:main: ----------------------------------------------------
 2017-03-31 11:41:23.714:INFO:cgcrjp.PerfRunner:main: -----------    Result Summary     ------------------
