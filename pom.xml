@@ -23,7 +23,7 @@
   <artifactId>jetty-parent</artifactId>
   <version>0.1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
-  <name>Google App Engine Jetty Runtime Parent</name>
+  <name>Google Jetty Runtime Parent</name>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
