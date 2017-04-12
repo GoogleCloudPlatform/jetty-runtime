@@ -69,6 +69,7 @@
                   </imageTags>
                   <dockerDirectory>${project.build.directory}/docker</dockerDirectory>
                   <pullOnBuild>true</pullOnBuild>
+                  <noCache>true</noCache>
                 </configuration>
               </execution>
               <execution>
