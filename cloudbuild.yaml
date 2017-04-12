@@ -7,7 +7,7 @@ steps:
   args: ['mvn', '-P-local-docker-build', '-P-test.local', '-Ddocker.tag.long=$_DOCKER_TAG', 'clean', 'install']
 # Build the runtime container
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '--tag=${_IMAGE}', '--no-cache', 'jetty9/target/docker']
+  args: ['build', '--tag=${_IMAGE}', '--no-cache', '--pull', 'jetty9/target/docker']
 
 # Test the built image
 
