@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.google.cloud.runtimes.perf</groupId>
+    <artifactId>perf</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>perf-test</artifactId>
+  <packaging>jar</packaging>
+
+  <name>Jetty Runtime :: Perf :: Perf Test</name>
+  <description>test load testing</description>
+
+  <properties>
+    <gcloud.api.version>0.11.2-beta</gcloud.api.version>
+    <gcloud-projectId-file>${project.build.directory}/gcloud-projectid.properties
+    </gcloud-projectId-file>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.google.cloud.runtimes.tests</groupId>
+      <artifactId>gcloud-testing-core</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.google.cloud</groupId>
+      <artifactId>google-cloud-logging</artifactId>
+      <version>${gcloud.api.version}</version>
+      <exclusions>
+        <!-- TODO remove once https://github.com/google/google-oauth-java-client/issues/145 is fixed -->
+        <exclusion>
+          <groupId>javax.servlet</groupId>
+          <artifactId>servlet-api</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>find-app-deploy-project</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <target>
+                <echo file="${gcloud-projectId-file}" append="false">
+                  app.deploy.project=
+                </echo>
+                <exec executable="gcloud" logError="true" append="true"
+                      output="${gcloud-projectId-file}">
+                  <arg value="--quiet"/>
+                  <arg value="config"/>
+                  <arg value="list"/>
+                  <arg value="--format=value(core.project)"/>
+                </exec>
+              </target>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>properties-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>read-gcloud-properties</id>
+            <phase>initialize</phase>
+            <goals>
+              <goal>read-project-properties</goal>
+            </goals>
+            <configuration>
+              <files>
+                <file>${gcloud-projectId-file}</file>
+              </files>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <systemPropertyVariables>
+            <app.deploy.web>jetty-runtime-perf-app</app.deploy.web>
+            <app.deploy.runner>jetty-runtime-perf-runner</app.deploy.runner>
+            <app.deploy.project>${app.deploy.project}</app.deploy.project>
+          </systemPropertyVariables>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
