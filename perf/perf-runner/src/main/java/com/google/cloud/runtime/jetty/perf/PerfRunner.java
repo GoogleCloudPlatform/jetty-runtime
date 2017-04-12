@@ -18,7 +18,6 @@ package com.google.cloud.runtime.jetty.perf;
 
 import com.beust.jcommander.JCommander;
 import org.eclipse.jetty.client.HttpClient;
-import org.eclipse.jetty.client.api.ContentResponse;
 import org.eclipse.jetty.client.api.Request;
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.Logger;
@@ -30,6 +29,7 @@ import org.mortbay.jetty.load.generator.listeners.CollectorInformations;
 import org.mortbay.jetty.load.generator.listeners.QpsListenerDisplay;
 import org.mortbay.jetty.load.generator.listeners.RequestQueuedListenerDisplay;
 import org.mortbay.jetty.load.generator.listeners.Utils;
+import org.mortbay.jetty.load.generator.listeners.latency.GlobalLatencyTimeDisplayListener;
 import org.mortbay.jetty.load.generator.listeners.report.GlobalSummaryListener;
 import org.mortbay.jetty.load.generator.starter.LoadGeneratorStarter;
 import org.mortbay.jetty.load.generator.starter.LoadGeneratorStarterArgs;
@@ -71,11 +71,11 @@ public class PerfRunner {
     runner.run();
     LOGGER.info( "load test done" );
 
-    CollectorInformations collectorInformations = runner.getResponseTimeSummary();
+    CollectorInformations latencyTimeSummary = runner.getLatencyTimeSummary();
 
-    long totalRequestCommitted = collectorInformations.getTotalCount();
-    long start = collectorInformations.getStartTimeStamp();
-    long end = collectorInformations.getEndTimeStamp();
+    long totalRequestCommitted = latencyTimeSummary.getTotalCount();
+    long start = latencyTimeSummary.getStartTimeStamp();
+    long end = latencyTimeSummary.getEndTimeStamp();
 
     String hostname = "";
     try {
@@ -83,13 +83,14 @@ public class PerfRunner {
     } catch ( Exception e ) {
       LOGGER.info( "ignore cannot get hostname:" + e.getMessage() );
     }
+    runner.host = hostname;
 
     LOGGER.info( "" );
     LOGGER.info( "" );
     LOGGER.info( "----------------------------------------------------");
-    LOGGER.info( "-----------    Result Summary     ------------------");
+    LOGGER.info( "--------    Latency Time Summary     ---------------");
     LOGGER.info( "----------------------------------------------------");
-    LOGGER.info( "" + collectorInformations.toString() );
+    LOGGER.info( "" + latencyTimeSummary.toString() );
     LOGGER.info( "----------------------------------------------------");
     LOGGER.info( "" );
     LOGGER.info( "----------------------------------------------------");
@@ -98,6 +99,12 @@ public class PerfRunner {
     long timeInSeconds = TimeUnit.SECONDS.convert( end - start, TimeUnit.MILLISECONDS );
     long qps = totalRequestCommitted / timeInSeconds;
     LOGGER.info( "host '" + hostname + "' estimated QPS : " + qps );
+    LOGGER.info( "----------------------------------------------------");
+    LOGGER.info( "perfmetric:max_latency:" + latencyTimeSummary.getMaxValue());
+    LOGGER.info( "perfmetric:min_latency:" + latencyTimeSummary.getMinValue());
+    LOGGER.info( "perfmetric:ave_latency:" + latencyTimeSummary.getMean());
+    LOGGER.info( "perfmetric:50_latency:" + latencyTimeSummary.getValue50());
+    LOGGER.info( "perfmetric:90_latency:" + latencyTimeSummary.getValue90());
     LOGGER.info( "----------------------------------------------------");
     LOGGER.info( "" );
 
@@ -117,23 +124,37 @@ public class PerfRunner {
 
   private static class LoadGeneratorRunner extends LoadGeneratorStarter {
 
+    private String host;
     private GlobalSummaryListener globalSummaryListener = new GlobalSummaryListener();
 
     private QpsListenerDisplay qpsListenerDisplay = //
         // FIXME those values need to be configurable!! //
-        new QpsListenerDisplay(10, 30, TimeUnit.SECONDS);
+        new QpsListenerDisplay(10, 10, TimeUnit.SECONDS);
 
     private RequestQueuedListenerDisplay requestQueuedListenerDisplay = //
         // FIXME those values need to be configurable!! //
-        new RequestQueuedListenerDisplay(10, 30, TimeUnit.SECONDS);
+        new RequestQueuedListenerDisplay(10, 10, TimeUnit.SECONDS);
+
+    private GlobalLatencyTimeDisplayListener globalLatencyTimeDisplayListener =
+        new GlobalLatencyTimeDisplayListener( 10, 10, TimeUnit.SECONDS );
 
     public LoadGeneratorRunner( LoadGeneratorStarterArgs runnerArgs ) {
       super( runnerArgs );
+      this.globalLatencyTimeDisplayListener.addValueListener( histogram -> {
+        LOGGER.info( "host '" + host );
+        LOGGER.info( "----------------------------------------------------");
+        LOGGER.info( "perfmetric_run:total:" + histogram.getTotalCount());
+        LOGGER.info( "perfmetric_run:max_latency:" + histogram.getMaxValue());
+        LOGGER.info( "perfmetric_run:min_latency:" + histogram.getMinValue());
+        LOGGER.info( "perfmetric_run:ave_latency:" + histogram.getMean());
+        LOGGER.info( "perfmetric_run:50_latency:" + histogram.getValueAtPercentile( 50 ));
+        LOGGER.info( "perfmetric_run:90_latency:" + histogram.getValueAtPercentile( 90 ));
+        LOGGER.info( "----------------------------------------------------");
+      } );
     }
 
     @Override
     protected Request.Listener[] getListeners() {
-
       return new Request.Listener[]{qpsListenerDisplay, requestQueuedListenerDisplay};
     }
 
@@ -147,8 +168,8 @@ public class PerfRunner {
       return new Resource.Listener[]{globalSummaryListener};
     }
 
-    public CollectorInformations getResponseTimeSummary() {
-      return new CollectorInformations( globalSummaryListener.getResponseTimeHistogram() //
+    public CollectorInformations getLatencyTimeSummary() {
+      return new CollectorInformations( globalSummaryListener.getLatencyTimeHistogram() //
                                             .getIntervalHistogram() );
     }
   }
