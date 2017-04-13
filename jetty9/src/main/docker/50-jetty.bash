@@ -1,4 +1,3 @@
-# The script below is from setup-env-ext.bash, which is appended to /setup-env.bash
 
 # default jetty arguments
 export JETTY_ARGS="-Djetty.base=$JETTY_BASE -jar $JETTY_HOME/start.jar"
@@ -43,4 +42,3 @@ if [ -n "$GAE_INSTANCE" -a ! -e "$JETTY_BASE/start.d/gcp.ini" ]; then
   --commands=$JETTY_BASE/config-scripts/gcp.commands
 fi
 
-# End setup-env-ext.bash
