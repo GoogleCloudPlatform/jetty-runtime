@@ -72,7 +72,7 @@ NOTE: We assume you already have gcloud configured correctly for your environmen
 
 The submodule `perf-server` contains a simple webapp which can be deploy to gcloud using with activating the appropriate maven profile `-Pgcloud-deploy`:
 
-`mvn install -Pgcloud-deploy -Dgcloud.sdk.path=<path to your gcloud sdk directory>`  
+`mvn install -Pgcloud-deploy`  
 
 The docker image will be based on the jetty image containing the war file.
 
