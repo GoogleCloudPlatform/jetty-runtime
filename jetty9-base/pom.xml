@@ -24,7 +24,7 @@
     <version>0.1.0-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
-  <name>Google App Engine Image Jetty (jetty9-base)</name>
+  <name>Google Jetty Runtime Base</name>
   <artifactId>jetty9-base</artifactId>
   <packaging>jar</packaging>
 

@@ -23,7 +23,7 @@
   <artifactId>jetty-parent</artifactId>
   <version>0.1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
-  <name>Google App Engine Jetty Runtime Parent</name>
+  <name>Google Jetty Runtime Parent</name>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -35,7 +35,7 @@
     <docker.tag.prefix></docker.tag.prefix>
     <docker.tag.short>${docker.tag.prefix}9.${jetty9.minor.version}</docker.tag.short>
     <docker.tag.long>${docker.tag.prefix}9.${jetty9.minor.version}-${maven.build.timestamp}</docker.tag.long>
-    <docker.openjdk.image>gcr.io/google-appengine/openjdk:8-2017-03-14_17_45</docker.openjdk.image>
+    <docker.openjdk.image>gcr.io/google-appengine/openjdk:8-2017-03-22_16_09</docker.openjdk.image>
   </properties>
 
   <licenses>
