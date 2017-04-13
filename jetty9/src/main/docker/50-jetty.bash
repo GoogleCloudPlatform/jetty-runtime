@@ -1,6 +1,6 @@
+# Configure the environment and CMD for the Jetty Container
 
-# default jetty arguments
-export JETTY_ARGS="-Djetty.base=$JETTY_BASE -jar $JETTY_HOME/start.jar"
+set -x
 
 # Unpack a WAR app (if present) beforehand so that Stackdriver Debugger
 # can load it. This should be done before the JVM for Jetty starts up.
@@ -19,27 +19,35 @@ if [ ! -e "$ROOT_DIR" -a -d /app ]; then
   ln -s /app "$ROOT_DIR"
 fi
 
-# If the passed arguments start with the java command
-if [ "java" = "$1" -o "$(which java)" = "$1" ]; then
-  # ignore the java command as it is the default
-  shift
-  # clear the JETTY args as the java command has been explicitly set
-  JETTY_ARGS=
+# move command line args to $JETTY_ARGS
+export JETTY_ARGS="${@/$1/}"
+set - "$1"
+
+# Add any Jetty properties to the JETTY_ARGS
+if [ "$JETTY_PROPERTIES" ]; then
+  JETTY_ARGS="$JETTY_ARGS ${JETTY_PROPERTIES//,/ }"
 fi
 
-# If the first argument is not executable
-if ! type "$1" &>/dev/null; then
-  # then jetty is being used so add the JETTY_ARGS to the JAVA_OPTS
-  export JAVA_OPTS="$JAVA_OPTS $JETTY_ARGS"
+# Enable jetty modules
+if [ "$JETTY_MODULES_ENABLE" ]; then
+  for M in ${JETTY_MODULES_ENABLE//,/ }; do
+    JETTY_ARGS="$JETTY_ARGS --module=$M"
+  done
 fi
 
-# If we are deployed on a GCP platform, enable the gcp module
+# Disable jetty modules
+if [ "$JETTY_MODULES_DISABLE" ]; then
+  for M in ${JETTY_MODULES_DISABLE//,/ }; do
+    rm -f ${JETTY_BASE}/start.d/${M}.ini
+  done
+fi
+
+# If we are deployed on a GAE platform, enable the gcp module
 if [ "$PLATFORM" = "gae" ]; then
-  # TODO make this a modification to runtime args rather than an extra invocation of java
-  java \
-  -Djetty.base=$JETTY_BASE \
-  -Djetty.home=$JETTY_HOME \
-  -jar $JETTY_HOME/start.jar \
-  --commands=$JETTY_BASE/config-scripts/gcp.commands
+  JETTY_ARGS="$JETTY_ARGS --module=gcp"
 fi
+
+# add the JETTY_ARGS to the JAVA_OPTS
+export JAVA_OPTS="$JAVA_OPTS $JETTY_ARGS"
+
 

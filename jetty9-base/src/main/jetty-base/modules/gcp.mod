@@ -17,6 +17,7 @@
 
 [depend]
 server
+http-forwarded
 
 [optional]
 resources
@@ -27,3 +28,14 @@ etc/gcp.xml
 
 [lib]
 lib/gcp/*.jar
+
+[ini]
+# Configure secure port redirection to 443 if not explicitly set
+jetty.httpConfig.securePort?=443
+
+# Disable hot deploy of webapps if not explicitly set
+jetty.deploy.scanInterval?=0
+
+# Disable support for RFC7239 header
+jetty.httpConfig.forwardedHeader=
+
