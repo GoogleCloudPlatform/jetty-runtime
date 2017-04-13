@@ -35,7 +35,10 @@ import org.mortbay.jetty.load.generator.starter.LoadGeneratorStarter;
 import org.mortbay.jetty.load.generator.starter.LoadGeneratorStarterArgs;
 
 import java.net.InetAddress;
+import java.time.Instant;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -66,17 +69,29 @@ public class PerfRunner {
     LOGGER.info( "runnerArgs:" + runnerArgs.toString() );
     ensureNetwork(runnerArgs,20);
 
-    LoadGeneratorRunner runner = new LoadGeneratorRunner( runnerArgs );
+    ExecutorService executorService = Executors.newCachedThreadPool();
+    LoadGeneratorRunner runner = new LoadGeneratorRunner( runnerArgs, executorService);
     String hostname = "";
     try {
       hostname = InetAddress.getLocalHost().getHostName();
     } catch ( Exception e ) {
       LOGGER.info( "ignore cannot get hostname:" + e.getMessage() );
     }
+    Instant startInstant = Instant.now();
     runner.host = hostname;
-    LOGGER.info( "start load test" );
-    runner.run();
-    LOGGER.info( "load test done" );
+    try {
+      LOGGER.info( "start load test" );
+      runner.run();
+      Instant endInstant = Instant.now();
+      LOGGER.info( "load test done start {} end {}", startInstant, endInstant );
+    } catch ( Exception e ) {
+      Instant endInstant = Instant.now();
+      LOGGER.info( "fail running the load start {} end {} message: {}", //
+                   startInstant, endInstant, e.getMessage() );
+      e.printStackTrace();
+    } finally {
+      runner.latencyTimeDisplayListener.onEnd( null );
+    }
 
     CollectorInformations latencyTimeSummary = runner.getLatencyTimeSummary();
 
@@ -112,6 +127,9 @@ public class PerfRunner {
     LOGGER.info( "----------------------------------------------------");
     LOGGER.info( "" );
 
+    // force stop executor as it's finished now
+    executorService.shutdownNow();
+
     // well it's only for test
     String returnExit = runnerArgs.getParams().get( "returnExit" );
     if (returnExit != null || Boolean.parseBoolean( returnExit )) {
@@ -135,6 +153,7 @@ public class PerfRunner {
 
     private String host;
     private GlobalSummaryListener globalSummaryListener = new GlobalSummaryListener();
+    private ExecutorService executorService;
 
     private QpsListenerDisplay qpsListenerDisplay = //
         // FIXME those values need to be configurable!! //
@@ -147,8 +166,10 @@ public class PerfRunner {
     private LatencyTimeDisplayListener latencyTimeDisplayListener =
         new LatencyTimeDisplayListener( 10, 10, TimeUnit.SECONDS );
 
-    public LoadGeneratorRunner( LoadGeneratorStarterArgs runnerArgs ) {
+    public LoadGeneratorRunner( LoadGeneratorStarterArgs runnerArgs,
+                                ExecutorService executorService ) {
       super( runnerArgs );
+      this.executorService = executorService;
       this.latencyTimeDisplayListener.addValueListener( histogram -> {
         LOGGER.info( "host '" + host );
         LOGGER.info( "----------------------------------------------------");
@@ -185,6 +206,11 @@ public class PerfRunner {
     public CollectorInformations getLatencyTimeSummary() {
       return new CollectorInformations( globalSummaryListener.getLatencyTimeHistogram() //
                                             .getIntervalHistogram() );
+    }
+
+    @Override
+    public ExecutorService getExecutorService() {
+      return this.executorService;
     }
   }
 
