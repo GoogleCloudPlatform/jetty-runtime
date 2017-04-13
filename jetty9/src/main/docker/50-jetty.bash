@@ -20,7 +20,7 @@ if [ ! -e "$ROOT_DIR" -a -d /app ]; then
 fi
 
 # If the passed arguments start with the java command
-if [ "java" = "$1" -o "$(which java)" = "$1" ] ; then
+if [ "java" = "$1" -o "$(which java)" = "$1" ]; then
   # ignore the java command as it is the default
   shift
   # clear the JETTY args as the java command has been explicitly set
@@ -34,7 +34,8 @@ if ! type "$1" &>/dev/null; then
 fi
 
 # If we are deployed on a GCP platform, enable the gcp module
-if [ -n "$GAE_INSTANCE" -a ! -e "$JETTY_BASE/start.d/gcp.ini" ]; then
+if [ "$PLATFORM" = "gae" ]; then
+  # TODO make this a modification to runtime args rather than an extra invocation of java
   java \
   -Djetty.base=$JETTY_BASE \
   -Djetty.home=$JETTY_HOME \
