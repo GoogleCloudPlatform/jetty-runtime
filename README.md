@@ -21,14 +21,14 @@ docker run gcr.io/google-appengine/jetty --list-config
 Alternate commands can also be passed to the `docker run` command, so the
 image can be explored with 
 ```console
-docker run -it --rm gcr.io/google-appengine/jetty bash
+docker run -it --rm launcher.gcr.io/google/jetty bash
 ```
 
 Various environment variables (see below) can also be used to set jetty properties, enable modules and
 disable modules.  These variables may be set either in an `app.yaml` or passed in to a docker run
 command eg.
 ```console
-docker run -it --rm -e JETTY_PROPERTIES=jetty.http.idleTimeout=10000 gcr.io/google-appengine/jetty 
+docker run -it --rm -e JETTY_PROPERTIES=jetty.http.idleTimeout=10000 launcher.gcr.io/google/jetty 
 ```
 
 To update the server configuration in a derived Docker image, the `Dockerfile` may
@@ -45,13 +45,13 @@ When using App Engine Flexible, you can use the runtime without worrying about D
 runtime: java
 env: flex
 ```
-The runtime image `gcr.io/google-appengine/jetty` will be automatically selected if you are attempting to deploy a WAR (`*.war` file).
+The runtime image `launcher.gcr.io/google/jetty` will be automatically selected if you are attempting to deploy a WAR (`*.war` file).
 
 If you want to use the image as a base for a custom runtime, you can specify `runtime: custom` in your `app.yaml` and then
 write the Dockerfile like this:
 
 ```dockerfile
-FROM gcr.io/google-appengine/jetty
+FROM launcher.gcr.io/google/jetty
 ADD your-application.war $JETTY_BASE/webapps/root.war
 ```
       
