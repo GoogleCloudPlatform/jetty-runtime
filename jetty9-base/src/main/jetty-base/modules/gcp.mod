@@ -39,3 +39,8 @@ jetty.deploy.scanInterval?=0
 # Disable support for RFC7239 header
 jetty.httpConfig.forwardedHeader=
 
+# Send Server version
+jetty.httpConfig.sendServerVersion?=true
+
+# Don't send date header
+jetty.httpConfig.sendDateHeader?=false
