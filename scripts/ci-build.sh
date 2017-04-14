@@ -27,5 +27,5 @@ cd github/jetty-runtime
 export TAG=$(git rev-parse --short HEAD)
 
 echo "Invoking build.sh with DOCKER_NAMESPACE=$DOCKER_NAMESPACE, TAG=$TAG"
-$dir/build.sh $DOCKER_NAMESPACE $TAG
+./scripts/build.sh $DOCKER_NAMESPACE $TAG
 
