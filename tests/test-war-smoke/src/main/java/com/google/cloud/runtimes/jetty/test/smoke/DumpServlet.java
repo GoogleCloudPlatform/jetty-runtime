@@ -106,5 +106,19 @@ public class DumpServlet extends HttpServlet {
     out.printf("encodedURL(\"/foo/bar\")=%s%n", response.encodeURL("/foo/bar"));
     out.printf("encodedRedirectURL(\"/foo/bar\")=%s%n", response.encodeRedirectURL("/foo/bar"));
     out.println("</pre>");
+
+    out.println("<h2>Environment:</h2>");
+    out.println("<pre>");
+    for (String n : System.getenv().keySet()) {
+      out.printf("%s=%s%n", n, System.getenv(n));
+    }
+    out.println("</pre>");
+    
+    out.println("<h2>System Properties:</h2>");
+    out.println("<pre>");
+    for (Object n : System.getProperties().keySet()) {
+      out.printf("%s=%s%n", n, System.getProperty(String.valueOf(n)));
+    }
+    out.println("</pre>");
   }
 }
