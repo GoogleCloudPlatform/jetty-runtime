@@ -15,24 +15,24 @@ commandTests:
   command: ['env']
   expectedOutput: ['GAE_IMAGE_LABEL=${docker.tag.long}']
 - name: 'check jetty setup default'
-  setup: [[ 'chmod', '+x', '/workspace/jetty-setup-default.bash' ]]
-  command: [ '/workspace/jetty-setup-default.bash' ]
+  setup: [[ 'chmod', '+x', '/workspace/jetty9/src/test/workspace/jetty-setup-default.bash' ]]
+  command: [ '/workspace/jetty9/src/test/workspace/jetty-setup-default.bash' ]
   expectedOutput: ['OK']
 - name: 'check jetty setup default GCP'
-  setup: [[ 'chmod', '+x', '/workspace/jetty-setup-default-gcp.bash' ]]
-  command: [ '/workspace/jetty-setup-default-gcp.bash' ]
+  setup: [[ 'chmod', '+x', '/workspace/jetty9/src/test/workspace/jetty-setup-default-gcp.bash' ]]
+  command: [ '/workspace/jetty9/src/test/workspace/jetty-setup-default-gcp.bash' ]
   expectedOutput: ['OK']
 - name: 'check jetty setup unpack'
-  setup: [[ 'chmod', '+x', '/workspace/jetty-setup-unpack.bash' ]]
-  command: [ '/workspace/jetty-setup-unpack.bash' ]
+  setup: [[ 'chmod', '+x', '/workspace/jetty9/src/test/workspace/jetty-setup-unpack.bash' ]]
+  command: [ '/workspace/jetty9/src/test/workspace/jetty-setup-unpack.bash' ]
   expectedOutput: ['OK']
 - name: 'check jetty setup app'
-  setup: [[ 'chmod', '+x', '/workspace/jetty-setup-app.bash' ]]
-  command: [ '/workspace/jetty-setup-app.bash' ]
+  setup: [[ 'chmod', '+x', '/workspace/jetty9/src/test/workspace/jetty-setup-app.bash' ]]
+  command: [ '/workspace/jetty9/src/test/workspace/jetty-setup-app.bash' ]
   expectedOutput: ['OK']
 - name: 'check jetty setup modules'
-  setup: [[ 'chmod', '+x', '/workspace/jetty-setup-modules.bash' ]]
-  command: [ '/workspace/jetty-setup-modules.bash' ]
+  setup: [[ 'chmod', '+x', '/workspace/jetty9/src/test/workspace/jetty-setup-modules.bash' ]]
+  command: [ '/workspace/jetty9/src/test/workspace/jetty-setup-modules.bash' ]
   expectedOutput: ['OK']
 
 fileExistenceTests:
