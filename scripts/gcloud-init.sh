@@ -19,7 +19,6 @@
 set -ex
 
 DIR=$(pwd)
-TMP_DIR=$(mktemp -d)
 
 if [ -z $GCLOUD_FILE ]; then
   echo '$GCLOUD_FILE environment variable must be set.'
@@ -36,7 +35,7 @@ if [ -z $GCP_PROJECT ]; then
   exit 1
 fi
 
-LOCAL_GCLOUD_FILE=$TMP_DIR/gcloud.tar.gz
+LOCAL_GCLOUD_FILE=gcloud.tar.gz
 cp $GCLOUD_FILE $LOCAL_GCLOUD_FILE
 
 # Hide the output here, it's long.
