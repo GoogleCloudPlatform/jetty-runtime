@@ -23,6 +23,11 @@ fi
 export JETTY_ARGS="${@/$1/}"
 set - "$1"
 
+# Check for start.jar
+if [ "$(echo $JETTY_ARGS | egrep start.jar | wc -l )" = "0" ]; then
+  JETTY_ARGS="-Djetty.base=${JETTY_BASE} -jar ${JETTY_HOME}/start.jar $JETTY_ARGS"
+fi
+
 # Add any Jetty properties to the JETTY_ARGS
 if [ "$JETTY_PROPERTIES" ]; then
   JETTY_ARGS="$JETTY_ARGS ${JETTY_PROPERTIES//,/ }"
