@@ -52,7 +52,6 @@ public class LogServlet extends HttpServlet {
       throws ServletException, IOException {
     resp.setContentType("text/plain");
 
-
     Map<String, String[]> params = req.getParameterMap();
     // pull parameters
     String moduleId = params.get("module_id")[0];
@@ -71,15 +70,14 @@ public class LogServlet extends HttpServlet {
     filter += " AND resource.labels.module_id=" + moduleId;
     filter += " AND textPayload:" + textPayload;
 
-    PrintWriter out = resp.getWriter();
-    out.println("Log Entries " + filter + ":");
     try (Logging logging = options.getService()) {
-      LOGGER.info( "start list log entries with filter", filter);
+      LOGGER.info( "start list log entries with filter: {}", filter);
       long start = System.currentTimeMillis();
       Page<LogEntry> entries = logging.listLogEntries(EntryListOption.filter(filter));
       long end = System.currentTimeMillis();
-
+      LOGGER.info( "time to find logs {} for filter {}", (end - start), filter);
       Iterator<LogEntry> entryIterator = entries.iterateAll();
+      PrintWriter out = resp.getWriter();
       while (entryIterator.hasNext()) {
         out.println(entryIterator.next());
       }
