@@ -1,6 +1,5 @@
+#!/bin/bash
 # Configure the environment and CMD for the Jetty Container
-
-set -x
 
 # Unpack a WAR app (if present) beforehand so that Stackdriver Debugger
 # can load it. This should be done before the JVM for Jetty starts up.
@@ -9,6 +8,7 @@ export ROOT_DIR=$JETTY_BASE/webapps/root
 if [ -e "$ROOT_WAR" ]; then
   # Unpack it only if $ROOT_DIR doesn't exist or the root is older than the war.
   if [ -e "$ROOT_WAR" -a \( \( ! -e "$ROOT_DIR" \) -o \( "$ROOT_DIR" -ot "$ROOT_WAR" \) \) ]; then
+    rm -fr $ROOT_DIR
     unzip $ROOT_WAR -d $ROOT_DIR
     chown -R jetty:jetty $ROOT_DIR
   fi
