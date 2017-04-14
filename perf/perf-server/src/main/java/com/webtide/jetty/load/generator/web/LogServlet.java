@@ -16,11 +16,15 @@
 
 package com.webtide.jetty.load.generator.web;
 
+import com.google.auth.Credentials;
 import com.google.cloud.Page;
 import com.google.cloud.logging.LogEntry;
 import com.google.cloud.logging.Logging;
 import com.google.cloud.logging.Logging.EntryListOption;
 import com.google.cloud.logging.LoggingOptions;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -40,6 +44,9 @@ import javax.servlet.http.HttpServletResponse;
  */
 @WebServlet(urlPatterns = {"/log/*"})
 public class LogServlet extends HttpServlet {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger( LogServlet.class );
+
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
@@ -67,7 +74,11 @@ public class LogServlet extends HttpServlet {
     PrintWriter out = resp.getWriter();
     out.println("Log Entries " + filter + ":");
     try (Logging logging = options.getService()) {
+      LOGGER.info( "start list log entries with filter", filter);
+      long start = System.currentTimeMillis();
       Page<LogEntry> entries = logging.listLogEntries(EntryListOption.filter(filter));
+      long end = System.currentTimeMillis();
+
       Iterator<LogEntry> entryIterator = entries.iterateAll();
       while (entryIterator.hasNext()) {
         out.println(entryIterator.next());
