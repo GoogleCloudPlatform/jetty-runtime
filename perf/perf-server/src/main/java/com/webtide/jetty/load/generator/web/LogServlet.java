@@ -16,8 +16,7 @@
 
 package com.webtide.jetty.load.generator.web;
 
-import com.google.auth.Credentials;
-import com.google.cloud.Page;
+import com.google.api.gax.core.Page;
 import com.google.cloud.logging.LogEntry;
 import com.google.cloud.logging.Logging;
 import com.google.cloud.logging.Logging.EntryListOption;
@@ -36,6 +35,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 
 /**
  * A servlet to query the Stackdriver logging for the gae_app smoke module.
@@ -69,14 +69,18 @@ public class LogServlet extends HttpServlet {
     String filter = "resource.type=gae_app";
     filter += " AND resource.labels.module_id=" + moduleId;
     filter += " AND textPayload:" + textPayload;
+    String timestamp = req.getParameter( "timestamp" );
+    if (timestamp != null) {
+      filter += " AND timestamp >= " + timestamp;
+    }
 
     try (Logging logging = options.getService()) {
       LOGGER.info( "start list log entries with filter: {}", filter);
       long start = System.currentTimeMillis();
-      Page<LogEntry> entries = logging.listLogEntries(EntryListOption.filter(filter));
+      Page<LogEntry> entries = logging.listLogEntries( EntryListOption.filter( filter));
       long end = System.currentTimeMillis();
       LOGGER.info( "time to find logs {} for filter {}", (end - start), filter);
-      Iterator<LogEntry> entryIterator = entries.iterateAll();
+      Iterator<LogEntry> entryIterator = entries.iterateAll().iterator();
       PrintWriter out = resp.getWriter();
       while (entryIterator.hasNext()) {
         out.println(entryIterator.next());
