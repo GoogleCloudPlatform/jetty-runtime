@@ -149,7 +149,6 @@ public class PerfCheckTest {
         .appendLiteral(':')
         .appendValue(ChronoField.SECOND_OF_MINUTE, 2).toFormatter();
 
-
     System.out.println("now:" + dtf //DateTimeFormatter.ISO_OFFSET_DATE_TIME
                             .withZone( ZoneId.systemDefault() ).format( Instant.now() ) );
     String timestamp = dtf.withZone( ZoneId.systemDefault() )

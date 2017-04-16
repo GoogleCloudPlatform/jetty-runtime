@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URLEncoder;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -71,7 +72,7 @@ public class LogServlet extends HttpServlet {
     filter += " AND textPayload:" + textPayload;
     String timestamp = req.getParameter( "timestamp" );
     if (timestamp != null) {
-      filter += " AND timestamp >= " + timestamp;
+      filter += " AND timestamp >= " + URLEncoder.encode(timestamp);
     }
 
     try (Logging logging = options.getService()) {
