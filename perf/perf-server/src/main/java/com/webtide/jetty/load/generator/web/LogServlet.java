@@ -69,10 +69,10 @@ public class LogServlet extends HttpServlet {
 
     String filter = "resource.type=gae_app";
     filter += " AND resource.labels.module_id=" + moduleId;
-    filter += " AND textPayload:" + textPayload;
+    filter += " AND textPayload:'" + textPayload + "'";
     String timestamp = req.getParameter( "timestamp" );
     if (timestamp != null) {
-      filter += " AND timestamp >= " + URLEncoder.encode(timestamp);
+      filter += " AND timestamp >= '" + URLEncoder.encode(timestamp) + "'";
     }
 
     try (Logging logging = options.getService()) {

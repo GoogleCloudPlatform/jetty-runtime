@@ -17,12 +17,25 @@
 package com.google.cloud.runtime.jetty.perf;
 
 import com.beust.jcommander.JCommander;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang.math.NumberUtils;
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.client.api.Request;
+import org.eclipse.jetty.server.HttpConfiguration;
+import org.eclipse.jetty.server.HttpConnectionFactory;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.handler.StatisticsHandler;
+import org.eclipse.jetty.server.session.HashSessionIdManager;
+import org.eclipse.jetty.server.session.SessionHandler;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.servlet.StatisticsServlet;
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.Logger;
 
 import org.eclipse.jetty.util.ssl.SslContextFactory;
+import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.mortbay.jetty.load.generator.LoadGenerator;
 import org.mortbay.jetty.load.generator.Resource;
 import org.mortbay.jetty.load.generator.listeners.CollectorInformations;
@@ -34,19 +47,38 @@ import org.mortbay.jetty.load.generator.listeners.report.GlobalSummaryListener;
 import org.mortbay.jetty.load.generator.starter.LoadGeneratorStarter;
 import org.mortbay.jetty.load.generator.starter.LoadGeneratorStarterArgs;
 
+import java.io.IOException;
+
 import java.net.InetAddress;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.Map;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * Runner performance testing
  */
 public class PerfRunner {
 
-  private static final Logger LOGGER = Log.getLogger( PerfRunner.class );  
+  private static final Logger LOGGER = Log.getLogger( PerfRunner.class );
+
+  private volatile RunStatus runStatus = new RunStatus( Eta.NOT_STARTED );
+
+  Server server;
+
+  ServerConnector connector;
+
+  StatisticsHandler statisticsHandler = new StatisticsHandler();
   
   public static void main(String[] args) throws Exception {
 
@@ -67,10 +99,20 @@ public class PerfRunner {
 
     getValuesFromEnvVar( runnerArgs );
     LOGGER.info( "runnerArgs:" + runnerArgs.toString() );
-    ensureNetwork(runnerArgs,20);
+    ensureNetwork(runnerArgs,10);
+    new PerfRunner().run( runnerArgs );
+  }
 
+  public void run(LoadGeneratorStarterArgs runnerArgs) throws Exception {
     ExecutorService executorService = Executors.newCachedThreadPool();
-    LoadGeneratorRunner runner = new LoadGeneratorRunner( runnerArgs, executorService);
+
+    String jettyRun = runnerArgs.getParams().get( "jettyRun" );
+    if (jettyRun != null && Boolean.parseBoolean( jettyRun )) {
+      startJetty(runnerArgs);
+    }
+
+
+    LoadGeneratorRunner runner = new LoadGeneratorRunner( runnerArgs, executorService, this);
     String hostname = "";
     try {
       hostname = InetAddress.getLocalHost().getHostName();
@@ -81,7 +123,9 @@ public class PerfRunner {
     runner.host = hostname;
     try {
       LOGGER.info( "start load test" );
+      this.runStatus.eta = Eta.RUNNING;
       runner.run();
+      this.runStatus.eta = Eta.FINISHED;
       Instant endInstant = Instant.now();
       LOGGER.info( "load test done start {} end {}", startInstant, endInstant );
     } catch ( Exception e ) {
@@ -127,12 +171,20 @@ public class PerfRunner {
     LOGGER.info( "----------------------------------------------------");
     LOGGER.info( "" );
 
+    this.runStatus = new RunStatus( latencyTimeSummary.getTotalCount(),
+                                    fromNanostoMillis(latencyTimeSummary.getMaxValue()),
+                                    fromNanostoMillis(latencyTimeSummary.getMinValue()),
+                                    fromNanostoMillis(Math.round(latencyTimeSummary.getMean())),
+                                    fromNanostoMillis(latencyTimeSummary.getValue50()),
+                                    fromNanostoMillis(latencyTimeSummary.getValue90()),
+                                    Eta.FINISHED);
+
     // force stop executor as it's finished now
     executorService.shutdownNow();
 
     // well it's only for test
     String returnExit = runnerArgs.getParams().get( "returnExit" );
-    if (returnExit != null || Boolean.parseBoolean( returnExit )) {
+    if (returnExit != null && Boolean.parseBoolean( returnExit )) {
       LOGGER.info( "returnExit" );
       return;
     }
@@ -140,10 +192,94 @@ public class PerfRunner {
     while ( true ) {
       Thread.sleep( 60000 );
     }
+  }
 
+  public void startJetty(LoadGeneratorStarterArgs runnerArgs) throws Exception {
+
+    QueuedThreadPool serverThreads = new QueuedThreadPool();
+    serverThreads.setName( "server" );
+    server = new Server( serverThreads );
+    server.setSessionIdManager( new HashSessionIdManager() );
+    connector = new ServerConnector( server, new HttpConnectionFactory( new HttpConfiguration() ) );
+    String jettyPort = runnerArgs.getParams().get( "jettyPort" );
+    int port = NumberUtils.toInt( jettyPort, 8080 );
+    connector.setPort( port );
+
+    server.addConnector( connector );
+    server.setHandler( statisticsHandler );
+    ServletContextHandler statsContext = new ServletContextHandler( statisticsHandler, "/" );
+    statsContext.addServlet( new ServletHolder( new StatisticsServlet() ), "/stats" );
+    RunStatusHandler runStatusHandler = new RunStatusHandler(this);
+    statsContext.addServlet( new ServletHolder( runStatusHandler ), "/status" );
+    statsContext.setSessionHandler( new SessionHandler() );
+    server.start();
+  }
+
+  public static class RunStatus {
+    private Date timestamp;
+    private Eta eta;
+    private long requestNumber;
+    private long maxLatency;
+    private long minLatency;
+    private long aveLatency;
+    // well checkstyle do not allow 50 (Abbreviation in name must contain no more than '1')
+    private long latency5;
+    private long latency9;
+
+    public RunStatus( Eta eta ) {
+      this.eta = eta;
+      this.timestamp = new Date();
+    }
+
+    public RunStatus( long requestNumber, long maxLatency, long minLatency, long aveLatency, //
+                      long latency50, long latency90, Eta eta ) {
+      this(eta);
+      this.requestNumber = requestNumber;
+      this.maxLatency = maxLatency;
+      this.minLatency = minLatency;
+      this.aveLatency = aveLatency;
+      this.latency5 = latency50;
+      this.latency9 = latency90;
+    }
+
+    public long getRequestNumber() {
+      return requestNumber;
+    }
+
+    public long getMaxLatency() {
+      return maxLatency;
+    }
+
+    public long getMinLatency() {
+      return minLatency;
+    }
+
+    public long getAveLatency() {
+      return aveLatency;
+    }
+
+    public long getLatency50() {
+      return latency5;
+    }
+
+    public long getLatency90() {
+      return latency9;
+    }
+
+    public Eta getEta() {
+      return eta;
+    }
+
+    public String getTimestamp() {
+      return DateTimeFormatter.ISO_DATE_TIME.withZone( ZoneId.systemDefault() )
+          .format( timestamp.toInstant() );
+    }
 
   }
 
+  public enum Eta {
+    RUNNING,FINISHED,NOT_STARTED;
+  }
 
   private static long fromNanostoMillis(long nanosValue) {
     return TimeUnit.MILLISECONDS.convert( nanosValue, TimeUnit.NANOSECONDS );
@@ -167,7 +303,7 @@ public class PerfRunner {
         new LatencyTimeDisplayListener( 10, 10, TimeUnit.SECONDS );
 
     public LoadGeneratorRunner( LoadGeneratorStarterArgs runnerArgs,
-                                ExecutorService executorService ) {
+                                ExecutorService executorService, PerfRunner perfRunner ) {
       super( runnerArgs );
       this.executorService = executorService;
       this.latencyTimeDisplayListener.addValueListener( histogram -> {
@@ -185,6 +321,15 @@ public class PerfRunner {
         LOGGER.info( "perfmetric_run:90_latency:"
                          + fromNanostoMillis( histogram.getValueAtPercentile( 90 )));
         LOGGER.info( "----------------------------------------------------");
+
+        perfRunner.runStatus = new RunStatus( histogram.getTotalCount(),
+                                              fromNanostoMillis(histogram.getMaxValue()),
+                                              fromNanostoMillis(histogram.getMinValue()),
+                                              fromNanostoMillis(Math.round(histogram.getMean())),
+                                              fromNanostoMillis(histogram.getValueAtPercentile(50)),
+                                              fromNanostoMillis(histogram.getValueAtPercentile(90)),
+                                              Eta.RUNNING);
+
       } );
     }
 
@@ -211,6 +356,23 @@ public class PerfRunner {
     @Override
     public ExecutorService getExecutorService() {
       return this.executorService;
+    }
+  }
+
+  static class RunStatusHandler extends HttpServlet {
+
+    final ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
+
+    final PerfRunner perfRunner;
+
+    public RunStatusHandler( PerfRunner perfRunner ) {
+      this.perfRunner = perfRunner;
+    }
+
+    @Override
+    protected void doGet( HttpServletRequest request, HttpServletResponse response )
+        throws ServletException, IOException {
+      objectMapper.writeValue( response.getOutputStream(), this.perfRunner.runStatus );
     }
   }
 

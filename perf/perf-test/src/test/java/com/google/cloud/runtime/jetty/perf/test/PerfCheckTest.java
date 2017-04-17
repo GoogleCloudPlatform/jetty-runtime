@@ -16,11 +16,7 @@
 
 package com.google.cloud.runtime.jetty.perf.test;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-
 import com.google.cloud.runtime.jetty.util.HttpUrlUtil;
-
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -34,12 +30,13 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
-import java.time.format.ResolverStyle;
 import java.time.format.SignStyle;
 import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class PerfCheckTest {
 

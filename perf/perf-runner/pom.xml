@@ -24,6 +24,7 @@
 		<transaction_rate>2800</transaction_rate>
 		<scheme>https</scheme>
 		<users>12</users>
+		<jettyPort>8080</jettyPort>
 		<profile.json>${basedir}/src/main/appengine/loadgenerator_profile.groovy</profile.json>
 		<warmup.number>2</warmup.number>
 		<runner.instances>1</runner.instances>
