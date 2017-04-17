@@ -15,13 +15,20 @@ The layout of this image is intended to mostly mimic the official [docker-jetty]
 Arguments passed to the `docker run` command are passed to Jetty, so the 
 configuration of the jetty server can be seen with a command like:
 ```console
-docker run launcher.gcr.io/google/jetty --list-config
+docker run gcr.io/google-appengine/jetty --list-config
 ```
 
 Alternate commands can also be passed to the `docker run` command, so the
 image can be explored with 
 ```console
 docker run -it --rm launcher.gcr.io/google/jetty bash
+```
+
+Various environment variables (see below) can also be used to set jetty properties, enable modules and
+disable modules.  These variables may be set either in an `app.yaml` or passed in to a docker run
+command eg.
+```console
+docker run -it --rm -e JETTY_PROPERTIES=jetty.http.idleTimeout=10000 launcher.gcr.io/google/jetty 
 ```
 
 To update the server configuration in a derived Docker image, the `Dockerfile` may
@@ -38,13 +45,13 @@ When using App Engine Flexible, you can use the runtime without worrying about D
 runtime: java
 env: flex
 ```
-The runtime image `gcr.io/google-appengine/jetty` will be automatically selected if you are attempting to deploy a WAR (`*.war` file).
+The runtime image `launcher.gcr.io/google/jetty` will be automatically selected if you are attempting to deploy a WAR (`*.war` file).
 
 If you want to use the image as a base for a custom runtime, you can specify `runtime: custom` in your `app.yaml` and then
 write the Dockerfile like this:
 
 ```dockerfile
-FROM gcr.io/google-appengine/jetty
+FROM launcher.gcr.io/google/jetty
 ADD your-application.war $JETTY_BASE/webapps/root.war
 ```
       
@@ -70,12 +77,12 @@ The [/docker-entrypoint.bash](https://github.com/GoogleCloudPlatform/openjdk-run
 for the image is inherited from the openjdk-runtime and its capabilities are described in the associated 
 [README](https://github.com/GoogleCloudPlatform/openjdk-runtime/blob/master/README.md)
 
-This image updates the docker `CMD` and appends to the
-[setup-env.bash](https://github.com/GoogleCloudPlatform/openjdk-runtime/blob/master/openjdk8/src/main/docker/setup-env.bash)
+This image updates the docker `CMD` and adds the 
+[/setup-env.d/50-jetty.bash](https://github.com/GoogleCloudPlatform/openjdk-runtime/blob/master/openjdk8/src/main/docker/50-jetty.bash)
 script to include options and arguments to run the Jetty container, unless an executable argument is passed to the docker image.
-Additional environment variables are set including:
+Additional environment variables are used/set including:
 
-|Env Var           | Maven Prop      | Value                                                |
+|Env Var           | Maven Prop      | Value/Comment                                        |
 |------------------|-----------------|------------------------------------------------------|
 |`JETTY_VERSION`   |`jetty9.version` |                                                      |
 |`GAE_IMAGE_NAME`  |                 |`jetty`                                               |
@@ -83,6 +90,9 @@ Additional environment variables are set including:
 |`JETTY_HOME`      |`jetty.home`     |`/opt/jetty-home`                                     |
 |`JETTY_BASE`      |`jetty.base`     |`/var/lib/jetty`                                      |
 |`TMPDIR`          |                 |`/tmp/jetty`                                          |
+|`JETTY_PROPERTIES`|                 |Comma separated list of `name=value` pairs appended to `$JETTY_ARGS` |
+|`JETTY_MODULES_ENABLED`|            |Comma separated list of modules to enable by appending to `$JETTY_ARGS` |
+|`JETTY_MODULES_DISABLED`|           |Comma separated list of modules to disable by removing from `$JETTY_BASE/start.d` |
 |`JETTY_ARGS`      |                 |`-Djetty.base=$JETTY_BASE -jar $JETTY_HOME/start.jar` |
 |`ROOT_WAR`        |                 |`$JETTY_BASE/webapps/root.war`                        |
 |`ROOT_DIR`        |                 |`$JETTY_BASE/webapps/root`                            |

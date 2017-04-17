@@ -1,0 +1,4 @@
+--create-startd
+
+--add-to-start=server,webapp,http,deploy,jsp,jstl,resources
+
