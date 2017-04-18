@@ -75,10 +75,11 @@ public class PerfRunner {
   private volatile RunStatus runStatus = new RunStatus( Eta.NOT_STARTED );
 
   Server server;
-
   ServerConnector connector;
-
   StatisticsHandler statisticsHandler = new StatisticsHandler();
+
+  Date runStartDate;
+  Date runEndDate;
   
   public static void main(String[] args) throws Exception {
 
@@ -123,8 +124,12 @@ public class PerfRunner {
     runner.host = hostname;
     try {
       LOGGER.info( "start load test" );
+      this.runStartDate = new Date();
+      this.runStatus.startDate = this.runStartDate;
       this.runStatus.eta = Eta.RUNNING;
       runner.run();
+      this.runEndDate = new Date();
+      this.runStatus.endDate = this.runEndDate;
       this.runStatus.eta = Eta.FINISHED;
       Instant endInstant = Instant.now();
       LOGGER.info( "load test done start {} end {}", startInstant, endInstant );
@@ -177,7 +182,9 @@ public class PerfRunner {
                                     fromNanostoMillis(Math.round(latencyTimeSummary.getMean())),
                                     fromNanostoMillis(latencyTimeSummary.getValue50()),
                                     fromNanostoMillis(latencyTimeSummary.getValue90()),
-                                    Eta.FINISHED);
+                                    Eta.FINISHED) //
+                      .startDate( this.runStartDate ) //
+                      .endDate( this.runEndDate );
 
     // force stop executor as it's finished now
     executorService.shutdownNow();
@@ -217,6 +224,8 @@ public class PerfRunner {
 
   public static class RunStatus {
     private Date timestamp;
+    private Date startDate;
+    private Date endDate;
     private Eta eta;
     private long requestNumber;
     private long maxLatency;
@@ -240,6 +249,16 @@ public class PerfRunner {
       this.aveLatency = aveLatency;
       this.latency5 = latency50;
       this.latency9 = latency90;
+    }
+
+    public RunStatus startDate( Date startDate ) {
+      this.startDate = startDate;
+      return this;
+    }
+
+    public RunStatus endDate( Date endDate ) {
+      this.endDate = endDate;
+      return this;
     }
 
     public long getRequestNumber() {
@@ -271,14 +290,26 @@ public class PerfRunner {
     }
 
     public String getTimestamp() {
-      return DateTimeFormatter.ISO_DATE_TIME.withZone( ZoneId.systemDefault() )
-          .format( timestamp.toInstant() );
+      return dateToString( this.timestamp );
     }
 
+    public String getStartDate() {
+      return dateToString( startDate );
+    }
+
+    public String getEndDate() {
+      return dateToString( endDate );
+    }
   }
 
   public enum Eta {
     RUNNING,FINISHED,NOT_STARTED;
+  }
+
+  private static String dateToString(Date date) {
+    return date == null ? "" : //
+        DateTimeFormatter.ISO_DATE_TIME.withZone( ZoneId.systemDefault() )
+        .format( date.toInstant() );
   }
 
   private static long fromNanostoMillis(long nanosValue) {
@@ -328,7 +359,7 @@ public class PerfRunner {
                                               fromNanostoMillis(Math.round(histogram.getMean())),
                                               fromNanostoMillis(histogram.getValueAtPercentile(50)),
                                               fromNanostoMillis(histogram.getValueAtPercentile(90)),
-                                              Eta.RUNNING);
+                                              Eta.RUNNING).startDate( perfRunner.runStartDate );
 
       } );
     }
