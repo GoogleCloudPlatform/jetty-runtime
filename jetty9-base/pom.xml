@@ -112,7 +112,7 @@
           </execution>
           <execution>
             <id>gcp-jars</id>
-            <phase>prepare-package</phase>
+            <phase>package</phase>
             <goals>
               <goal>copy-dependencies</goal>
             </goals>
@@ -134,7 +134,7 @@
         <executions>
           <execution>
             <id>add-jetty-modules</id>
-            <phase>prepare-package</phase>
+            <phase>package</phase>
             <goals>
               <goal>exec</goal>
             </goals>
@@ -155,7 +155,7 @@
         <artifactId>maven-assembly-plugin</artifactId>
         <executions>
           <execution>
-            <phase>prepare-package</phase>
+            <phase>package</phase>
             <goals>
               <goal>single</goal>
             </goals>
