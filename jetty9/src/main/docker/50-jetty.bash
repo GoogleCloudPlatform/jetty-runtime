@@ -19,13 +19,25 @@ if [ ! -e "$ROOT_DIR" -a -d /app ]; then
   ln -s /app "$ROOT_DIR"
 fi
 
+# If a webapp root directory exist, use it as the work directory
 if [ -d "$ROOT_DIR" ]; then
   cd "$ROOT_DIR"
 fi
 
-# move command line args to $JETTY_ARGS
-export JETTY_ARGS="${@/$1/}"
-set - "$1"
+# TODO update docker-entrypoint.bash to do this before calling setup scripts
+# If the first argument is the java command
+if [ "java" = "$1" -o "$(which java)" = "$1" ] ; then
+  # ignore it as java is the default command
+  shift
+fi
+
+# If the first argument is not executable
+if ! type "$1" &>/dev/null; then
+  # The arguments are additional arguments for the default command to run jetty
+  # move command line args to $JETTY_ARGS
+  export JETTY_ARGS="$@"
+  set - "$(which java)"
+fi
 
 # Check for start.jar
 if [ "$(echo $JETTY_ARGS | egrep start.jar | wc -l )" = "0" ]; then
