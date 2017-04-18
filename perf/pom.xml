@@ -30,12 +30,13 @@
 
   <properties>
     <gcloud.api.version>0.13.0-beta</gcloud.api.version>
+    <running.time>10</running.time>
+    <running.time.unit>m</running.time.unit>
   </properties>
 
   <modules>
     <module>perf-server</module>
     <module>perf-runner</module>
-    <module>perf-test</module>
   </modules>
 
   <build>
@@ -52,6 +53,15 @@
       </plugins>
     </pluginManagement>
   </build>
+
+  <profiles>
+    <profile>
+      <id>perf-test</id>
+      <modules>
+        <module>perf-test</module>
+      </modules>
+    </profile>
+  </profiles>
 
   <repositories>
     <repository>

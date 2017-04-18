@@ -23,6 +23,11 @@
 
   <dependencies>
     <dependency>
+      <groupId>com.google.cloud.runtimes.perf</groupId>
+      <artifactId>perf-runner</artifactId>
+      <version>0.1.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
@@ -98,10 +103,13 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
+          <!-- FIXME this should be dynamic as it depends on how long the load test run -->
+          <forkedProcessTimeoutInSeconds>1200</forkedProcessTimeoutInSeconds>
           <systemPropertyVariables>
             <app.deploy.web>jetty-runtime-perf-app</app.deploy.web>
             <app.deploy.runner>jetty-runtime-perf-runner</app.deploy.runner>
             <app.deploy.project>${app.deploy.project}</app.deploy.project>
+            <running.time>${running.time}</running.time>
           </systemPropertyVariables>
         </configuration>
       </plugin>

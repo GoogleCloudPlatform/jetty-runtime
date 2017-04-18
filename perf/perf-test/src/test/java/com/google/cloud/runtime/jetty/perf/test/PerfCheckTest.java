@@ -16,8 +16,20 @@
 
 package com.google.cloud.runtime.jetty.perf.test;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+
+import com.google.cloud.runtime.jetty.perf.PerfRunner;
 import com.google.cloud.runtime.jetty.util.HttpUrlUtil;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.eclipse.jetty.client.HttpClient;
+import org.eclipse.jetty.client.api.ContentResponse;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -32,16 +44,81 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.SignStyle;
 import java.time.temporal.ChronoField;
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
 
 public class PerfCheckTest {
 
+  private HttpClient httpClient;
+
+  private ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
+
+  @Before
+  public void initialize() throws Exception {
+    this.httpClient = new HttpClient(new SslContextFactory(true) );
+    httpClient.start();
+  }
+
+  @After
+  public void shutdown() throws Exception {
+    if (!this.httpClient.isStopped()) {
+      this.httpClient.stop();
+    }
+  }
+
   @Test
   public void checkQps() throws Exception {
+    String runnerName = System.getProperty("app.deploy.runner");
+    Assert.assertNotNull(runnerName);
+    String projectId = System.getProperty("app.deploy.project");
+    Assert.assertNotNull(projectId);
+    // construct the remote uri
+    StringBuilder baseUriString = new StringBuilder();
+    baseUriString.append("https://")
+        .append(runnerName)
+        .append("-dot-");
+    baseUriString.append(projectId)
+        .append(".")
+        .append(System.getProperty("app.deploy.host","appspot.com"));
+    PerfRunner.RunStatus runStatus = getStatus( baseUriString.toString() );
+    System.out.println( "qps:" + runStatus.getQps() //
+                            + ", ave latency:" + runStatus.getAveLatency() //
+                            + ", latency 50:" + runStatus.getLatency50() //
+                            + ", latency 90:" + runStatus.getLatency90());
+
+  }
+
+  private PerfRunner.RunStatus getStatus( String baseUri) throws Exception {
+    // FIXME could depends on time unit as well
+    long timeoutMinutes = Long.getLong( "running.time", 15 );
+    long start = new Date().getTime();
+    while (true) {
+      ContentResponse contentResponse = httpClient.newRequest( baseUri + "/status" ).send();
+      if (contentResponse.getStatus() == 200) {
+        String json = contentResponse.getContentAsString();
+        System.out.println( "json:" + json );
+        PerfRunner.RunStatus runStatus = objectMapper.readValue( json, PerfRunner.RunStatus.class );
+        System.out.println( "runStatus:" + runStatus.getEta() );
+        if (runStatus.getEta() == PerfRunner.Eta.FINISHED) {
+          return runStatus;
+        }
+      }
+      if (new Date().getTime() - start
+          > TimeUnit.MILLISECONDS.convert( timeoutMinutes, TimeUnit.MINUTES ) ) {
+        throw new RuntimeException( "cannot get status 200 after "
+                                        + timeoutMinutes + " minutes" );
+      }
+      // still not finished so we wait
+      Thread.sleep( 10000 );
+    }
+  }
+
+  @Test
+  @Ignore
+  public void checkQpsWithLogs() throws Exception {
 
     String serverName = System.getProperty("app.deploy.web");
     Assert.assertNotNull(serverName);

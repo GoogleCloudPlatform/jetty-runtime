@@ -17,6 +17,7 @@
 package com.google.cloud.runtime.jetty.perf;
 
 import com.beust.jcommander.JCommander;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang.math.NumberUtils;
 import org.eclipse.jetty.client.HttpClient;
@@ -232,9 +233,14 @@ public class PerfRunner {
     private long minLatency;
     private long aveLatency;
     // well checkstyle do not allow 50 (Abbreviation in name must contain no more than '1')
+    @JsonProperty("latency50")
     private long latency5;
+    @JsonProperty("latency90")
     private long latency9;
     private long qps;
+
+    public RunStatus() {
+    }
 
     public RunStatus( Eta eta ) {
       this.eta = eta;
