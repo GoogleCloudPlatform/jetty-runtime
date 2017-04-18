@@ -19,6 +19,10 @@ if [ ! -e "$ROOT_DIR" -a -d /app ]; then
   ln -s /app "$ROOT_DIR"
 fi
 
+if [ -d "$ROOT_DIR" ]; then
+  cd "$ROOT_DIR"
+fi
+
 # move command line args to $JETTY_ARGS
 export JETTY_ARGS="${@/$1/}"
 set - "$1"
