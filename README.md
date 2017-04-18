@@ -91,8 +91,8 @@ Additional environment variables are used/set including:
 |`JETTY_BASE`      |`jetty.base`     |`/var/lib/jetty`                                      |
 |`TMPDIR`          |                 |`/tmp/jetty`                                          |
 |`JETTY_PROPERTIES`|                 |Comma separated list of `name=value` pairs appended to `$JETTY_ARGS` |
-|`JETTY_MODULES_ENABLED`|            |Comma separated list of modules to enable by appending to `$JETTY_ARGS` |
-|`JETTY_MODULES_DISABLED`|           |Comma separated list of modules to disable by removing from `$JETTY_BASE/start.d` |
+|`JETTY_MODULES_ENABLE`|             |Comma separated list of modules to enable by appending to `$JETTY_ARGS` |
+|`JETTY_MODULES_DISABLE`|            |Comma separated list of modules to disable by removing from `$JETTY_BASE/start.d` |
 |`JETTY_ARGS`      |                 |`-Djetty.base=$JETTY_BASE -jar $JETTY_HOME/start.jar` |
 |`ROOT_WAR`        |                 |`$JETTY_BASE/webapps/root.war`                        |
 |`ROOT_DIR`        |                 |`$JETTY_BASE/webapps/root`                            |
@@ -113,7 +113,7 @@ java $JAVA_OPTS \
 ```
 ## Logging
 This image is configured to use [Java Util Logging](https://docs.oracle.com/javase/8/docs/api/java/util/logging/package-summary.html)(JUL) to capture all logging from 
-the container and it's dependencies.  Applications that also use the JUL API will inherit the same logging configuration.
+the container and its dependencies.  Applications that also use the JUL API will inherit the same logging configuration.
 
 By default JUL is configured to use a [ConsoleHandler](https://docs.oracle.com/javase/8/docs/api/java/util/logging/ConsoleHandler.html) to send logs to the `stderr` of the container process. When run on as a GCP deployment, all output to `stderr` is captured and is available via the Stackdriver logging console, however more detailed and integrated logs are available if the Stackdriver logging mechanism is used directly (see below).
 
@@ -167,15 +167,22 @@ docker run -it --rm \
 ...
 ```
 
-### Enhanced Stackdriver Logging
-When running on the Google Cloud Platform Flex environment, the Stackdriver logging can be enhanced with additional information about the environment by adding the following lines to the `logging.properties`: 
+### Enhanced Stackdriver Logging (BETA!)
+When running on the Google Cloud Platform Flex environment, the Java Util Logging can be configured to send logs to Google Stackdriver Logging by providing a `logging.properties` file that configures a [LoggingHandler](http://googlecloudplatform.github.io/google-cloud-java/0.10.0/apidocs/com/google/cloud/logging/LoggingHandler.html) as follows:
 ```
+handlers=com.google.cloud.logging.LoggingHandler
+com.google.cloud.logging.LoggingHandler.level=FINE
+com.google.cloud.logging.LoggingHandler.log=gae_app.log
 com.google.cloud.logging.LoggingHandler.resourceType=gae_app
 com.google.cloud.logging.LoggingHandler.enhancers=com.google.cloud.logging.GaeFlexLoggingEnhancer
-```
-This enables the [GaeFlexLoggingEnhancer](http://googlecloudplatform.github.io/google-cloud-java/0.10.0/apidocs/com/google/cloud/logging/GaeFlexLoggingEnhancer.html), which enhances the logs generated be linking them to the `nginx` request log in the logging console by `traceid` (The traceId for a request on a Google Cloud Platform is obtained from the `setCurrentTraceId` HTTP header as the first field of the `'/'` delimited value).    
+com.google.cloud.logging.LoggingHandler.formatter=java.util.logging.SimpleFormatter
+java.util.logging.SimpleFormatter.format=%3$s: %5$s%6$s
 
-When this image is deployed on a GCP environment, then the `gcp` module will automatically call the [setCurrentTraceId](http://googlecloudplatform.github.io/google-cloud-java/0.10.0/apidocs/com/google/cloud/logging/GaeFlexLoggingEnhancer.html#setCurrentTraceId-java.lang.String-) for any thread handling a request.  
+```
+
+This uses the [GaeFlexLoggingEnhancer](http://googlecloudplatform.github.io/google-cloud-java/0.10.0/apidocs/com/google/cloud/logging/GaeFlexLoggingEnhancer.html) to enhances the logs generated be linking them to the `nginx` request log in the logging console by `traceid` (The traceId for a request on a Google Cloud Platform is obtained from the `setCurrentTraceId` HTTP header as the first field of the `'/'` delimited value).    
+
+When an image so configured is deployed on a GCP environment, then the `gcp` module will automatically call the [setCurrentTraceId](http://googlecloudplatform.github.io/google-cloud-java/0.10.0/apidocs/com/google/cloud/logging/GaeFlexLoggingEnhancer.html#setCurrentTraceId-java.lang.String-) for any thread handling a request.  
 
 
 ## Extending the image
