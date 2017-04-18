@@ -182,7 +182,7 @@ public class PerfRunner {
                                     fromNanostoMillis(Math.round(latencyTimeSummary.getMean())),
                                     fromNanostoMillis(latencyTimeSummary.getValue50()),
                                     fromNanostoMillis(latencyTimeSummary.getValue90()),
-                                    Eta.FINISHED) //
+                                    Eta.FINISHED, qps) //
                       .startDate( this.runStartDate ) //
                       .endDate( this.runEndDate );
 
@@ -234,6 +234,7 @@ public class PerfRunner {
     // well checkstyle do not allow 50 (Abbreviation in name must contain no more than '1')
     private long latency5;
     private long latency9;
+    private long qps;
 
     public RunStatus( Eta eta ) {
       this.eta = eta;
@@ -241,7 +242,7 @@ public class PerfRunner {
     }
 
     public RunStatus( long requestNumber, long maxLatency, long minLatency, long aveLatency, //
-                      long latency50, long latency90, Eta eta ) {
+                      long latency50, long latency90, Eta eta, long qps ) {
       this(eta);
       this.requestNumber = requestNumber;
       this.maxLatency = maxLatency;
@@ -249,6 +250,7 @@ public class PerfRunner {
       this.aveLatency = aveLatency;
       this.latency5 = latency50;
       this.latency9 = latency90;
+      this.qps = qps;
     }
 
     public RunStatus startDate( Date startDate ) {
@@ -287,6 +289,10 @@ public class PerfRunner {
 
     public Eta getEta() {
       return eta;
+    }
+
+    public long getQps() {
+      return qps;
     }
 
     public String getTimestamp() {
@@ -353,14 +359,21 @@ public class PerfRunner {
                          + fromNanostoMillis( histogram.getValueAtPercentile( 90 )));
         LOGGER.info( "----------------------------------------------------");
 
-        perfRunner.runStatus = new RunStatus( histogram.getTotalCount(),
-                                              fromNanostoMillis(histogram.getMaxValue()),
-                                              fromNanostoMillis(histogram.getMinValue()),
-                                              fromNanostoMillis(Math.round(histogram.getMean())),
-                                              fromNanostoMillis(histogram.getValueAtPercentile(50)),
-                                              fromNanostoMillis(histogram.getValueAtPercentile(90)),
-                                              Eta.RUNNING).startDate( perfRunner.runStartDate );
+        long timeInSeconds =
+            TimeUnit.SECONDS.convert( histogram.getEndTimeStamp() //
+                                          - histogram.getStartTimeStamp(), //
+                                                       TimeUnit.MILLISECONDS );
+        long qps = histogram.getTotalCount() / timeInSeconds;
 
+        perfRunner.runStatus =
+            new RunStatus( histogram.getTotalCount(), //
+                            fromNanostoMillis(histogram.getMaxValue()), //
+                            fromNanostoMillis(histogram.getMinValue()), //
+                            fromNanostoMillis(Math.round(histogram.getMean())), //
+                            fromNanostoMillis(histogram.getValueAtPercentile(50)), //
+                            fromNanostoMillis(histogram.getValueAtPercentile(90)), //
+                            Eta.RUNNING, qps) //
+                    .startDate( perfRunner.runStartDate );
       } );
     }
 
