@@ -16,7 +16,7 @@
 
 package com.google.cloud.runtimes.jetty.test.smoke;
 
-import com.google.cloud.Page;
+import com.google.api.gax.core.Page;
 import com.google.cloud.logging.LogEntry;
 import com.google.cloud.logging.Logging;
 import com.google.cloud.logging.Logging.EntryListOption;
@@ -24,7 +24,6 @@ import com.google.cloud.logging.LoggingOptions;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Iterator;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -57,9 +56,8 @@ public class LogServlet extends HttpServlet {
     out.println("Log Entries " + filter + ":");
     try (Logging logging = options.getService()) {
       Page<LogEntry> entries = logging.listLogEntries(EntryListOption.filter(filter));
-      Iterator<LogEntry> entryIterator = entries.iterateAll();
-      while (entryIterator.hasNext()) {
-        out.println(entryIterator.next());
+      for (LogEntry entry : entries.iterateAll()) {
+        out.println(entry);
       }
     } catch (Exception ex) {
       throw new ServletException(ex);
