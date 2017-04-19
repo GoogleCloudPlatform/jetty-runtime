@@ -37,6 +37,7 @@
   <modules>
     <module>perf-server</module>
     <module>perf-runner</module>
+    <module>perf-test</module>
   </modules>
 
   <build>

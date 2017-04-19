@@ -75,6 +75,9 @@ public class PerfCheckTest {
     Assert.assertNotNull(runnerName);
     String projectId = System.getProperty("app.deploy.project");
     Assert.assertNotNull(projectId);
+    String testQpsRange = System.getProperty("test.qps.range");
+    Assert.assertNotNull(testQpsRange);
+
     // construct the remote uri
     StringBuilder baseUriString = new StringBuilder();
     baseUriString.append("https://")
@@ -88,6 +91,15 @@ public class PerfCheckTest {
                             + ", ave latency:" + runStatus.getAveLatency() //
                             + ", latency 50:" + runStatus.getLatency50() //
                             + ", latency 90:" + runStatus.getLatency90());
+
+    String[] testTargetQps = testQpsRange.split("-");
+
+
+    Assert.assertFalse("average qps below required levels: " + testTargetQps[0],
+        runStatus.getQps() < Long.parseLong(testTargetQps[0]));
+    Assert.assertFalse("average qps above required levels: " + testTargetQps[1],
+        runStatus.getQps() > Long.parseLong(testTargetQps[1]));
+
 
   }
 
@@ -161,48 +173,37 @@ public class PerfCheckTest {
   }
 
   @Test
-  @Ignore
   public void checkLatency() throws Exception {
 
-    String serverName = System.getProperty("app.deploy.web");
-    Assert.assertNotNull(serverName);
     String runnerName = System.getProperty("app.deploy.runner");
     Assert.assertNotNull(runnerName);
     String projectId = System.getProperty("app.deploy.project");
     Assert.assertNotNull(projectId);
+    String testLatencyRange = System.getProperty("test.latency.range");
+    Assert.assertNotNull(testLatencyRange);
 
     // construct the remote uri
     StringBuilder baseUriString = new StringBuilder();
     baseUriString.append("https://")
-        .append(serverName)
+        .append(runnerName)
         .append("-dot-");
     baseUriString.append(projectId)
         .append(".")
-        .append(System.getProperty("app.deploy.host","appspot.com"))
-        .append("/");
+        .append(System.getProperty("app.deploy.host","appspot.com"));
+    PerfRunner.RunStatus runStatus = getStatus( baseUriString.toString() );
+    System.out.println( "qps:" + runStatus.getQps() //
+        + ", ave latency:" + runStatus.getAveLatency() //
+        + ", latency 50:" + runStatus.getLatency50() //
+        + ", latency 90:" + runStatus.getLatency90());
 
-    URI baseUri = new URI(baseUriString.toString());
+    String[] testTargetLatencies = testLatencyRange.split("-");
 
-    StringBuilder url = new StringBuilder();
-    url.append("/log?");
-    url.append("module_id=").append(runnerName);
-    url.append("&text_payload=").append(URLEncoder.encode("perfmetric:ave_latency:"));
-    appendTimestamp( url );
 
-    URI qpsCheck = baseUri.resolve(url.toString());
+    Assert.assertFalse("average latency below required levels: " + testTargetLatencies[0],
+        runStatus.getAveLatency() < Long.parseLong(testTargetLatencies[0]));
+    Assert.assertFalse("average latency above required levels: " + testTargetLatencies[1],
+        runStatus.getAveLatency() > Long.parseLong(testTargetLatencies[1]));
 
-    System.out.println("param filer:" + qpsCheck);
-
-    HttpURLConnection http = HttpUrlUtil.openTo(qpsCheck);
-    assertThat(http.getResponseCode(), is(200));
-    String responseBody = HttpUrlUtil.getResponseBody(http);
-
-    List<String> lines =
-        new BufferedReader(new StringReader(responseBody)).lines().collect(Collectors.toList());
-
-    // estimated QPS : 1408
-
-    lines.stream().forEach(s -> System.out.println(s.substring(s.lastIndexOf(":"))));
 
   }
 

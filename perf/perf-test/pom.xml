@@ -19,6 +19,8 @@
   <properties>
     <gcloud-projectId-file>${project.build.directory}/gcloud-projectid.properties
     </gcloud-projectId-file>
+    <test.latency.range>5000-6000</test.latency.range>
+    <test.qps.range>4800-5200</test.qps.range>
   </properties>
 
   <dependencies>
@@ -110,6 +112,8 @@
             <app.deploy.runner>jetty-runtime-perf-runner</app.deploy.runner>
             <app.deploy.project>${app.deploy.project}</app.deploy.project>
             <running.time>${running.time}</running.time>
+            <test.latency.range>${test.latency.range}</test.latency.range>
+            <test.qps.range>${test.qps.range}</test.qps.range>
           </systemPropertyVariables>
         </configuration>
       </plugin>
