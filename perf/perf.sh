@@ -33,12 +33,12 @@ case $key in
     shift
     shift
     ;;
-    -tl|--test-latency-range)
+    -tlr|--test-latency-range)
     TEST_LATENCY_RANGE="$2"
     shift
     shift
     ;;
-    -tl|--test-qps-range)
+    -tqr|--test-qps-range)
     TEST_QPS_RANGE="$2"
     shift
     shift
@@ -69,6 +69,18 @@ done
 
 if [ "$RUNNING_TIME" == "required" ]; then
   echo "Usage: perf.sh --running-time # (in minutes)"
+  echo "  client settings"
+  echo "   [ -rt # | --running-time # ]"
+  echo "   [ -tr # | --transaction-rate # ]"
+  echo "   [ -ri # | --runner-instances # ]"
+  echo "  test settings"
+  echo "   [ -tlr #-# | --test-latency-range #-# ]"
+  echo "   [ -tqr #-# | --test-qps-range #-# ]"
+  echo "  runtime settings"
+  echo "   [ -scd | --skip-client-deploy ]"
+  echo "   [ -ssd | --skip-server-deploy ]"
+  echo "   [ --verbose ]"
+  echo "   [ --log-file <filename> ] (perf.log)"
   exit
 fi
 
