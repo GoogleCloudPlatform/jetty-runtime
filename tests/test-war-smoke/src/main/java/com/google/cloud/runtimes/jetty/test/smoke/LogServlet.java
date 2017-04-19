@@ -45,7 +45,7 @@ public class LogServlet extends HttpServlet {
 
     LoggingOptions options = LoggingOptions.getDefaultInstance();
     
-    String filter = "resource.type=gae_app" + " AND resource.labels.module_id=smoke";
+    String filter = "resource.type=gae_app AND resource.labels.module_id=smoke";
     String id = req.getPathInfo();
     if (id.length() > 1 && id.startsWith("/")) {
       id = id.substring(1);

@@ -24,6 +24,7 @@ import com.google.cloud.runtime.jetty.test.AbstractIntegrationTest;
 import com.google.cloud.runtime.jetty.test.annotation.RemoteOnly;
 import com.google.cloud.runtime.jetty.util.HttpUrlUtil;
 
+import org.hamcrest.Matchers;
 import org.junit.Test;
 
 import java.io.BufferedReader;
@@ -55,6 +56,7 @@ public class LoggingIntegrationTest extends AbstractIntegrationTest {
         containsString(id));
     String traceId = lines.stream().filter(s -> s.startsWith("X-Cloud-Trace-Context: "))
         .findFirst().get().split("[ /]")[1];
+    assertThat(traceId,Matchers.notNullValue());
     
     // Hit the LogServlet to query the resulting log entries
     target = getUri().resolve("/log/" + id);
@@ -69,11 +71,17 @@ public class LoggingIntegrationTest extends AbstractIntegrationTest {
     assertThat(line,containsString("textPayload:" + id));
     
     line = in.readLine();
+    while (line != null && !line.contains("severity=INFO")) {
+      line = in.readLine();
+    }
     assertThat(line,containsString("JUL.info:/dump/info/" + id));
     assertThat(line,containsString("appengine.googleapis.com/trace_id=" + traceId));
     assertThat(line,containsString("zone="));
     
     line = in.readLine();
+    while (line != null && !line.contains("severity=INFO")) {
+      line = in.readLine();
+    }
     assertThat(line,containsString("ServletContext.log:/dump/info/" + id));
     assertThat(line,containsString("appengine.googleapis.com/trace_id=" + traceId));
     assertThat(line,containsString("zone="));
