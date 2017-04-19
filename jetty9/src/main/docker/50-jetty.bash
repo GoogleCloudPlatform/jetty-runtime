@@ -66,5 +66,3 @@ if [ "$1" = "java" ]; then
   fi
 fi
 
-echo $@
-
