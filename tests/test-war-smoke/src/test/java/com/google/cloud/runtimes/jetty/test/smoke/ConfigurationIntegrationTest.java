@@ -19,12 +19,11 @@ package com.google.cloud.runtimes.jetty.test.smoke;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.not;
 
 import com.google.cloud.runtime.jetty.test.AbstractIntegrationTest;
+import com.google.cloud.runtime.jetty.test.annotation.RemoteOnly;
 import com.google.cloud.runtime.jetty.util.HttpUrlUtil;
 
-import org.hamcrest.Matchers;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -39,6 +38,7 @@ public class ConfigurationIntegrationTest extends AbstractIntegrationTest {
    * @throws IOException test in error
    */
   @Test
+  @RemoteOnly
   public void testNoDirectoryListing() throws IOException {
 
     URI target = getUri().resolve("/directory/");

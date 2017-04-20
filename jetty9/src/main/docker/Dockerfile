@@ -33,15 +33,14 @@ RUN chown -R jetty:jetty $JETTY_HOME
 ENV JETTY_BASE ${jetty.base}
 ENV TMPDIR /tmp/jetty
 ADD jetty-base $JETTY_BASE
+ADD 50-jetty.bash /setup-env.d/
+ADD 51-jetty-sessions.bash /setup-env.d/
 WORKDIR $JETTY_BASE
-RUN mkdir webapps $TMPDIR \
+RUN mkdir -p webapps $TMPDIR \
  && java -jar $JETTY_HOME/start.jar --add-to-start=setuid \
- && chown -R jetty:jetty $JETTY_BASE $TMPDIR
-
-# Start Jetty directly
-COPY setup-env-ext.bash /tmp/
-RUN cat /tmp/setup-env-ext.bash >> /setup-env.bash \
- && rm /tmp/setup-env-ext.bash
+ && chown -R jetty:jetty $JETTY_BASE $TMPDIR \
+ && chmod +x /setup-env.d/50-jetty.bash \
+ && chmod +x /setup-env.d/51-jetty-sessions.bash
 
 EXPOSE 8080
 CMD ["java","-Djetty.base=${jetty.base}","-jar","${jetty.home}/start.jar"]

@@ -40,44 +40,6 @@ public class ForwardedIntegrationTest extends AbstractIntegrationTest {
    * @throws IOException test in error
    */
   @Test
-  @LocalOnly
-  public void testLocalProto() throws IOException {
-    URI target = getUri().resolve("/dump/info");
-    assertThat(target.getPath(), containsString("/dump/info"));
-
-    HttpURLConnection http = HttpUrlUtil.openTo(target);
-    http.setRequestProperty("X-Forwarded-Proto", "https");
-
-    assertThat(http.getResponseCode(), is(200));
-    String responseBody = HttpUrlUtil.getResponseBody(http);
-    assertThat(responseBody, containsString("scheme=https(secure=true)"));
-  }
-  
-  /**
-   * Validate proxy for header is handled.
-   *
-   * @throws IOException test in error
-   */
-  @Test
-  @LocalOnly
-  public void testLocalFor() throws IOException {
-    URI target = getUri().resolve("/dump/info");
-    assertThat(target.getPath(), containsString("/dump/info"));
-
-    HttpURLConnection http = HttpUrlUtil.openTo(target);
-    http.setRequestProperty("X-Forwarded-For", "1.2.3.4,5.6.7.8");
-
-    assertThat(http.getResponseCode(), is(200));
-    String responseBody = HttpUrlUtil.getResponseBody(http);
-    assertThat(responseBody, containsString("remoteHost/Addr:port=1.2.3.4"));
-  }
-
-  /**
-   * Validate proxy proto header is handled.
-   *
-   * @throws IOException test in error
-   */
-  @Test
   @RemoteOnly
   public void testRemoteUserProto() throws IOException {
     URI target = getUri().resolve("/dump/info");

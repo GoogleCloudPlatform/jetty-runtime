@@ -14,4 +14,5 @@ handlers:
   secure: optional
 
 env_variables:
+  JAVA_USER_OPTS: -Djava.util.logging.config.file=WEB-INF/logging.properties
   SESSIONS: 'datastore'

@@ -35,6 +35,7 @@
   <modules>
     <module>gcloud-testing-core</module>
     <module>test-war-smoke</module>
+    <module>runtimes-common-testing</module>
   </modules>
   <build>
     <pluginManagement>

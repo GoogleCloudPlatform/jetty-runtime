@@ -93,7 +93,7 @@ public class AbstractIntegrationTest {
       }
       uri.append(projectId)
         .append(".")
-        .append(System.getProperty("app.deploy.host","appspot-preview.com"))
+        .append(System.getProperty("app.deploy.host","appspot.com"))
         .append("/");
 
       TIMEOUT_SECONDS = DEFAULT_REMOTE_TIMEOUT_SECONDS;

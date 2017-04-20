@@ -35,6 +35,18 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
+      <groupId>com.google.cloud</groupId>
+      <artifactId>google-cloud-logging</artifactId>
+      <version>${gcloud.api.version}</version>
+      <exclusions>
+        <!-- TODO remove once https://github.com/google/google-oauth-java-client/issues/145 is fixed -->
+        <exclusion>
+          <groupId>javax.servlet</groupId>
+          <artifactId>servlet-api</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
       <groupId>com.google.cloud.runtimes.tests</groupId>
       <artifactId>gcloud-testing-core</artifactId>
       <version>${project.version}</version>
@@ -47,39 +59,45 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>com.spotify</groupId>
-        <artifactId>docker-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>build</id>
-            <phase>package</phase>
-            <goals>
-              <goal>build</goal>
-            </goals>
-            <configuration>
-              <imageName>${project.artifactId}</imageName>
-              <imageTags>
-                <imageTag>${project.version}</imageTag>
-              </imageTags>
-              <dockerDirectory>${project.build.directory}/docker</dockerDirectory>
-              <resources>
-                <resource>
-                  <targetPath>/</targetPath>
-                  <directory>${project.build.directory}</directory>
-                  <include>${project.build.finalName}.war</include>
-                </resource>
-              </resources>
-              <forceTags>true</forceTags>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
   <profiles>
+    <profile>
+      <id>local-docker-build</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.spotify</groupId>
+            <artifactId>docker-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>build</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>build</goal>
+                </goals>
+                <configuration>
+                  <imageName>${project.artifactId}</imageName>
+                  <imageTags>
+                    <imageTag>${project.version}</imageTag>
+                  </imageTags>
+                  <dockerDirectory>${project.build.directory}/docker</dockerDirectory>
+                  <resources>
+                    <resource>
+                      <targetPath>/</targetPath>
+                      <directory>${project.build.directory}</directory>
+                      <include>${project.build.finalName}.war</include>
+                    </resource>
+                  </resources>
+                  <forceTags>true</forceTags>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
     <profile>
       <id>test.local</id>
       <activation>
@@ -237,12 +255,13 @@
                   <workingDirectory>${project.build.directory}/appengine-staging</workingDirectory>
                   <executable>gcloud</executable>
                   <arguments>
-                    <argument>--quiet</argument>
                     <argument>app</argument>
                     <argument>deploy</argument>
                     <argument>app.yaml</argument>
                     <argument>--version</argument>
                     <argument>${maven.build.timestamp}</argument>
+                    <argument>--no-stop-previous-version</argument>
+                    <argument>--quiet</argument>
                   </arguments>
                 </configuration>
               </execution>
@@ -256,11 +275,11 @@
                 <configuration>
                   <executable>gcloud</executable>
                   <arguments>
-                    <argument>--quiet</argument>
                     <argument>app</argument>
                     <argument>services</argument>
                     <argument>delete</argument>
                     <argument>smoke</argument>
+                    <argument>--quiet</argument>
                   </arguments>
                 </configuration>
               </execution>

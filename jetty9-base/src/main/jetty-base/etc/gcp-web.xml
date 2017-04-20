@@ -20,6 +20,6 @@
     </Call>
   </Set>
 
-  <Set name="overrideDescriptor"><Property name="jetty.base"/>/etc/gae-override-web.xml</Set>
+  <Set name="overrideDescriptor"><Property name="jetty.base"/>/etc/gcp-override-web.xml</Set>
  
 </Configure>

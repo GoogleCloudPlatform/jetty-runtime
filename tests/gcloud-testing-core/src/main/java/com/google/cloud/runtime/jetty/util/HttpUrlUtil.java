@@ -52,8 +52,7 @@ public final class HttpUrlUtil {
     while (waiting && System.currentTimeMillis() < expiration) {
       try {
         System.out.print(".");
-        HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
-        http.setRequestProperty("User-Agent", "jetty-runtime/gcloud-util-core(server-up)");
+        HttpURLConnection http = openTo(uri);
         int statusCode = http.getResponseCode();
         if (statusCode != HttpURLConnection.HTTP_OK) {
           log.log(Level.FINER, "Waiting 2s for next attempt");
@@ -87,7 +86,6 @@ public final class HttpUrlUtil {
     log.info("HttpUrlUtil.openTo(" + uri + ")");
     HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
     http.setRequestProperty("User-Agent", "jetty-runtime/gcloud-util-core");
-    http.setInstanceFollowRedirects(false);
     return http;
   }
 
