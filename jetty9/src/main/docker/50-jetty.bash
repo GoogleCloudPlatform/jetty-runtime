@@ -24,25 +24,8 @@ if [ -d "$ROOT_DIR" ]; then
   cd "$ROOT_DIR"
 fi
 
-# TODO update docker-entrypoint.bash to do this before calling setup scripts
-# If the first argument is the java command
-if [ "java" = "$1" -o "$(which java)" = "$1" ] ; then
-  # ignore it as java is the default command
-  shift
-fi
-
-# If the first argument is not executable
-if ! type "$1" &>/dev/null; then
-  # The arguments are additional arguments for the default command to run jetty
-  # move command line args to $JETTY_ARGS
-  export JETTY_ARGS="$@"
-  set - "$(which java)"
-fi
-
-# Check for start.jar
-if [ "$(echo $JETTY_ARGS | egrep start.jar | wc -l )" = "0" ]; then
-  JETTY_ARGS="-Djetty.base=${JETTY_BASE} -jar ${JETTY_HOME}/start.jar $JETTY_ARGS"
-fi
+# Calculate the Jetty args
+export JETTY_ARGS
 
 # Add any Jetty properties to the JETTY_ARGS
 if [ "$JETTY_PROPERTIES" ]; then
@@ -68,7 +51,18 @@ if [ "$PLATFORM" = "gae" ]; then
   JETTY_ARGS="$JETTY_ARGS --module=gcp"
 fi
 
-# add the JETTY_ARGS to the JAVA_OPTS
-export JAVA_OPTS="$JAVA_OPTS $JETTY_ARGS"
+# If command line is running java, then assume it is jetty and mix in JETTY_ARGS
+if [ "$1" = "java" ]; then
+  # Check for jetty start.jar and prepend if missing
+  if [ "$(echo $@ | egrep start.jar | wc -l )" = "0" ]; then
+    shift
+    set -- java -Djetty.base=${JETTY_BASE} -jar ${JETTY_HOME}/start.jar $@
+  fi
 
+  # Append JETTY_ARGS
+  if [ -n "$JETTY_ARGS" ]; then
+    shift
+    set -- java $@ $JETTY_ARGS
+  fi
+fi
 
