@@ -10,8 +10,8 @@ VERBOSE="false"
 LOG_FILE="perf.log"
 
 # test config defaults
-TEST_LATENCY_RANGE=5000-6000
-TEST_QPS_RANGE=4900-5200
+TEST_LATENCY_RANGE=4000-6000
+TEST_QPS_RANGE=4900-5600
 
 while [[ $# -ge 1 ]]
 do
@@ -121,7 +121,7 @@ else
       -Drunner.instances=$RUNNER_INSTANCES \
       -Drunning.time=$RUNNING_TIME \
       -Dtransaction.rate=$TRANSACTION_RATE \
-      > $LOG_FILE 2>&1;
+      >> $LOG_FILE 2>&1;
   fi
 fi
 
