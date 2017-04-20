@@ -20,11 +20,18 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
+import com.google.api.gax.core.Page;
+import com.google.cloud.logging.LogEntry;
+import com.google.cloud.logging.Logging;
+import com.google.cloud.logging.Logging.EntryListOption;
+import com.google.cloud.logging.LoggingOptions;
+import com.google.cloud.logging.Severity;
 import com.google.cloud.runtime.jetty.test.AbstractIntegrationTest;
 import com.google.cloud.runtime.jetty.test.annotation.RemoteOnly;
 import com.google.cloud.runtime.jetty.util.HttpUrlUtil;
 
 import org.hamcrest.Matchers;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.BufferedReader;
@@ -40,7 +47,6 @@ public class LoggingIntegrationTest extends AbstractIntegrationTest {
   @Test
   @RemoteOnly
   public void testLogging() throws Exception {
-
     // Create unique ID to relate request with log entries
     String id = Long.toHexString(System.nanoTime());
 
@@ -49,41 +55,56 @@ public class LoggingIntegrationTest extends AbstractIntegrationTest {
     HttpURLConnection http = HttpUrlUtil.openTo(target);
     assertThat(http.getResponseCode(), is(200));
     String responseBody = HttpUrlUtil.getResponseBody(http);
-    
+
     List<String> lines =
         new BufferedReader(new StringReader(responseBody)).lines().collect(Collectors.toList());
     assertThat(lines.stream().filter(s -> s.startsWith("requestURI=")).findFirst().get(),
         containsString(id));
-    String traceId = lines.stream().filter(s -> s.startsWith("X-Cloud-Trace-Context: "))
-        .findFirst().get().split("[ /]")[1];
-    assertThat(traceId,Matchers.notNullValue());
-    
-    // Hit the LogServlet to query the resulting log entries
-    target = getUri().resolve("/log/" + id);
+    String traceId = lines.stream().filter(s -> s.startsWith("X-Cloud-Trace-Context: ")).findFirst()
+        .get().split("[ /]")[1];
+    assertThat(traceId, Matchers.notNullValue());
 
-    http = HttpUrlUtil.openTo(target);
+    LoggingOptions options = LoggingOptions.getDefaultInstance();
+
+    String filter =
+        "resource.type=gae_app AND resource.labels.module_id=smoke" + " AND textPayload:" + id;
+
+    int expected = 2;
+    try (Logging logging = options.getService()) {
+      Page<LogEntry> entries = logging.listLogEntries(EntryListOption.filter(filter));
+      for (LogEntry entry : entries.iterateAll()) {
+        if (entry.getSeverity() == Severity.INFO) {
+          assertThat(entry.getLogName(), is("gae_app.log"));
+          assertThat(entry.getResource().getType(), is("gae_app"));
+          assertThat(entry.getResource().getLabels().get("module_id"), is("smoke"));
+          assertThat(entry.getResource().getLabels().get("zone"), Matchers.notNullValue());
+          assertThat(entry.getLabels().get("appengine.googleapis.com/trace_id"), is(traceId));
+          assertThat(entry.getLabels().get("appengine.googleapis.com/instance_name"),
+              Matchers.notNullValue());
+
+          if (entry.getPayload().toString().contains("JUL.info:/dump/info/")) {
+            expected--;
+            assertThat(entry.getPayload().toString(), Matchers.containsString(id));
+          }
+          if (entry.getPayload().toString().contains("ServletContext.log:/dump/info")) {
+            expected--;
+            assertThat(entry.getPayload().toString(), Matchers.containsString(id));
+          }
+        }
+      }
+      assertThat(expected, is(0));
+    }
+  }
+
+  @Test
+  public void testClassPath() throws Exception {
+
+    URI target = getUri().resolve("/classloader");
+    HttpURLConnection http = HttpUrlUtil.openTo(target);
     assertThat(http.getResponseCode(), is(200));
-    responseBody = HttpUrlUtil.getResponseBody(http);
-            
-    BufferedReader in = new BufferedReader(new StringReader(responseBody));
-    String line = in.readLine();
-    assertThat(line,containsString("Log Entries "));
-    assertThat(line,containsString("textPayload:" + id));
-    
-    line = in.readLine();
-    while (line != null && !line.contains("severity=INFO")) {
-      line = in.readLine();
-    }
-    assertThat(line,containsString("JUL.info:/dump/info/" + id));
-    assertThat(line,containsString("appengine.googleapis.com/trace_id=" + traceId));
-    assertThat(line,containsString("zone="));
-    
-    line = in.readLine();
-    while (line != null && !line.contains("severity=INFO")) {
-      line = in.readLine();
-    }
-    assertThat(line,containsString("ServletContext.log:/dump/info/" + id));
-    assertThat(line,containsString("appengine.googleapis.com/trace_id=" + traceId));
-    assertThat(line,containsString("zone="));
+    String responseBody = HttpUrlUtil.getResponseBody(http);
+
+    Assert.assertThat(responseBody, Matchers.containsString("Found classes = 0 (0 expected)"));
+    Assert.assertThat(responseBody, Matchers.containsString("Not found classes = 4 (4 expected)"));
   }
 }

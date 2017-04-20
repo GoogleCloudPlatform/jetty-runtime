@@ -45,6 +45,7 @@
           <artifactId>servlet-api</artifactId>
         </exclusion>
       </exclusions>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.google.cloud.runtimes.tests</groupId>
