@@ -55,15 +55,6 @@
     </pluginManagement>
   </build>
 
-  <profiles>
-    <profile>
-      <id>perf-test</id>
-      <modules>
-        <module>perf-test</module>
-      </modules>
-    </profile>
-  </profiles>
-
   <repositories>
     <repository>
       <id>jetty.snapshot</id>

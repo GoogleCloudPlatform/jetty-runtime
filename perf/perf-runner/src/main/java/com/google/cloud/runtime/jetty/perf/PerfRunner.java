@@ -17,8 +17,10 @@
 package com.google.cloud.runtime.jetty.perf;
 
 import com.beust.jcommander.JCommander;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
+
 import org.apache.commons.lang.math.NumberUtils;
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.client.api.Request;
@@ -48,23 +50,14 @@ import org.mortbay.jetty.load.generator.listeners.report.GlobalSummaryListener;
 import org.mortbay.jetty.load.generator.starter.LoadGeneratorStarter;
 import org.mortbay.jetty.load.generator.starter.LoadGeneratorStarterArgs;
 
-import java.io.IOException;
-
 import java.net.InetAddress;
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Map;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * Runner performance testing
@@ -73,7 +66,7 @@ public class PerfRunner {
 
   private static final Logger LOGGER = Log.getLogger( PerfRunner.class );
 
-  private volatile RunStatus runStatus = new RunStatus( Eta.NOT_STARTED );
+  volatile RunStatus runStatus = new RunStatus( Eta.NOT_STARTED );
 
   Server server;
   ServerConnector connector;
@@ -81,7 +74,11 @@ public class PerfRunner {
 
   Date runStartDate;
   Date runEndDate;
-  
+
+  LoadGeneratorStarterArgs runnerArgs;
+
+  ExecutorService service = Executors.newFixedThreadPool( 1 );
+
   public static void main(String[] args) throws Exception {
 
     LoadGeneratorStarterArgs runnerArgs = new LoadGeneratorStarterArgs();
@@ -102,93 +99,12 @@ public class PerfRunner {
     getValuesFromEnvVar( runnerArgs );
     LOGGER.info( "runnerArgs:" + runnerArgs.toString() );
     ensureNetwork(runnerArgs,10);
-    new PerfRunner().run( runnerArgs );
-  }
-
-  public void run(LoadGeneratorStarterArgs runnerArgs) throws Exception {
-    ExecutorService executorService = Executors.newCachedThreadPool();
-
+    PerfRunner perfRunner = new PerfRunner().runnerArgs(runnerArgs);
     String jettyRun = runnerArgs.getParams().get( "jettyRun" );
     if (jettyRun != null && Boolean.parseBoolean( jettyRun )) {
-      startJetty(runnerArgs);
+      perfRunner.startJetty(runnerArgs);
     }
-
-
-    LoadGeneratorRunner runner = new LoadGeneratorRunner( runnerArgs, executorService, this);
-    String hostname = "";
-    try {
-      hostname = InetAddress.getLocalHost().getHostName();
-    } catch ( Exception e ) {
-      LOGGER.info( "ignore cannot get hostname:" + e.getMessage() );
-    }
-    Instant startInstant = Instant.now();
-    runner.host = hostname;
-    try {
-      LOGGER.info( "start load test" );
-      this.runStartDate = new Date();
-      this.runStatus.startDate = this.runStartDate;
-      this.runStatus.eta = Eta.RUNNING;
-      runner.run();
-      this.runEndDate = new Date();
-      this.runStatus.endDate = this.runEndDate;
-      this.runStatus.eta = Eta.FINISHED;
-      Instant endInstant = Instant.now();
-      LOGGER.info( "load test done start {} end {}", startInstant, endInstant );
-    } catch ( Exception e ) {
-      Instant endInstant = Instant.now();
-      LOGGER.info( "fail running the load start {} end {} message: {}", //
-                   startInstant, endInstant, e.getMessage() );
-      e.printStackTrace();
-    } finally {
-      runner.latencyTimeDisplayListener.onEnd( null );
-    }
-
-    CollectorInformations latencyTimeSummary = runner.getLatencyTimeSummary();
-
-    long totalRequestCommitted = latencyTimeSummary.getTotalCount();
-    long start = latencyTimeSummary.getStartTimeStamp();
-    long end = latencyTimeSummary.getEndTimeStamp();
-
-    LOGGER.info( "" );
-    LOGGER.info( "" );
-    LOGGER.info( "----------------------------------------------------");
-    LOGGER.info( "--------    Latency Time Summary     ---------------");
-    LOGGER.info( "----------------------------------------------------");
-    LOGGER.info( "" + latencyTimeSummary.toString() );
-    LOGGER.info( "----------------------------------------------------");
-    LOGGER.info( "" );
-    LOGGER.info( "----------------------------------------------------");
-    LOGGER.info( "-----------     Estimated QPS     ------------------");
-    LOGGER.info( "----------------------------------------------------");
-    long timeInSeconds = TimeUnit.SECONDS.convert( end - start, TimeUnit.MILLISECONDS );
-    long qps = totalRequestCommitted / timeInSeconds;
-    LOGGER.info( "host '" + hostname + "' estimated QPS : " + qps );
-    LOGGER.info( "----------------------------------------------------");
-    LOGGER.info( "perfmetric:max_latency:"
-                     + fromNanostoMillis(latencyTimeSummary.getMaxValue()));
-    LOGGER.info( "perfmetric:min_latency:"
-                     + fromNanostoMillis(latencyTimeSummary.getMinValue()));
-    LOGGER.info( "perfmetric:ave_latency:"
-                     + fromNanostoMillis(Math.round(latencyTimeSummary.getMean())));
-    LOGGER.info( "perfmetric:50_latency:"
-                     + fromNanostoMillis(latencyTimeSummary.getValue50()));
-    LOGGER.info( "perfmetric:90_latency:"
-                     + fromNanostoMillis(latencyTimeSummary.getValue90()));
-    LOGGER.info( "----------------------------------------------------");
-    LOGGER.info( "" );
-
-    this.runStatus = new RunStatus( latencyTimeSummary.getTotalCount(),
-                                    fromNanostoMillis(latencyTimeSummary.getMaxValue()),
-                                    fromNanostoMillis(latencyTimeSummary.getMinValue()),
-                                    fromNanostoMillis(Math.round(latencyTimeSummary.getMean())),
-                                    fromNanostoMillis(latencyTimeSummary.getValue50()),
-                                    fromNanostoMillis(latencyTimeSummary.getValue90()),
-                                    Eta.FINISHED, qps) //
-                      .startDate( this.runStartDate ) //
-                      .endDate( this.runEndDate );
-
-    // force stop executor as it's finished now
-    executorService.shutdownNow();
+    perfRunner.run();
 
     // well it's only for test
     String returnExit = runnerArgs.getParams().get( "returnExit" );
@@ -200,9 +116,103 @@ public class PerfRunner {
     while ( true ) {
       Thread.sleep( 60000 );
     }
+
   }
 
-  public void startJetty(LoadGeneratorStarterArgs runnerArgs) throws Exception {
+  private PerfRunner runnerArgs(LoadGeneratorStarterArgs runnerArgs) {
+    this.runnerArgs = runnerArgs;
+    return this;
+  }
+
+  public void run() throws Exception {
+
+    ExecutorService executorService = Executors.newCachedThreadPool();
+    try {
+      LoadGeneratorRunner runner = new LoadGeneratorRunner( runnerArgs, executorService, this );
+      String hostname = "";
+      try {
+        hostname = InetAddress.getLocalHost().getHostName();
+      } catch ( Exception e ) {
+        LOGGER.info( "ignore cannot get hostname:" + e.getMessage() );
+      }
+      Instant startInstant = Instant.now();
+      runner.host = hostname;
+      try {
+        LOGGER.info( "start load test" );
+        this.runStartDate = new Date();
+        synchronized ( this ) {
+          this.runStatus.startDate = this.runStartDate;
+          this.runStatus.eta = Eta.RUNNING;
+        }
+        runner.run();
+        this.runEndDate = new Date();
+        synchronized ( this ) {
+          this.runStatus.endDate = this.runEndDate;
+          this.runStatus.eta = Eta.FINISHED;
+        }
+        Instant endInstant = Instant.now();
+        LOGGER.info( "load test done start {} end {}", startInstant, endInstant );
+      } catch ( Exception e ) {
+        Instant endInstant = Instant.now();
+        LOGGER.info( "fail running the load start {} end {} message: {}", //
+                     startInstant, endInstant, e.getMessage() );
+        e.printStackTrace();
+      } finally {
+        runner.latencyTimeDisplayListener.onEnd( null );
+      }
+
+      CollectorInformations latencyTimeSummary = runner.getLatencyTimeSummary();
+
+      long totalRequestCommitted = latencyTimeSummary.getTotalCount();
+      long start = latencyTimeSummary.getStartTimeStamp();
+      long end = latencyTimeSummary.getEndTimeStamp();
+
+      LOGGER.info( "" );
+      LOGGER.info( "" );
+      LOGGER.info( "----------------------------------------------------" );
+      LOGGER.info( "--------    Latency Time Summary     ---------------" );
+      LOGGER.info( "----------------------------------------------------" );
+      LOGGER.info( "" + latencyTimeSummary.toString() );
+      LOGGER.info( "----------------------------------------------------" );
+      LOGGER.info( "" );
+      LOGGER.info( "----------------------------------------------------" );
+      LOGGER.info( "-----------     Estimated QPS     ------------------" );
+      LOGGER.info( "----------------------------------------------------" );
+      long timeInSeconds = TimeUnit.SECONDS.convert( end - start, TimeUnit.MILLISECONDS );
+      long qps = totalRequestCommitted / timeInSeconds;
+      LOGGER.info( "host '" + hostname + "' estimated QPS : " + qps );
+      LOGGER.info( "----------------------------------------------------" );
+      LOGGER.info( "perfmetric:max_latency:" //
+                       + fromNanostoMillis( latencyTimeSummary.getMaxValue() ) );
+      LOGGER.info( "perfmetric:min_latency:" //
+                       + fromNanostoMillis( latencyTimeSummary.getMinValue() ) );
+      LOGGER.info( "perfmetric:ave_latency:" //
+                       + fromNanostoMillis( Math.round( latencyTimeSummary.getMean() ) ) );
+      LOGGER.info( "perfmetric:50_latency:" //
+                       + fromNanostoMillis( latencyTimeSummary.getValue50() ) );
+      LOGGER.info( "perfmetric:90_latency:" //
+                       + fromNanostoMillis( latencyTimeSummary.getValue90() ) );
+      LOGGER.info( "----------------------------------------------------" );
+      LOGGER.info( "" );
+      synchronized ( this ) {
+        this.runStatus =
+            new RunStatus( latencyTimeSummary.getTotalCount(), //
+                            fromNanostoMillis( latencyTimeSummary.getMaxValue() ), //
+                            fromNanostoMillis( latencyTimeSummary.getMinValue() ), //
+                            fromNanostoMillis( Math.round( latencyTimeSummary.getMean() ) ), //
+                            fromNanostoMillis( latencyTimeSummary.getValue50() ), //
+                            fromNanostoMillis( latencyTimeSummary.getValue90() ), //
+                            Eta.FINISHED, //
+                            qps ) //
+            .startDate( this.runStartDate ) //
+            .endDate( this.runEndDate );
+      }
+    } finally {
+      executorService.shutdownNow();
+    }
+  }
+
+  public PerfRunner startJetty(LoadGeneratorStarterArgs runnerArgs) throws Exception {
 
     QueuedThreadPool serverThreads = new QueuedThreadPool();
     serverThreads.setName( "server" );
@@ -219,13 +229,28 @@ public class PerfRunner {
     statsContext.addServlet( new ServletHolder( new StatisticsServlet() ), "/stats" );
     RunStatusHandler runStatusHandler = new RunStatusHandler(this);
     statsContext.addServlet( new ServletHolder( runStatusHandler ), "/status" );
+    RunnerHandler runnerHandler = new RunnerHandler(this);
+    statsContext.addServlet( new ServletHolder( runnerHandler ), "/run" );
     statsContext.setSessionHandler( new SessionHandler() );
     server.start();
+    return this;
   }
 
   public static class RunStatus {
+    @JsonProperty
+    @JsonFormat( shape = JsonFormat.Shape.STRING,
+                pattern = "yyyy-MM-dd'T'HH:mm:ss.SSZ",
+                without = { JsonFormat.Feature.WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS } )
     private Date timestamp;
+    @JsonProperty
+    @JsonFormat( shape = JsonFormat.Shape.STRING,
+        pattern = "yyyy-MM-dd'T'HH:mm:ss.SSZ",
+        without = { JsonFormat.Feature.WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS } )
     private Date startDate;
+    @JsonProperty
+    @JsonFormat( shape = JsonFormat.Shape.STRING,
+        pattern = "yyyy-MM-dd'T'HH:mm:ss.SSZ",
+        without = { JsonFormat.Feature.WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS } )
     private Date endDate;
     private Eta eta;
     private long requestNumber;
@@ -301,27 +326,21 @@ public class PerfRunner {
       return qps;
     }
 
-    public String getTimestamp() {
-      return dateToString( this.timestamp );
+    public Date getTimestamp() {
+      return this.timestamp;
     }
 
-    public String getStartDate() {
-      return dateToString( startDate );
+    public Date getStartDate() {
+      return startDate;
     }
 
-    public String getEndDate() {
-      return dateToString( endDate );
+    public Date getEndDate() {
+      return endDate;
     }
   }
 
   public enum Eta {
     RUNNING,FINISHED,NOT_STARTED;
-  }
-
-  private static String dateToString(Date date) {
-    return date == null ? "" : //
-        DateTimeFormatter.ISO_DATE_TIME.withZone( ZoneId.systemDefault() )
-        .format( date.toInstant() );
   }
 
   private static long fromNanostoMillis(long nanosValue) {
@@ -370,17 +389,19 @@ public class PerfRunner {
                                           - histogram.getStartTimeStamp(), //
                                                        TimeUnit.MILLISECONDS );
         long qps = histogram.getTotalCount() / timeInSeconds;
-
-        perfRunner.runStatus =
-            new RunStatus( histogram.getTotalCount(), //
-                            fromNanostoMillis(histogram.getMaxValue()), //
-                            fromNanostoMillis(histogram.getMinValue()), //
-                            fromNanostoMillis(Math.round(histogram.getMean())), //
-                            fromNanostoMillis(histogram.getValueAtPercentile(50)), //
-                            fromNanostoMillis(histogram.getValueAtPercentile(90)), //
-                            Eta.RUNNING, qps) //
-                    .startDate( perfRunner.runStartDate );
-      } );
+        synchronized ( perfRunner ) {
+          perfRunner.runStatus = //
+              new RunStatus( histogram.getTotalCount(), //
+                              fromNanostoMillis( histogram.getMaxValue() ), //
+                              fromNanostoMillis( histogram.getMinValue() ), //
+                              fromNanostoMillis( Math.round( histogram.getMean() ) ), //
+                              fromNanostoMillis( histogram.getValueAtPercentile( 50 ) ), //
+                              fromNanostoMillis( histogram.getValueAtPercentile( 90 ) ), //
+                              Eta.RUNNING, //
+                              qps ) //
+              .startDate( perfRunner.runStartDate );
+        }
+      });
     }
 
     @Override
@@ -409,23 +430,6 @@ public class PerfRunner {
     }
   }
 
-  static class RunStatusHandler extends HttpServlet {
-
-    final ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
-
-    final PerfRunner perfRunner;
-
-    public RunStatusHandler( PerfRunner perfRunner ) {
-      this.perfRunner = perfRunner;
-    }
-
-    @Override
-    protected void doGet( HttpServletRequest request, HttpServletResponse response )
-        throws ServletException, IOException {
-      objectMapper.writeValue( response.getOutputStream(), this.perfRunner.runStatus );
-    }
-  }
-
   public static void ensureNetwork(LoadGeneratorStarterArgs runnerArgs, int trynumber)
       throws Exception {
     // we do one request until we are sure the network is here
@@ -449,6 +453,18 @@ public class PerfRunner {
         }
         throw e;
       }
+    }
+  }
+
+  public static class LoadGeneratorStarterConfig extends LoadGeneratorStarterArgs {
+    private Resource resource;
+
+    public Resource getResource() {
+      return resource;
+    }
+
+    public void setResource( Resource resource ) {
+      this.resource = resource;
     }
   }
 
