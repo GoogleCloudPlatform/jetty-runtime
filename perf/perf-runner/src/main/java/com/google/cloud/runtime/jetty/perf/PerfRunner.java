@@ -75,13 +75,13 @@ public class PerfRunner {
   Date runStartDate;
   Date runEndDate;
 
-  LoadGeneratorStarterArgs runnerArgs;
+  LoadGeneratorStarterConfig runnerArgs;
 
   ExecutorService service = Executors.newFixedThreadPool( 1 );
 
   public static void main(String[] args) throws Exception {
 
-    LoadGeneratorStarterArgs runnerArgs = new LoadGeneratorStarterArgs();
+    LoadGeneratorStarterConfig runnerArgs = new LoadGeneratorStarterConfig();
 
     try {
       JCommander jcommander = new JCommander( runnerArgs, args );
@@ -104,7 +104,7 @@ public class PerfRunner {
     if (jettyRun != null && Boolean.parseBoolean( jettyRun )) {
       perfRunner.startJetty(runnerArgs);
     }
-    perfRunner.run();
+    perfRunner.run(runnerArgs);
 
     // well it's only for test
     String returnExit = runnerArgs.getParams().get( "returnExit" );
@@ -119,16 +119,19 @@ public class PerfRunner {
 
   }
 
-  private PerfRunner runnerArgs(LoadGeneratorStarterArgs runnerArgs) {
+  private PerfRunner runnerArgs(LoadGeneratorStarterConfig runnerArgs) {
     this.runnerArgs = runnerArgs;
     return this;
   }
 
-  public void run() throws Exception {
-
+  public void run(LoadGeneratorStarterConfig config) throws Exception {
+    // we reuse previous resource profile
+    if (config.getResource() == null) {
+      config.setResource( runnerArgs.resource );
+    }
     ExecutorService executorService = Executors.newCachedThreadPool();
     try {
-      LoadGeneratorRunner runner = new LoadGeneratorRunner( runnerArgs, executorService, this );
+      LoadGeneratorRunner runner = new LoadGeneratorRunner( config, executorService, this );
       String hostname = "";
       try {
         hostname = InetAddress.getLocalHost().getHostName();
@@ -231,6 +234,8 @@ public class PerfRunner {
     statsContext.addServlet( new ServletHolder( runStatusHandler ), "/status" );
     RunnerHandler runnerHandler = new RunnerHandler(this);
     statsContext.addServlet( new ServletHolder( runnerHandler ), "/run" );
+    RunConfigHandler runConfigHandler = new RunConfigHandler(this);
+    statsContext.addServlet( new ServletHolder( runConfigHandler ), "/config" );
     statsContext.setSessionHandler( new SessionHandler() );
     server.start();
     return this;
@@ -239,18 +244,15 @@ public class PerfRunner {
   public static class RunStatus {
     @JsonProperty
     @JsonFormat( shape = JsonFormat.Shape.STRING,
-                pattern = "yyyy-MM-dd'T'HH:mm:ss.SSZ",
-                without = { JsonFormat.Feature.WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS } )
+                pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ" )
     private Date timestamp;
     @JsonProperty
     @JsonFormat( shape = JsonFormat.Shape.STRING,
-        pattern = "yyyy-MM-dd'T'HH:mm:ss.SSZ",
-        without = { JsonFormat.Feature.WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS } )
+        pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ" )
     private Date startDate;
     @JsonProperty
     @JsonFormat( shape = JsonFormat.Shape.STRING,
-        pattern = "yyyy-MM-dd'T'HH:mm:ss.SSZ",
-        without = { JsonFormat.Feature.WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS } )
+        pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ" )
     private Date endDate;
     private Eta eta;
     private long requestNumber;

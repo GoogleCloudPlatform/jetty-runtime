@@ -55,7 +55,7 @@ public class RunnerHandler extends HttpServlet {
     this.perfRunner.service.execute(() ->
     {
       try {
-        RunnerHandler.this.perfRunner.run();
+        this.perfRunner.run(this.perfRunner.runnerArgs);
       } catch ( Exception e ) {
         LOGGER.warn( "Unable to start a new run:" + e.getMessage(), e );
       }
@@ -76,7 +76,15 @@ public class RunnerHandler extends HttpServlet {
     if (json != null && json.length() > 0) {
       PerfRunner.LoadGeneratorStarterConfig loadGeneratorStarterConfig =
           objectMapper.readValue( json, PerfRunner.LoadGeneratorStarterConfig.class );
+      this.perfRunner.service.execute(() ->
+      {
+        try {
+          this.perfRunner.run(loadGeneratorStarterConfig);
+          LOGGER.info( "restart a new run with config " + loadGeneratorStarterConfig );
+        } catch ( Exception e ) {
+          LOGGER.warn( "Unable to start a new run:" + e.getMessage(), e );
+        }
+      });
     }
-    LOGGER.info( "restart a new run: " + (json == null ? " null " : " new config ") );
   }
 }
