@@ -39,7 +39,8 @@ public class RunConfigHandler
   @Override
   protected void doGet( HttpServletRequest request, HttpServletResponse response )
     throws ServletException, IOException {
-    objectMapper.writeValue( response.getOutputStream(), this.perfRunner.loadGeneratorStarterConfig );
+    objectMapper.writeValue( response.getOutputStream(),
+                             this.perfRunner.loadGeneratorStarterConfig );
   }
 
 }

@@ -39,15 +39,9 @@ import org.eclipse.jetty.util.log.Logger;
 
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
-import org.mortbay.jetty.load.generator.LoadGenerator;
 import org.mortbay.jetty.load.generator.Resource;
 import org.mortbay.jetty.load.generator.listeners.CollectorInformations;
-import org.mortbay.jetty.load.generator.listeners.QpsListenerDisplay;
-import org.mortbay.jetty.load.generator.listeners.RequestQueuedListenerDisplay;
 import org.mortbay.jetty.load.generator.listeners.Utils;
-import org.mortbay.jetty.load.generator.listeners.latency.LatencyTimeDisplayListener;
-import org.mortbay.jetty.load.generator.listeners.report.GlobalSummaryListener;
-import org.mortbay.jetty.load.generator.starter.LoadGeneratorStarter;
 import org.mortbay.jetty.load.generator.starter.LoadGeneratorStarterArgs;
 
 import java.net.InetAddress;
@@ -126,9 +120,6 @@ public class PerfRunner {
 
   public void run(LoadGeneratorStarterConfig config) throws Exception {
     // we reuse previous resource profile
-    if (config.getResource() == null) {
-      config.setResource( loadGeneratorStarterConfig.resource );
-    }
     ExecutorService executorService = Executors.newCachedThreadPool();
     try {
       LoadGeneratorRunner runner = new LoadGeneratorRunner( config, executorService, this );
@@ -345,92 +336,10 @@ public class PerfRunner {
     RUNNING,FINISHED,NOT_STARTED;
   }
 
-  private static long fromNanostoMillis(long nanosValue) {
+  static long fromNanostoMillis(long nanosValue) {
     return TimeUnit.MILLISECONDS.convert( nanosValue, TimeUnit.NANOSECONDS );
   }
 
-  private static class LoadGeneratorRunner extends LoadGeneratorStarter {
-
-    private String host;
-    private GlobalSummaryListener globalSummaryListener = new GlobalSummaryListener();
-    private ExecutorService executorService;
-
-    private QpsListenerDisplay qpsListenerDisplay = //
-        // FIXME those values need to be configurable!! //
-        new QpsListenerDisplay(10, 10, TimeUnit.SECONDS);
-
-    private RequestQueuedListenerDisplay requestQueuedListenerDisplay = //
-        // FIXME those values need to be configurable!! //
-        new RequestQueuedListenerDisplay(10, 10, TimeUnit.SECONDS);
-
-    private LatencyTimeDisplayListener latencyTimeDisplayListener =
-        new LatencyTimeDisplayListener( 10, 10, TimeUnit.SECONDS );
-
-    public LoadGeneratorRunner( LoadGeneratorStarterArgs runnerArgs,
-                                ExecutorService executorService, PerfRunner perfRunner ) {
-      super( runnerArgs );
-      this.executorService = executorService;
-      this.latencyTimeDisplayListener.addValueListener( histogram -> {
-        LOGGER.info( "host '" + host );
-        LOGGER.info( "----------------------------------------------------");
-        LOGGER.info( "perfmetric_run:total:" + histogram.getTotalCount());
-        LOGGER.info( "perfmetric_run:max_latency:"
-                         + fromNanostoMillis( histogram.getMaxValue()) );
-        LOGGER.info( "perfmetric_run:min_latency:"
-                         + fromNanostoMillis( histogram.getMinValue()) );
-        LOGGER.info( "perfmetric_run:ave_latency:"
-                         + fromNanostoMillis( Math.round( histogram.getMean())) );
-        LOGGER.info( "perfmetric_run:50_latency:"
-                         + fromNanostoMillis( histogram.getValueAtPercentile( 50 )));
-        LOGGER.info( "perfmetric_run:90_latency:"
-                         + fromNanostoMillis( histogram.getValueAtPercentile( 90 )));
-        LOGGER.info( "----------------------------------------------------");
-
-        long timeInSeconds =
-            TimeUnit.SECONDS.convert( histogram.getEndTimeStamp() //
-                                          - histogram.getStartTimeStamp(), //
-                                                       TimeUnit.MILLISECONDS );
-        long qps = histogram.getTotalCount() / timeInSeconds;
-        synchronized ( perfRunner ) {
-          perfRunner.runStatus = //
-              new RunStatus( histogram.getTotalCount(), //
-                              fromNanostoMillis( histogram.getMaxValue() ), //
-                              fromNanostoMillis( histogram.getMinValue() ), //
-                              fromNanostoMillis( Math.round( histogram.getMean() ) ), //
-                              fromNanostoMillis( histogram.getValueAtPercentile( 50 ) ), //
-                              fromNanostoMillis( histogram.getValueAtPercentile( 90 ) ), //
-                              Eta.RUNNING, //
-                              qps ) //
-              .startDate( perfRunner.runStartDate );
-        }
-      });
-    }
-
-    @Override
-    protected Request.Listener[] getListeners() {
-      return new Request.Listener[]{qpsListenerDisplay, requestQueuedListenerDisplay};
-    }
-
-    @Override
-    protected LoadGenerator.Listener[] getLoadGeneratorListeners() {
-      return new LoadGenerator.Listener[]{qpsListenerDisplay, requestQueuedListenerDisplay};
-    }
-
-    @Override
-    protected Resource.Listener[] getResourceListeners() {
-      return new Resource.Listener[]{globalSummaryListener, latencyTimeDisplayListener };
-    }
-
-    public CollectorInformations getLatencyTimeSummary() {
-      return new CollectorInformations( globalSummaryListener.getLatencyTimeHistogram() //
-                                            .getIntervalHistogram() );
-    }
-
-    @Override
-    public ExecutorService getExecutorService() {
-      return this.executorService;
-    }
-  }
 
   public static void ensureNetwork(LoadGeneratorStarterArgs runnerArgs, int trynumber)
       throws Exception {
@@ -459,15 +368,7 @@ public class PerfRunner {
   }
 
   public static class LoadGeneratorStarterConfig extends LoadGeneratorStarterArgs {
-    private Resource resource;
-
-    public Resource getResource() {
-      return resource;
-    }
-
-    public void setResource( Resource resource ) {
-      this.resource = resource;
-    }
+    //
   }
 
   /**
