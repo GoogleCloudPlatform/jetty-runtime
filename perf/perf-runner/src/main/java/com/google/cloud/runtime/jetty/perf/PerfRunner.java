@@ -75,39 +75,39 @@ public class PerfRunner {
   Date runStartDate;
   Date runEndDate;
 
-  LoadGeneratorStarterConfig runnerArgs;
+  LoadGeneratorStarterConfig loadGeneratorStarterConfig;
 
   ExecutorService service = Executors.newFixedThreadPool( 1 );
 
   public static void main(String[] args) throws Exception {
 
-    LoadGeneratorStarterConfig runnerArgs = new LoadGeneratorStarterConfig();
+    LoadGeneratorStarterConfig starterConfig = new LoadGeneratorStarterConfig();
 
     try {
-      JCommander jcommander = new JCommander( runnerArgs, args );
-      if ( runnerArgs.isHelp() ) {
+      JCommander jcommander = new JCommander( starterConfig, args );
+      if ( starterConfig.isHelp() ) {
         jcommander.usage();
         return;
       }
     }
     catch ( Exception e ) {
       e.printStackTrace();
-      new JCommander( runnerArgs ).usage();
+      new JCommander( starterConfig ).usage();
       return;
     }
 
-    getValuesFromEnvVar( runnerArgs );
-    LOGGER.info( "runnerArgs:" + runnerArgs.toString() );
-    ensureNetwork(runnerArgs,10);
-    PerfRunner perfRunner = new PerfRunner().runnerArgs(runnerArgs);
-    String jettyRun = runnerArgs.getParams().get( "jettyRun" );
+    getValuesFromEnvVar( starterConfig );
+    LOGGER.info( "loadGeneratorStarterConfig:" + starterConfig.toString() );
+    ensureNetwork(starterConfig,10);
+    PerfRunner perfRunner = new PerfRunner().runnerArgs(starterConfig);
+    String jettyRun = starterConfig.getParams().get( "jettyRun" );
     if (jettyRun != null && Boolean.parseBoolean( jettyRun )) {
-      perfRunner.startJetty(runnerArgs);
+      perfRunner.startJetty(starterConfig);
     }
-    perfRunner.run(runnerArgs);
+    perfRunner.run(starterConfig);
 
     // well it's only for test
-    String returnExit = runnerArgs.getParams().get( "returnExit" );
+    String returnExit = starterConfig.getParams().get( "returnExit" );
     if (returnExit != null && Boolean.parseBoolean( returnExit )) {
       LOGGER.info( "returnExit" );
       return;
@@ -120,14 +120,14 @@ public class PerfRunner {
   }
 
   private PerfRunner runnerArgs(LoadGeneratorStarterConfig runnerArgs) {
-    this.runnerArgs = runnerArgs;
+    this.loadGeneratorStarterConfig = runnerArgs;
     return this;
   }
 
   public void run(LoadGeneratorStarterConfig config) throws Exception {
     // we reuse previous resource profile
     if (config.getResource() == null) {
-      config.setResource( runnerArgs.resource );
+      config.setResource( loadGeneratorStarterConfig.resource );
     }
     ExecutorService executorService = Executors.newCachedThreadPool();
     try {

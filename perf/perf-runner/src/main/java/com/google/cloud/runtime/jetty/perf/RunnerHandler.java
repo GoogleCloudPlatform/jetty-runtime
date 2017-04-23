@@ -55,7 +55,7 @@ public class RunnerHandler extends HttpServlet {
     this.perfRunner.service.execute(() ->
     {
       try {
-        this.perfRunner.run(this.perfRunner.runnerArgs);
+        this.perfRunner.run(this.perfRunner.loadGeneratorStarterConfig );
       } catch ( Exception e ) {
         LOGGER.warn( "Unable to start a new run:" + e.getMessage(), e );
       }
