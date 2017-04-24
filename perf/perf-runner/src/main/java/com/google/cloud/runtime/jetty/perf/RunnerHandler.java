@@ -51,10 +51,12 @@ public class RunnerHandler extends HttpServlet {
       response.setStatus( HttpServletResponse.SC_CONFLICT );
       return;
     }
-    LOGGER.info( "restart a new run" );
+
     this.perfRunner.service.execute(() ->
     {
       try {
+        LOGGER.info( "restart a new run with config " + //
+                         this.perfRunner.loadGeneratorStarterConfig);
         this.perfRunner.run(this.perfRunner.loadGeneratorStarterConfig );
       } catch ( Exception e ) {
         LOGGER.warn( "Unable to start a new run:" + e.getMessage(), e );
@@ -79,8 +81,8 @@ public class RunnerHandler extends HttpServlet {
       this.perfRunner.service.execute(() ->
       {
         try {
-          this.perfRunner.run(loadGeneratorStarterConfig);
           LOGGER.info( "restart a new run with config " + loadGeneratorStarterConfig );
+          this.perfRunner.run(loadGeneratorStarterConfig);
         } catch ( Exception e ) {
           LOGGER.warn( "Unable to start a new run:" + e.getMessage(), e );
         }

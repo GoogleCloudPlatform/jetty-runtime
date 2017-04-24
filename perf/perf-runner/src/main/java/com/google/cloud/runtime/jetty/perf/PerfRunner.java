@@ -92,12 +92,13 @@ public class PerfRunner {
 
     getValuesFromEnvVar( starterConfig );
     LOGGER.info( "loadGeneratorStarterConfig:" + starterConfig.toString() );
-    ensureNetwork(starterConfig,10);
     PerfRunner perfRunner = new PerfRunner().runnerArgs(starterConfig);
     String jettyRun = starterConfig.getParams().get( "jettyRun" );
     if (jettyRun != null && Boolean.parseBoolean( jettyRun )) {
       perfRunner.startJetty(starterConfig);
     }
+    // not network access to target host so fail fast!
+    ensureNetwork(starterConfig,5);
     perfRunner.run(starterConfig);
 
     // well it's only for test
