@@ -2,7 +2,7 @@
 Provides SLF4J API.  Requires a slf4j implementation (eg slf4j-simple-impl)
 otherwise a noop implementation is used.
 
-TODO Remove once jetty-9.5.4 released
+TODO Remove this file once jetty-9.5.5 released
 
 [tags]
 logging
