@@ -35,23 +35,25 @@ public class ClassLoaderServlet extends HttpServlet {
     resp.setContentType("text/plain");
 
     String[] hidden = {
-        "com.google.cloud.logging.Logging.class", 
+        "com.google.cloud.logging.Logging", 
         "org.eclipse.jetty.server.Server",
         "com.google.cloud.BaseService", 
-        "io.netty.util.Constant.class"
+        "io.netty.channel.Channel",
+        "io.netty.util.Timer",
+        "org.slf4j.Logger"
         };
 
     int notFound = 0;
     int found = 0;
 
     ClassLoader loader = Thread.currentThread().getContextClassLoader();
-    for (String clazz : hidden) {
+    for (String name : hidden) {
       try {
-        loader.loadClass(clazz);
-        resp.getWriter().printf("Context loaded %s%n", clazz);
+        Class<?> clazz = loader.loadClass(name);
+        resp.getWriter().printf("Context loaded %s from%s%n", name, clazz.getClassLoader());
         found++;
       } catch (ClassNotFoundException e) {
-        resp.getWriter().printf("Context Not Found %s%n", clazz);
+        resp.getWriter().printf("Context Not Found %s%n", name);
         notFound++;
       }
     }

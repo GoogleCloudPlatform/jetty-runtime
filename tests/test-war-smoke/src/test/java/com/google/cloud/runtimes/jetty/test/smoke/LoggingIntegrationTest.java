@@ -105,6 +105,6 @@ public class LoggingIntegrationTest extends AbstractIntegrationTest {
     String responseBody = HttpUrlUtil.getResponseBody(http);
 
     Assert.assertThat(responseBody, Matchers.containsString("Found classes = 0 (0 expected)"));
-    Assert.assertThat(responseBody, Matchers.containsString("Not found classes = 4 (4 expected)"));
+    Assert.assertThat(responseBody, Matchers.containsString("Not found classes = 6 (6 expected)"));
   }
 }
