@@ -4,6 +4,7 @@
 RUNNING_TIME="required"
 APP_NAME="required"
 APP_PROJECT="required"
+TARGET_NAME="required"
 
 # defaults
 SKIP_CLIENT_DEPLOY="false"
@@ -63,6 +64,11 @@ case $key in
     shift
     shift
     ;;
+    --target-name)
+    TARGET_NAME="$2"
+    shift
+    shift
+    ;;
     -scd|--skip-client-deploy)
     SKIP_CLIENT_DEPLOY="true"
     shift
@@ -89,11 +95,13 @@ done
 
 if [ "$RUNNING_TIME" == "required" ] ||
    [ "$APP_NAME" == "required" ] ||
-   [ "$APP_PROJECT" == "required" ]; then
-  echo "Usage: perf.sh --app-name <name> --app-project <project> --running-time # (in minutes)"
+   [ "$APP_PROJECT" == "required" ] ||
+   [ "$TARGET_NAME" == "required" ]; then
+  echo "Usage: perf.sh --app-name <name> --app-project <project> --target-name <name> --running-time # (in minutes)"
   echo "  required settings"
   echo "   [ --app-name <name> ]"
   echo "   [ --app-project <project> ]"
+  echo "   [ --target-name <name> ]"
   echo "   [ -rt # | --running-time # ]"
   echo "  client settings"
   echo "   [ -tr # | --transaction-rate # ]"
@@ -132,7 +140,7 @@ echo " Client Settings:"
 echo " - runner instances: $RUNNER_INSTANCES"
 echo " - running time: $RUNNING_TIME"
 echo " - transaction rate: $TRANSACTION_RATE"
-echo " - warm up time: $WARM_UP"
+echo " - warm up: $WARM_UP"
 
 if [ "$SKIP_CLIENT_DEPLOY" == "true" ]; then
    echo "(skipping client deploy)"
@@ -148,7 +156,7 @@ if [ "$SKIP_CLIENT_DEPLOY" == "true" ]; then
 
    CLIENT_RUN_JSON="{\"profileXmlPath\":null,\"profileJsonPath\":null,
     \"profileGroovyPath\":\"/loadgenerator_profile.groovy\",
-    \"host\":\"$APP_NAME-dot-$APP_PROJECT.appspot.com\",\"port\":443,\"users\":12,
+    \"host\":\"$TARGET_NAME-dot-$APP_PROJECT.appspot.com\",\"port\":443,\"users\":12,
     \"transactionRate\":$TRANSACTION_RATE,\"transport\":\"HTTP\",\"selectors\":1,\"threads\":1,\"runningTime\":$RUNNING_TIME,
     \"runningTimeUnit\":\"MINUTES\",\"runIteration\":0,\"reportHost\":\"localhost\",\"scheme\":\"https\",
     \"reportPort\":0,\"notInterrupt\":false,\"statsFile\":null,\"params\":{\"jettyRun\":\"true\",\"noSysExit\":\"true\",

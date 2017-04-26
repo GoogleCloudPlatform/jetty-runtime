@@ -106,7 +106,7 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
           <!-- FIXME this should be dynamic as it depends on how long the load test run -->
-          <forkedProcessTimeoutInSeconds>1200</forkedProcessTimeoutInSeconds>
+          <forkedProcessTimeoutInSeconds>2000</forkedProcessTimeoutInSeconds>
           <systemPropertyVariables>
             <app.deploy.web>jetty-runtime-perf-app</app.deploy.web>
             <app.deploy.runner>jetty-runtime-perf-runner</app.deploy.runner>
