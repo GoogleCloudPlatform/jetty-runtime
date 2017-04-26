@@ -10,6 +10,7 @@ SKIP_CLIENT_DEPLOY="false"
 SKIP_SERVER_DEPLOY="false"
 RUNNER_INSTANCES=1
 TRANSACTION_RATE=2800
+WARM_UP=2
 VERBOSE="false"
 LOG_FILE="perf.log"
 
@@ -44,6 +45,11 @@ case $key in
     ;;
     -tqr|--test-qps-range)
     TEST_QPS_RANGE="$2"
+    shift
+    shift
+    ;;
+    -wu|--warm-up)
+    WARM_UP="$2"
     shift
     shift
     ;;
@@ -126,11 +132,11 @@ echo " Client Settings:"
 echo " - runner instances: $RUNNER_INSTANCES"
 echo " - running time: $RUNNING_TIME"
 echo " - transaction rate: $TRANSACTION_RATE"
+echo " - warm up time: $WARM_UP"
 
 if [ "$SKIP_CLIENT_DEPLOY" == "true" ]; then
    echo "(skipping client deploy)"
-#   echo " APP_NAME: $APP_NAME"
-#   echo " APP_PROJECT: $APP_PROJECT"
+
    CLIENT_URL="https://$APP_NAME-dot-$APP_PROJECT.appspot.com"
    echo "(checking for live runner config)"
    CLIENT_STATUS=`curl $CLIENT_URL/status 2>/dev/null`
@@ -142,11 +148,11 @@ if [ "$SKIP_CLIENT_DEPLOY" == "true" ]; then
 
    CLIENT_RUN_JSON="{\"profileXmlPath\":null,\"profileJsonPath\":null,
     \"profileGroovyPath\":\"/loadgenerator_profile.groovy\",
-    \"host\":\"jetty-runtime-perf-app-dot-jetty9-work.appspot.com\",\"port\":443,\"users\":12,
+    \"host\":\"$APP_NAME-dot-$APP_PROJECT.appspot.com\",\"port\":443,\"users\":12,
     \"transactionRate\":$TRANSACTION_RATE,\"transport\":\"HTTP\",\"selectors\":1,\"threads\":1,\"runningTime\":$RUNNING_TIME,
     \"runningTimeUnit\":\"MINUTES\",\"runIteration\":0,\"reportHost\":\"localhost\",\"scheme\":\"https\",
     \"reportPort\":0,\"notInterrupt\":false,\"statsFile\":null,\"params\":{\"jettyRun\":\"true\",\"noSysExit\":\"true\",
-    \"jettyPort\":\"8080\"},\"help\":false,\"displayStatsAtEnd\":false,\"collectServerStats\":false,\"warmupNumber\":2,
+    \"jettyPort\":\"8080\"},\"help\":false,\"displayStatsAtEnd\":false,\"collectServerStats\":false,\"warmupNumber\":$WARM_UP,
     \"maxRequestsQueued\":410000,\"channelPerUser\":-1}"
 
    echo "(init test run)"
