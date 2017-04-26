@@ -1,10 +1,14 @@
 #!/usr/bin/env bash
 
+# required options
+RUNNING_TIME="required"
+APP_NAME="required"
+APP_PROJECT="required"
+
 # defaults
 SKIP_CLIENT_DEPLOY="false"
 SKIP_SERVER_DEPLOY="false"
 RUNNER_INSTANCES=1
-RUNNING_TIME="required"
 TRANSACTION_RATE=2800
 VERBOSE="false"
 LOG_FILE="perf.log"
@@ -43,6 +47,16 @@ case $key in
     shift
     shift
     ;;
+    --app-name)
+    APP_NAME="$2"
+    shift
+    shift
+    ;;
+    --app-project)
+    APP_PROJECT="$2"
+    shift
+    shift
+    ;;
     -scd|--skip-client-deploy)
     SKIP_CLIENT_DEPLOY="true"
     shift
@@ -67,10 +81,15 @@ case $key in
 esac
 done
 
-if [ "$RUNNING_TIME" == "required" ]; then
-  echo "Usage: perf.sh --running-time # (in minutes)"
-  echo "  client settings"
+if [ "$RUNNING_TIME" == "required" ] ||
+   [ "$APP_NAME" == "required" ] ||
+   [ "$APP_PROJECT" == "required" ]; then
+  echo "Usage: perf.sh --app-name <name> --app-project <project> --running-time # (in minutes)"
+  echo "  required settings"
+  echo "   [ --app-name <name> ]"
+  echo "   [ --app-project <project> ]"
   echo "   [ -rt # | --running-time # ]"
+  echo "  client settings"
   echo "   [ -tr # | --transaction-rate # ]"
   echo "   [ -ri # | --runner-instances # ]"
   echo "  test settings"
@@ -91,7 +110,6 @@ if [ "$VERBOSE" != "true" ]; then
 fi
 
 echo " Server Settings:"
-#echo " - skip server deploy: $SKIP_SERVER_DEPLOY"
 
 if [ "$SKIP_SERVER_DEPLOY" == "true" ]; then
   echo "(skipping server deploy)"
@@ -111,11 +129,36 @@ echo " - transaction rate: $TRANSACTION_RATE"
 
 if [ "$SKIP_CLIENT_DEPLOY" == "true" ]; then
    echo "(skipping client deploy)"
-   echo "TODO / support running perf test with already deployed runner instance"
+#   echo " APP_NAME: $APP_NAME"
+#   echo " APP_PROJECT: $APP_PROJECT"
+   CLIENT_URL="https://$APP_NAME-dot-$APP_PROJECT.appspot.com"
+   echo "(checking for live runner config)"
+   CLIENT_STATUS=`curl $CLIENT_URL/status 2>/dev/null`
+   if [[ $CLIENT_STATUS != \{* ]] || [[ $CLIENT_STATUS == *RUNNING* ]]; then
+     echo "INVALID RUNNER: $CLIENT_STATUS"
+     echo "(aborting)"
+     exit
+   fi
+
+   CLIENT_RUN_JSON="{\"profileXmlPath\":null,\"profileJsonPath\":null,
+    \"profileGroovyPath\":\"/loadgenerator_profile.groovy\",
+    \"host\":\"jetty-runtime-perf-app-dot-jetty9-work.appspot.com\",\"port\":443,\"users\":12,
+    \"transactionRate\":$TRANSACTION_RATE,\"transport\":\"HTTP\",\"selectors\":1,\"threads\":1,\"runningTime\":$RUNNING_TIME,
+    \"runningTimeUnit\":\"MINUTES\",\"runIteration\":0,\"reportHost\":\"localhost\",\"scheme\":\"https\",
+    \"reportPort\":0,\"notInterrupt\":false,\"statsFile\":null,\"params\":{\"jettyRun\":\"true\",\"noSysExit\":\"true\",
+    \"jettyPort\":\"8080\"},\"help\":false,\"displayStatsAtEnd\":false,\"collectServerStats\":false,\"warmupNumber\":2,
+    \"maxRequestsQueued\":410000,\"channelPerUser\":-1}"
+
+   echo "(init test run)"
+   curl -H "Content-Type: application/json" -X POST -d "$CLIENT_RUN_JSON" $CLIENT_URL/run
+
 else
   echo "(installing client, this may take a few minutes)";
   if [ "$VERBOSE" == "true" ]; then
-    mvn install  -pl :perf-runner -Pgcloud-deploy -Pperf;
+    mvn install  -pl :perf-runner -Pgcloud-deploy -Pperf \
+      -Drunner.instances=$RUNNER_INSTANCES \
+      -Drunning.time=$RUNNING_TIME \
+      -Dtransaction.rate=$TRANSACTION_RATE;
   else
     mvn install  -pl :perf-runner -Pgcloud-deploy -Pperf \
       -Drunner.instances=$RUNNER_INSTANCES \
@@ -125,7 +168,11 @@ else
   fi
 fi
 
+echo " Test Settings:"
+echo " - latency range: $TEST_LATENCY_RANGE"
+echo " - qps range: $TEST_QPS_RANGE"
 echo "(running perf test)";
+
 mvn install  -pl :perf-test \
   -Dtest.latency.range=$TEST_LATENCY_RANGE \
   -Dtest.qps.range=$TEST_QPS_RANGE
