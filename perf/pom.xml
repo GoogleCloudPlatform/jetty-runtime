@@ -32,6 +32,8 @@
     <gcloud.api.version>0.13.0-beta</gcloud.api.version>
     <running.time>10</running.time>
     <running.time.unit>m</running.time.unit>
+    <perf.app.name>jetty-runtime-perf-app</perf.app.name>
+    <perf.runner.name>jetty-runtime-perf-runner</perf.runner.name>
   </properties>
 
   <modules>

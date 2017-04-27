@@ -18,6 +18,7 @@ package com.google.cloud.runtime.jetty.perf;
 
 import com.beust.jcommander.JCommander;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 
@@ -233,6 +234,7 @@ public class PerfRunner {
     return this;
   }
 
+  @JsonIgnoreProperties(ignoreUnknown = true)
   public static class RunStatus {
     @JsonProperty
     @JsonFormat( shape = JsonFormat.Shape.STRING,

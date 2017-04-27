@@ -1,6 +1,6 @@
 runtime: custom
 env: flex
-service: jetty-runtime-perf-app
+service: ${perf.app.name}
 resources:
   cpu: ${resources.cpu}
   memory_gb: ${resources.memory_gb}
