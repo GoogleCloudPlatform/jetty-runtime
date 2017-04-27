@@ -6,12 +6,13 @@ The following modules are involved:
 
 * perf-server: A simple webapp which is deployed into Google Flexible environment with static and dynamic resources.
 * perf-runner: A configurable load testing client which is bundled into a Docker container which generates load to the webapp deployed in under perf-server.
+* perf-test: A unit test that will monitoring an executing performance test and then validate the final results against injected criteria.
 
 The process involved is 2 step, first an instance of the perf-server is deployed into the GCE and started up.  Once this is in place we are able to navigate to all the assets that the load client can through a normal browser, it is for all intents and purposes a standard Google Flexible based application.  We hold the number of instances of this application to a fixed amount of 1 with no intent to enable autoscaling (at this time).  We then deploy the pre-configured perf-runner instances which once deployed will begin a period of warm-up or burn-in by making some initial requests to the perf-server.  This helps ensure the JVM for both the perf-server and perf-runner(s) have compiled all JIT related optimizations and garbage collection events have been normalized.  After this burn-in period the perf-runner instances will begin to offer up a consistent amount of load intended to bring the perf-server into a state of stable load.  Effort is taken to ensure that from the perf-server and perf-client perspective there should be as little variation in performance from one run to another.  Given the same constant request rate and the same amount of queued requests on the perf-client, and the same webapp deployed with the same assets on the perf-server there should be little no variation between muitple runs.  
 
 In this way if a change in the monitored metrics are detected then it may be important to determine what the source the variation is.  Has a new version of Jetty been deployed in the perf-server?  Have there been changes in the underlying docker instance of the perf-server?  Differences in the JDK between runs?
 
-Currently we use a combination of Stackdriver and logging within the perf-server and perf-runner instances to gather data. 
+In terms of a monitoring dashboard, currently we use a combination of Stackdriver and logging within the perf-server and perf-runner instances to gather data. 
 
 On the Stackdriver side of things we are interested in:
 
@@ -64,9 +65,40 @@ Within the perf-server the following information may be found in the streaming l
 
 ## Usage
 
-This module is currently configured to be interacted and configured via Maven.  The following sections detail how to configure the environment and get this running.  
+This module is currently configured to be interacted and configured via either a shell script or Maven.   Following the shell script usage section are details on how to configure the environment and get this running with Maven.    
 
 NOTE: We assume you already have gcloud configured correctly for your environment.
+
+### perf.sh 
+
+The _perf_ directory has a perf.sh shell script which handles the bulk of logic related to setting up and running the performance testing scenario and is broke into three phases upon execution.
+
+* First we determine if a perf-server application needs to be deployed, if it does then we descend into the perf-server artifact and build and deploy a new perf server.
+* Second we determine if a perf-client application needs of be deployed, if it does then we do the same in perf-client artifact.  Otherwise we check if there is a live perf-client instance that we can leverage to run the performance test.  If there is then we use curl to push it a json configuration file that details the parameters of the performance test to run.
+* Lastly we move into the perf-test artifact and execute a standard junit test which will pull the perf-client instance looking for a FINISHED state.  When a FINISHED state is found the unit test will then validate the final statistics of the unit test to ensure the reported statistics fall within the established boundries.  
+
+Over time the metrics being monitored and validated will become broader.
+
+To find the available parameters for the perf.sh script simply run it once for output akin to this:
+`
+Usage: perf.sh --app-name <name> --app-project <project> --target-name <name> --running-time # (in minutes)
+  required settings
+   [ --app-name <name> ]
+   [ --app-project <project> ]
+   [ --target-name <name> ]
+   [ -rt # | --running-time # ]
+  client settings
+   [ -tr # | --transaction-rate # ]
+   [ -ri # | --runner-instances # ]
+  test settings
+   [ -tlr #-# | --test-latency-range #-# ]
+   [ -tqr #-# | --test-qps-range #-# ]
+  runtime settings
+   [ -scd | --skip-client-deploy ]
+   [ -ssd | --skip-server-deploy ]
+   [ --verbose ]
+   [ --log-file <filename> ] (perf.log)
+`
 
 ### perf-server
 
