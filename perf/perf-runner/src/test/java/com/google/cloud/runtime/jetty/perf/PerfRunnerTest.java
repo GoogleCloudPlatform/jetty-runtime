@@ -27,6 +27,8 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.servlet.StatisticsServlet;
 import org.eclipse.jetty.util.IO;
+import org.eclipse.jetty.util.log.Log;
+import org.eclipse.jetty.util.log.Logger;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.junit.After;
 import org.junit.Assert;
@@ -52,12 +54,11 @@ import javax.servlet.http.HttpSession;
  */
 public class PerfRunnerTest {
 
+  private static final Logger LOGGER = Log.getLogger(PerfRunnerTest.class);
+
   Server server;
-
   ServerConnector connector;
-
   StatisticsHandler statisticsHandler = new StatisticsHandler();
-
   TestHandler testHandler;
 
   @Before

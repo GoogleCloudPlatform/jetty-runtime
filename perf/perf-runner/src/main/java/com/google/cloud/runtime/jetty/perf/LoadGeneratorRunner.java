@@ -77,9 +77,10 @@ public class LoadGeneratorRunner extends LoadGeneratorStarter {
                                       - histogram.getStartTimeStamp(), //
                                   TimeUnit.MILLISECONDS );
       long qps = histogram.getTotalCount() / timeInSeconds;
-      synchronized ( perfRunner ) {
+      synchronized ( perfRunner.runStatus ) {
         perfRunner.runStatus = //
-          new PerfRunner.RunStatus( histogram.getTotalCount(), //
+          new PerfRunner.RunStatus( perfRunner.runId, //
+                                    histogram.getTotalCount(), //
                                       fromNanostoMillis( histogram.getMaxValue() ), //
                                       fromNanostoMillis( histogram.getMinValue() ), //
                                       fromNanostoMillis( Math.round( histogram.getMean() ) ), //
@@ -89,6 +90,7 @@ public class LoadGeneratorRunner extends LoadGeneratorStarter {
                                       qps ) //
                 .startDate( perfRunner.runStartDate );
       }
+      perfRunner.bigQueryRecord( perfRunner.runStatus );
     });
   }
 

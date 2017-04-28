@@ -16,15 +16,30 @@
 
 package com.google.cloud.runtime.jetty.perf;
 
+import com.google.cloud.bigquery.BigQuery;
+import com.google.cloud.bigquery.BigQueryOptions;
+import com.google.cloud.bigquery.Dataset;
+import com.google.cloud.bigquery.DatasetInfo;
+import com.google.cloud.bigquery.Field;
+import com.google.cloud.bigquery.InsertAllRequest;
+import com.google.cloud.bigquery.InsertAllResponse;
+import com.google.cloud.bigquery.Schema;
+import com.google.cloud.bigquery.StandardTableDefinition;
+import com.google.cloud.bigquery.Table;
+import com.google.cloud.bigquery.TableId;
+import com.google.cloud.bigquery.TableInfo;
+
 import com.beust.jcommander.JCommander;
+
+import com.eaio.uuid.UUID;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-
 import org.apache.commons.lang.math.NumberUtils;
+
 import org.eclipse.jetty.client.HttpClient;
-import org.eclipse.jetty.client.api.Request;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
@@ -40,14 +55,17 @@ import org.eclipse.jetty.util.log.Logger;
 
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
-import org.mortbay.jetty.load.generator.Resource;
+
 import org.mortbay.jetty.load.generator.listeners.CollectorInformations;
 import org.mortbay.jetty.load.generator.listeners.Utils;
 import org.mortbay.jetty.load.generator.starter.LoadGeneratorStarterArgs;
 
 import java.net.InetAddress;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 import java.util.concurrent.ExecutorService;
@@ -63,6 +81,18 @@ public class PerfRunner {
 
   volatile RunStatus runStatus = new RunStatus( Eta.NOT_STARTED );
 
+  volatile String runId;
+
+  //"2014-08-19 12:41:35.220000"
+  // FIXME olamy not TZ???? it generate an error??
+  public static final DateTimeFormatter BIG_QUERY_DATE_FORMATTER = DateTimeFormatter //
+                                                .ofPattern( "YYY-MM-dd HH:mm:ss.SSSSSS" ) //
+                                                .withZone( ZoneId.systemDefault() );
+
+  public static final String BIG_QUERY_DATASETID = "jetty_runtime";
+
+  public static final String BIG_QUERY_TABLE_NAME = "loadgenerator_run";
+
   Server server;
   ServerConnector connector;
   StatisticsHandler statisticsHandler = new StatisticsHandler();
@@ -71,8 +101,9 @@ public class PerfRunner {
   Date runEndDate;
 
   LoadGeneratorStarterConfig loadGeneratorStarterConfig;
-
   ExecutorService service = Executors.newFixedThreadPool( 1 );
+
+  protected BigQuery bigQuery;
 
   public static void main(String[] args) throws Exception {
 
@@ -100,6 +131,12 @@ public class PerfRunner {
     }
     // not network access to target host so fail fast!
     ensureNetwork(starterConfig,5);
+    // is bigquery setup?
+    String bigQuery = starterConfig.getParams().get( "bigQuery" );
+    if (bigQuery != null && Boolean.parseBoolean( bigQuery )) {
+      LOGGER.info( "enable bigQuery recording" );
+      perfRunner.bigQuery = setupBigQuery();
+    }
     perfRunner.run(starterConfig);
 
     // well it's only for test
@@ -121,6 +158,7 @@ public class PerfRunner {
   }
 
   public void run(LoadGeneratorStarterConfig config) throws Exception {
+    this.runId = new UUID().toString();
     // we reuse previous resource profile
     ExecutorService executorService = Executors.newCachedThreadPool();
     try {
@@ -136,13 +174,13 @@ public class PerfRunner {
       try {
         LOGGER.info( "start load test" );
         this.runStartDate = new Date();
-        synchronized ( this ) {
+        synchronized ( this.runStatus ) {
           this.runStatus.startDate = this.runStartDate;
           this.runStatus.eta = Eta.RUNNING;
         }
         runner.run();
         this.runEndDate = new Date();
-        synchronized ( this ) {
+        synchronized ( this.runStatus ) {
           this.runStatus.endDate = this.runEndDate;
           this.runStatus.eta = Eta.FINISHED;
         }
@@ -190,9 +228,10 @@ public class PerfRunner {
                        + fromNanostoMillis( latencyTimeSummary.getValue90() ) );
       LOGGER.info( "----------------------------------------------------" );
       LOGGER.info( "" );
-      synchronized ( this ) {
+      synchronized ( this.runStatus ) {
         this.runStatus =
-            new RunStatus( latencyTimeSummary.getTotalCount(), //
+            new RunStatus( this.runId, //
+                           latencyTimeSummary.getTotalCount(), //
                             fromNanostoMillis( latencyTimeSummary.getMaxValue() ), //
                             fromNanostoMillis( latencyTimeSummary.getMinValue() ), //
                             fromNanostoMillis( Math.round( latencyTimeSummary.getMean() ) ), //
@@ -203,6 +242,8 @@ public class PerfRunner {
             .startDate( this.runStartDate ) //
             .endDate( this.runEndDate );
       }
+      // last record
+      bigQueryRecord( this.runStatus );
     } finally {
       executorService.shutdownNow();
     }
@@ -234,8 +275,83 @@ public class PerfRunner {
     return this;
   }
 
-  @JsonIgnoreProperties(ignoreUnknown = true)
+  protected static BigQuery setupBigQuery() {
+    BigQuery bigQuery = BigQueryOptions.getDefaultInstance().getService();
+    Dataset dataset = bigQuery.getDataset( BIG_QUERY_DATASETID );
+    // create dataset if not exists
+    if (dataset == null) {
+      dataset = bigQuery.create( DatasetInfo.newBuilder( BIG_QUERY_DATASETID ).build() );
+    }
+
+    TableId tableId = TableId.of( BIG_QUERY_DATASETID, BIG_QUERY_TABLE_NAME );
+    Table table = bigQuery.getTable( tableId);
+    // create table if not exists
+    if (table == null) {
+      LOGGER.info("Creating big query table: '{}'", tableId);
+      Field runId = Field.of( "runId", Field.Type.string());
+      Field timestampField = Field.of( "timestamp", Field.Type.timestamp());
+      Field startDateField = Field.of( "startDate", Field.Type.timestamp());
+      Field endDateField = Field.of( "endDate", Field.Type.timestamp());
+      Field etaField = Field.of( "eta", Field.Type.string());
+      Field requestNumber = Field.of( "requestNumber", Field.Type.integer());
+      Field maxLatency = Field.of( "maxLatency", Field.Type.integer());
+      Field minLatency = Field.of( "minLatency", Field.Type.integer());
+      Field aveLatency = Field.of( "aveLatency", Field.Type.integer());
+      Field latency50 = Field.of( "latency50", Field.Type.integer());
+      Field latency90 = Field.of( "latency90", Field.Type.integer());
+      Field qps = Field.of( "qps", Field.Type.integer());
+      Schema schema = Schema.of(runId, timestampField, startDateField, endDateField, //
+                                etaField, requestNumber, maxLatency, minLatency, //
+                                aveLatency, latency50, latency90, qps);
+      table = bigQuery.create( TableInfo.of( tableId, StandardTableDefinition.of( schema)));
+    }
+    return bigQuery;
+  }
+
+  protected static Map<String, Object> toBigQueryRows( RunStatus runStatus ) {
+    if (runStatus == null) {
+      return null;
+    }
+    Map<String, Object> row = new HashMap<>(11);
+    row.put( "runId", runStatus.runId );
+    if (runStatus.timestamp != null) {
+      row.put( "timestamp", BIG_QUERY_DATE_FORMATTER.format( runStatus.timestamp.toInstant()) );
+    }
+    if (runStatus.startDate != null) {
+      row.put( "startDate", BIG_QUERY_DATE_FORMATTER.format( runStatus.startDate.toInstant()) );
+    }
+    if (runStatus.endDate != null) {
+      row.put( "endDate", BIG_QUERY_DATE_FORMATTER.format( runStatus.endDate.toInstant()) );
+    }
+    row.put( "eta", runStatus.eta == null ? "" : runStatus.eta.toString() );
+    row.put( "requestNumber", runStatus.requestNumber );
+    row.put( "maxLatency", runStatus.maxLatency );
+    row.put( "minLatency", runStatus.minLatency );
+    row.put( "aveLatency", runStatus.aveLatency );
+    row.put( "latency50", runStatus.latency5 );
+    row.put( "latency90", runStatus.latency9 );
+    row.put( "qps", runStatus.qps );
+    return row;
+  }
+
+  // TODO async mode?
+  protected void bigQueryRecord( RunStatus runStatus ) {
+    if (this.bigQuery != null) {
+      Map<String, Object> row = toBigQueryRows( runStatus );
+      TableId tableId = TableId.of( BIG_QUERY_DATASETID, BIG_QUERY_TABLE_NAME);
+      InsertAllRequest insertRequest =
+          InsertAllRequest.newBuilder(tableId).addRow( row ).build();
+      InsertAllResponse insertResponse = this.bigQuery.insertAll( insertRequest);
+      if (insertResponse.hasErrors()) {
+        LOGGER.info("Errors occurred while inserting rows: {}", //
+                    insertResponse.getInsertErrors());
+      }
+    }
+  }
+
   public static class RunStatus {
+
+    private String runId;
     @JsonProperty
     @JsonFormat( shape = JsonFormat.Shape.STRING,
                 pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ" )
@@ -268,9 +384,10 @@ public class PerfRunner {
       this.timestamp = new Date();
     }
 
-    public RunStatus( long requestNumber, long maxLatency, long minLatency, long aveLatency, //
-                      long latency50, long latency90, Eta eta, long qps ) {
+    public RunStatus( String runId, long requestNumber, long maxLatency, long minLatency, //
+                      long aveLatency, long latency50, long latency90, Eta eta, long qps ) {
       this(eta);
+      this.runId = runId;
       this.requestNumber = requestNumber;
       this.maxLatency = maxLatency;
       this.minLatency = minLatency;
@@ -332,6 +449,14 @@ public class PerfRunner {
 
     public Date getEndDate() {
       return endDate;
+    }
+
+    public String getRunId() {
+      return runId;
+    }
+
+    public void setRunId( String runId ) {
+      this.runId = runId;
     }
   }
 
