@@ -136,8 +136,10 @@ public class PerfRunner {
       LOGGER.info( "enable bigQuery recording" );
       perfRunner.bigQuery = setupBigQuery();
     }
-    perfRunner.run(starterConfig);
-
+    String runOnStart = starterConfig.getParams().get( "runOnStart" );
+    if (runOnStart != null && Boolean.parseBoolean( runOnStart )) {
+      perfRunner.run( starterConfig );
+    }
     // well it's only for test
     String returnExit = starterConfig.getParams().get( "returnExit" );
     if (returnExit != null && Boolean.parseBoolean( returnExit )) {
