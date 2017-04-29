@@ -159,6 +159,12 @@ public class PerfRunner {
   }
 
   public void run(LoadGeneratorStarterConfig config) throws Exception {
+    LOGGER.info( "start load test" );
+    this.runStartDate = new Date();
+    synchronized ( this.runStatus ) {
+      this.runStatus.startDate = this.runStartDate;
+      this.runStatus.eta = Eta.RUNNING;
+    }
     this.runId = new UUID().toString();
     // we reuse previous resource profile
     ExecutorService executorService = Executors.newCachedThreadPool();
@@ -173,12 +179,6 @@ public class PerfRunner {
       Instant startInstant = Instant.now();
       runner.host = hostname;
       try {
-        LOGGER.info( "start load test" );
-        this.runStartDate = new Date();
-        synchronized ( this.runStatus ) {
-          this.runStatus.startDate = this.runStartDate;
-          this.runStatus.eta = Eta.RUNNING;
-        }
         runner.run();
         this.runEndDate = new Date();
         synchronized ( this.runStatus ) {

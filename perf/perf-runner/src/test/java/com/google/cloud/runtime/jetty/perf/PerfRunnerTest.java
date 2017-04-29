@@ -112,6 +112,7 @@ public class PerfRunnerTest {
     args.add( "--profile-groovy-path");
     args.add( "src/test/resources/loadgenerator_profile.groovy");
     args.add( "-DreturnExit=true" );
+    args.add( "-DrunOnStart=true" );
 
     PerfRunner.main( args.toArray( new String[args.size()]) );
 

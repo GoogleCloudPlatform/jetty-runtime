@@ -45,13 +45,14 @@ public class RunnerHandler extends HttpServlet {
   @Override
   protected void doGet( HttpServletRequest request, HttpServletResponse response )
     throws ServletException, IOException {
-    if (this.perfRunner.runStatus.getEta() != PerfRunner.Eta.FINISHED) {
-      LOGGER.warn( "previous run not finished" );
-      response.getWriter().write( "previous run not finished" );
-      response.setStatus( HttpServletResponse.SC_CONFLICT );
-      return;
+    synchronized ( this.perfRunner.runStatus ) {
+      if ( this.perfRunner.runStatus.getEta() == PerfRunner.Eta.RUNNING ) {
+        LOGGER.warn( "previous run not finished" );
+        response.getWriter().write( "previous run not finished" );
+        response.setStatus( HttpServletResponse.SC_CONFLICT );
+        return;
+      }
     }
-
     this.perfRunner.service.execute(() ->
     {
       try {
