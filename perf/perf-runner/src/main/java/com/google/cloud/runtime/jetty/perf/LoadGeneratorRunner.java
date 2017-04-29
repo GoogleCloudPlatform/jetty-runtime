@@ -38,7 +38,10 @@ public class LoadGeneratorRunner extends LoadGeneratorStarter {
 
   private static final Logger LOGGER = Log.getLogger( LoadGeneratorRunner.class );
   String host;
-  private GlobalSummaryListener globalSummaryListener = new GlobalSummaryListener();
+
+  private GlobalSummaryListener globalSummaryListener = new GlobalSummaryListener() //
+      .addExcludeHttpStatusFamily( 100, 300, 500 ); //
+
   private ExecutorService executorService;
 
   QpsListenerDisplay qpsListenerDisplay = //
@@ -50,7 +53,8 @@ public class LoadGeneratorRunner extends LoadGeneratorStarter {
       new RequestQueuedListenerDisplay(10, 10, TimeUnit.SECONDS);
 
   LatencyTimeDisplayListener latencyTimeDisplayListener =
-      new LatencyTimeDisplayListener( 10, 10, TimeUnit.SECONDS );
+      new LatencyTimeDisplayListener( 10, 10, TimeUnit.SECONDS )
+          .addExcludeHttpStatusFamily( 100, 300, 500 ); //
 
   public LoadGeneratorRunner( LoadGeneratorStarterArgs runnerArgs,
                               ExecutorService executorService, PerfRunner perfRunner ) {
@@ -112,6 +116,10 @@ public class LoadGeneratorRunner extends LoadGeneratorStarter {
   public CollectorInformations getLatencyTimeSummary() {
     return new CollectorInformations( globalSummaryListener.getLatencyTimeHistogram() //
                                           .getIntervalHistogram() );
+  }
+
+  public GlobalSummaryListener getGlobalSummaryListener() {
+    return globalSummaryListener;
   }
 
   @Override

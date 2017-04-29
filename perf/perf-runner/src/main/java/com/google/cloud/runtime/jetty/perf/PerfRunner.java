@@ -34,7 +34,6 @@ import com.beust.jcommander.JCommander;
 import com.eaio.uuid.UUID;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import org.apache.commons.lang.math.NumberUtils;
@@ -227,7 +226,18 @@ public class PerfRunner {
       LOGGER.info( "perfmetric:90_latency:" //
                        + fromNanostoMillis( latencyTimeSummary.getValue90() ) );
       LOGGER.info( "----------------------------------------------------" );
+      LOGGER.info( "response 1xx family: "
+                       + runner.getGlobalSummaryListener().getResponses1xx().longValue() );
+      LOGGER.info( "response 2xx family: "
+                       + runner.getGlobalSummaryListener().getResponses2xx().longValue() );
+      LOGGER.info( "response 3xx family: "
+                       + runner.getGlobalSummaryListener().getResponses3xx().longValue() );
+      LOGGER.info( "response 4xx family: "
+                       + runner.getGlobalSummaryListener().getResponses4xx().longValue() );
+      LOGGER.info( "response 5xx family: "
+                       + runner.getGlobalSummaryListener().getResponses5xx().longValue() );
       LOGGER.info( "" );
+
       synchronized ( this.runStatus ) {
         this.runStatus =
             new RunStatus( this.runId, //
