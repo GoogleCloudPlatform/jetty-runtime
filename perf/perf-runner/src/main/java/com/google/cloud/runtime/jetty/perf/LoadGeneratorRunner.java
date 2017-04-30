@@ -60,36 +60,40 @@ public class LoadGeneratorRunner extends LoadGeneratorStarter {
                               ExecutorService executorService, PerfRunner perfRunner ) {
     super( runnerArgs );
     this.executorService = executorService;
-    this.latencyTimeDisplayListener.addValueListener( histogram -> {
+    this.latencyTimeDisplayListener.addValueListener( ( latencyHistogram, totalHistogram )  -> {
       LOGGER.info( "host '" + host );
       LOGGER.info( "----------------------------------------------------");
-      LOGGER.info( "perfmetric_run:total:" + histogram.getTotalCount());
+      LOGGER.info( "perfmetric_run:total:" + latencyHistogram.getTotalCount());
       LOGGER.info( "perfmetric_run:max_latency:"
-                     + fromNanostoMillis( histogram.getMaxValue()) );
+                     + fromNanostoMillis( latencyHistogram.getMaxValue()) );
       LOGGER.info( "perfmetric_run:min_latency:"
-                     + fromNanostoMillis( histogram.getMinValue()) );
+                     + fromNanostoMillis( latencyHistogram.getMinValue()) );
       LOGGER.info( "perfmetric_run:ave_latency:"
-                     + fromNanostoMillis( Math.round( histogram.getMean())) );
+                     + fromNanostoMillis( Math.round( latencyHistogram.getMean())) );
       LOGGER.info( "perfmetric_run:50_latency:"
-                     + fromNanostoMillis( histogram.getValueAtPercentile( 50 )));
+                     + fromNanostoMillis( latencyHistogram.getValueAtPercentile( 50 )));
       LOGGER.info( "perfmetric_run:90_latency:"
-                     + fromNanostoMillis( histogram.getValueAtPercentile( 90 )));
+                     + fromNanostoMillis( latencyHistogram.getValueAtPercentile( 90 )));
       LOGGER.info( "----------------------------------------------------");
 
       long timeInSeconds =
-          TimeUnit.SECONDS.convert( histogram.getEndTimeStamp() //
-                                      - histogram.getStartTimeStamp(), //
+          TimeUnit.SECONDS.convert( totalHistogram.getEndTimeStamp() //
+                                      - totalHistogram.getStartTimeStamp(), //
                                   TimeUnit.MILLISECONDS );
-      long qps = histogram.getTotalCount() / timeInSeconds;
+      long qps = totalHistogram.getTotalCount() / timeInSeconds;
       synchronized ( perfRunner.runStatus ) {
         perfRunner.runStatus = //
           new PerfRunner.RunStatus( perfRunner.runId, //
-                                    histogram.getTotalCount(), //
-                                      fromNanostoMillis( histogram.getMaxValue() ), //
-                                      fromNanostoMillis( histogram.getMinValue() ), //
-                                      fromNanostoMillis( Math.round( histogram.getMean() ) ), //
-                                      fromNanostoMillis( histogram.getValueAtPercentile( 50 ) ), //
-                                      fromNanostoMillis( histogram.getValueAtPercentile( 90 ) ), //
+                                    latencyHistogram.getTotalCount(), //
+                                      fromNanostoMillis( latencyHistogram.getMaxValue() ), //
+                                      fromNanostoMillis(
+                                          latencyHistogram.getMinValue() ), //
+                                      fromNanostoMillis(
+                                          Math.round( latencyHistogram.getMean() ) ), //
+                                      fromNanostoMillis(
+                                          latencyHistogram.getValueAtPercentile( 50 ) ), //
+                                      fromNanostoMillis(
+                                          latencyHistogram.getValueAtPercentile( 90 ) ), //
                                       PerfRunner.Eta.RUNNING, //
                                       qps ) //
                 .startDate( perfRunner.runStartDate );
@@ -100,7 +104,10 @@ public class LoadGeneratorRunner extends LoadGeneratorStarter {
 
   @Override
   protected Request.Listener[] getListeners() {
-    return new Request.Listener[]{qpsListenerDisplay, requestQueuedListenerDisplay};
+    return new Request.Listener[]{qpsListenerDisplay, //
+                                  requestQueuedListenerDisplay, //
+                                  latencyTimeDisplayListener, //
+                                  globalSummaryListener};
   }
 
   @Override
@@ -120,6 +127,10 @@ public class LoadGeneratorRunner extends LoadGeneratorStarter {
 
   public GlobalSummaryListener getGlobalSummaryListener() {
     return globalSummaryListener;
+  }
+
+  public QpsListenerDisplay getQpsListenerDisplay() {
+    return qpsListenerDisplay;
   }
 
   @Override

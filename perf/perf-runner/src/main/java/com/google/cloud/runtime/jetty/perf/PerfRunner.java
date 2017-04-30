@@ -198,7 +198,7 @@ public class PerfRunner {
 
       CollectorInformations latencyTimeSummary = runner.getLatencyTimeSummary();
 
-      long totalRequestCommitted = latencyTimeSummary.getTotalCount();
+      long totalRequestCommitted = runner.getGlobalSummaryListener().getRequestCommitTotal();
       long start = latencyTimeSummary.getStartTimeStamp();
       long end = latencyTimeSummary.getEndTimeStamp();
 
