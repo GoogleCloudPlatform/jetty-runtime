@@ -338,7 +338,7 @@
                   <executable>bash</executable>
                   <arguments>
                     <argument>-c</argument>
-                    <argument>gcloud beta container images delete `docker inspect --format='{{index .RepoDigests 0}}' ${jetty.test.image}` -q</argument>
+                    <argument>gcloud beta container images delete `docker inspect --format='{{index .RepoDigests 0}}' ${jetty.test.image}` -q --force-delete-tags</argument>
                   </arguments>
                 </configuration>
               </execution>
