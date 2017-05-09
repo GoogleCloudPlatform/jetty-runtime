@@ -55,8 +55,7 @@ fi
 # Add the JETTY_ARGS to the JAVA_OPTS
 export JAVA_OPTS="$JAVA_OPTS $JETTY_ARGS"
 
-# Set CDBG_APP_WEB_INF_DIR, used by CDBG
+# Set CDBG_APP_WEB_INF_DIR, used by CDBG in format-env-appengine-vm.sh
 if [ "$DBG_ENABLE" = "true" ]; then
-  DBG_AGENT="$( RUNTIME_DIR=$JETTY_BASE /opt/cdbg/format-env-appengine-vm.sh )"
-  CDBG_APP_WEB_INF_DIR="${RUNTIME_DIR}/webapps/root/WEB-INF"
+  CDBG_APP_WEB_INF_DIR="${JETTY_BASE}/webapps/root/WEB-INF"
 fi
