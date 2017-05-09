@@ -33,7 +33,6 @@ RUN chown -R jetty:jetty $JETTY_HOME
 ENV JETTY_BASE ${jetty.base}
 ENV TMPDIR /tmp/jetty
 ADD jetty-base $JETTY_BASE
-ADD docker-entrypoint.bash /
 ADD 50-jetty.bash /setup-env.d/
 ADD 51-jetty-sessions.bash /setup-env.d/
 WORKDIR $JETTY_BASE

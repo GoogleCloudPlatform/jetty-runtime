@@ -171,6 +171,10 @@ docker run -it --rm \
 ### Enhanced Stackdriver Logging (BETA!)
 When running on the Google Cloud Platform Flex environment, the Java Util Logging can be configured to send logs to Google Stackdriver Logging by providing a `logging.properties` file that configures a [LoggingHandler](http://googlecloudplatform.github.io/google-cloud-java/0.10.0/apidocs/com/google/cloud/logging/LoggingHandler.html) as follows:
 ```
+.level=INFO
+io.grpc.netty.level=INFO
+sun.net.level=INFO
+
 handlers=com.google.cloud.logging.LoggingHandler
 com.google.cloud.logging.LoggingHandler.level=FINE
 com.google.cloud.logging.LoggingHandler.log=gae_app.log
@@ -180,15 +184,16 @@ com.google.cloud.logging.LoggingHandler.formatter=java.util.logging.SimpleFormat
 java.util.logging.SimpleFormatter.format=%3$s: %5$s%6$s
 
 ```
+This uses the [GaeFlexLoggingEnhancer](http://googlecloudplatform.github.io/google-cloud-java/0.10.0/apidocs/com/google/cloud/logging/GaeFlexLoggingEnhancer.html) to enhances the logs generated be linking them to the `nginx` request log in the logging console by `traceid` (The traceId for a request on a Google Cloud Platform is obtained from the `setCurrentTraceId` HTTP header as the first field of the `'/'` delimited value).
 
-This uses the [GaeFlexLoggingEnhancer](http://googlecloudplatform.github.io/google-cloud-java/0.10.0/apidocs/com/google/cloud/logging/GaeFlexLoggingEnhancer.html) to enhances the logs generated be linking them to the `nginx` request log in the logging console by `traceid` (The traceId for a request on a Google Cloud Platform is obtained from the `setCurrentTraceId` HTTP header as the first field of the `'/'` delimited value).    
+When an image so configured is deployed on a GCP environment, then the `gcp` module will automatically call the [setCurrentTraceId](http://googlecloudplatform.github.io/google-cloud-java/0.10.0/apidocs/com/google/cloud/logging/GaeFlexLoggingEnhancer.html#setCurrentTraceId-java.lang.String-) for any thread handling a request.
 
-When an image so configured is deployed on a GCP environment, then the `gcp` module will automatically call the [setCurrentTraceId](http://googlecloudplatform.github.io/google-cloud-java/0.10.0/apidocs/com/google/cloud/logging/GaeFlexLoggingEnhancer.html#setCurrentTraceId-java.lang.String-) for any thread handling a request.  
+When using Stackdriver logging, it is recommended that `io.grpc` and `sun.net` logging level is kept at INFO level, as both these packages are used by Stackdriver internals and can result in verbose and/or initialisation problems. 
 
 
 ## Extending the image
 The image produced by this project may be automatically used/extended by the Cloud SDK and/or App Engine maven plugin. 
-Alternately it may be explicitly extended with a custom Dockerfile.  
+Alternately it may be explicitly extended with a custom Dockerfile.
 
 The latest released version of this image is available at `launcher.gcr.io/google/jetty`, alternately you may 
 build and push your own version with the shell commands:
