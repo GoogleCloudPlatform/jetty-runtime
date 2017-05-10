@@ -92,8 +92,8 @@ Additional environment variables are used/set including:
 |`JETTY_BASE`      |`jetty.base`     |`/var/lib/jetty`                                      |
 |`TMPDIR`          |                 |`/tmp/jetty`                                          |
 |`JETTY_PROPERTIES`|                 |Comma separated list of `name=value` pairs appended to `$JETTY_ARGS` |
-|`JETTY_MODULES_ENABLE`|             |Comma separated list of modules to enable by appending to `$JETTY_ARGS` |
-|`JETTY_MODULES_DISABLE`|            |Comma separated list of modules to disable by removing from `$JETTY_BASE/start.d` |
+|`JETTY_MODULES_ENABLE`|            |Comma separated list of modules to enable by appending to `$JETTY_ARGS` |
+|`JETTY_MODULES_DISABLE`|           |Comma separated list of modules to disable by removing from `$JETTY_BASE/start.d` |
 |`JETTY_ARGS`      |                 |`-Djetty.base=$JETTY_BASE -jar $JETTY_HOME/start.jar` |
 |`ROOT_WAR`        |                 |`$JETTY_BASE/webapps/root.war`                        |
 |`ROOT_DIR`        |                 |`$JETTY_BASE/webapps/root`                            |
