@@ -34,13 +34,11 @@ ENV JETTY_BASE ${jetty.base}
 ENV TMPDIR /tmp/jetty
 ADD jetty-base $JETTY_BASE
 ADD 50-jetty.bash /setup-env.d/
-ADD 51-jetty-sessions.bash /setup-env.d/
 WORKDIR $JETTY_BASE
 RUN mkdir -p webapps $TMPDIR \
  && java -jar $JETTY_HOME/start.jar --add-to-start=setuid \
  && chown -R jetty:jetty $JETTY_BASE $TMPDIR \
  && chmod +x /setup-env.d/50-jetty.bash \
- && chmod +x /setup-env.d/51-jetty-sessions.bash \
  && chmod +x /docker-entrypoint.bash
 
 EXPOSE 8080
