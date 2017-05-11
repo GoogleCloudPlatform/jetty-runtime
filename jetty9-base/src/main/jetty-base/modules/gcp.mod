@@ -46,4 +46,4 @@ jetty.httpConfig.sendServerVersion?=true
 jetty.httpConfig.sendDateHeader?=false
 
 # Hide the gcloud libraries from deployed webapps
-jetty.webapp.addServerClasses+=,file://${jetty.base}/lib/gcp/
+jetty.webapp.addServerClasses+=,${jetty.base.uri}/lib/gcp/
