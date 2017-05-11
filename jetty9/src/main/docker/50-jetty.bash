@@ -1,6 +1,11 @@
 #!/bin/bash
 # Configure the environment and CMD for the Jetty Container
 
+#Set the unique name for the node based on the GAE environment
+if [ "$GAE_INSTANCE" ]; then
+  export JETTY_WORKER_INSTANCE=$GAE_INSTANCE
+fi
+
 # Unpack a WAR app (if present) beforehand so that Stackdriver Debugger
 # can load it. This should be done before the JVM for Jetty starts up.
 export ROOT_WAR=$JETTY_BASE/webapps/root.war
