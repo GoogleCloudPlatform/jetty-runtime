@@ -92,8 +92,8 @@ Additional environment variables are used/set including:
 |`JETTY_BASE`      |`jetty.base`     |`/var/lib/jetty`                                      |
 |`TMPDIR`          |                 |`/tmp/jetty`                                          |
 |`JETTY_PROPERTIES`|                 |Comma separated list of `name=value` pairs appended to `$JETTY_ARGS` |
-|`JETTY_MODULES_ENABLE`|             |Comma separated list of modules to enable by appending to `$JETTY_ARGS` |
-|`JETTY_MODULES_DISABLE`|            |Comma separated list of modules to disable by removing from `$JETTY_BASE/start.d` |
+|`JETTY_MODULES_ENABLE`|            |Comma separated list of modules to enable by appending to `$JETTY_ARGS` |
+|`JETTY_MODULES_DISABLE`|           |Comma separated list of modules to disable by removing from `$JETTY_BASE/start.d` |
 |`JETTY_ARGS`      |                 |`-Djetty.base=$JETTY_BASE -jar $JETTY_HOME/start.jar` |
 |`ROOT_WAR`        |                 |`$JETTY_BASE/webapps/root.war`                        |
 |`ROOT_DIR`        |                 |`$JETTY_BASE/webapps/root`                            |
@@ -178,15 +178,17 @@ sun.net.level=INFO
 handlers=com.google.cloud.logging.LoggingHandler
 com.google.cloud.logging.LoggingHandler.level=FINE
 com.google.cloud.logging.LoggingHandler.log=gae_app.log
-com.google.cloud.logging.LoggingHandler.resourceType=gae_app
-com.google.cloud.logging.LoggingHandler.enhancers=com.google.cloud.logging.GaeFlexLoggingEnhancer
 com.google.cloud.logging.LoggingHandler.formatter=java.util.logging.SimpleFormatter
 java.util.logging.SimpleFormatter.format=%3$s: %5$s%6$s
 
 ```
-This uses the [GaeFlexLoggingEnhancer](http://googlecloudplatform.github.io/google-cloud-java/0.10.0/apidocs/com/google/cloud/logging/GaeFlexLoggingEnhancer.html) to enhances the logs generated be linking them to the `nginx` request log in the logging console by `traceid` (The traceId for a request on a Google Cloud Platform is obtained from the `setCurrentTraceId` HTTP header as the first field of the `'/'` delimited value).
+When deployed on the GCP Flex environment, an image so configured will automatically be configured with:
+* a [LabelLoggingEnhancer](https://github.com/GoogleCloudPlatform/google-cloud-java/blob/v0.17.2/google-cloud-logging/src/main/java/com/google/cloud/logging/MonitoredResourceUtil.java#L224) instance, that will add labels from the monitored resource to each log entry.
+* a [TraceLoggingEnhancer](https://github.com/GoogleCloudPlatform/google-cloud-java/blob/v0.17.2/google-cloud-logging/src/main/java/com/google/cloud/logging/TraceLoggingEnhancer.java) instance that will add any trace-id set to each log entry.
+* the `gcp` module will be enabled that configures jetty so that the [setCurrentTraceId](https://github.com/GoogleCloudPlatform/google-cloud-java/blob/v0.17.2/google-cloud-logging/src/main/java/com/google/cloud/logging/TraceLoggingEnhancer.java#L40) method is called for any thread handling a request.
 
-When an image so configured is deployed on a GCP environment, then the `gcp` module will automatically call the [setCurrentTraceId](http://googlecloudplatform.github.io/google-cloud-java/0.10.0/apidocs/com/google/cloud/logging/GaeFlexLoggingEnhancer.html#setCurrentTraceId-java.lang.String-) for any thread handling a request.
+When deployed in other environments, logging enhancers can be manually configured by setting a comma separated list of class names as the
+`com.google.cloud.logging.LoggingHandler.enhancers` property.
 
 When using Stackdriver logging, it is recommended that `io.grpc` and `sun.net` logging level is kept at INFO level, as both these packages are used by Stackdriver internals and can result in verbose and/or initialisation problems. 
 
