@@ -6,7 +6,7 @@ Enables GCloud Datastore API and implementation
 gcloud
 
 [depends]
-gcloud
+gcp-gcloud
 jcl-slf4j
 jul-impl
 
