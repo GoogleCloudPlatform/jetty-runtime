@@ -38,18 +38,27 @@ public class RunnerHandler extends HttpServlet {
 
   final PerfRunner perfRunner;
 
+  private static final String NOT_FINISHED_MESSAGE = "previous run not finished";
+
   public RunnerHandler( PerfRunner perfRunner ) {
     this.perfRunner = perfRunner;
+  }
+
+  private boolean canStartRun(HttpServletResponse response) throws IOException {
+    if ( this.perfRunner.runStatus.getEta() == PerfRunner.Eta.RUNNING ) {
+      LOGGER.warn( NOT_FINISHED_MESSAGE );
+      response.getWriter().write( "previous run not finished" );
+      response.setStatus( HttpServletResponse.SC_CONFLICT );
+      return false;
+    }
+    return true;
   }
 
   @Override
   protected void doGet( HttpServletRequest request, HttpServletResponse response )
     throws ServletException, IOException {
     synchronized ( this.perfRunner.runStatus ) {
-      if ( this.perfRunner.runStatus.getEta() == PerfRunner.Eta.RUNNING ) {
-        LOGGER.warn( "previous run not finished" );
-        response.getWriter().write( "previous run not finished" );
-        response.setStatus( HttpServletResponse.SC_CONFLICT );
+      if ( !canStartRun( response ) ) {
         return;
       }
     }
@@ -69,10 +78,7 @@ public class RunnerHandler extends HttpServlet {
   @Override
   protected void doPost( HttpServletRequest request, HttpServletResponse response )
     throws ServletException, IOException {
-    if (this.perfRunner.runStatus.getEta() != PerfRunner.Eta.FINISHED) {
-      LOGGER.warn( "previous run not finished" );
-      response.getWriter().write( "previous run not finished" );
-      response.setStatus( HttpServletResponse.SC_CONFLICT );
+    if ( !canStartRun( response ) ) {
       return;
     }
     String json = IOUtils.toString( request.getReader() );

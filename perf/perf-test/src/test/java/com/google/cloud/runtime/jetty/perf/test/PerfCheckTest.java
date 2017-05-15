@@ -22,6 +22,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import com.google.cloud.runtime.jetty.perf.PerfRunner;
 import com.google.cloud.runtime.jetty.util.HttpUrlUtil;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.eclipse.jetty.client.HttpClient;
@@ -49,12 +50,13 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-
 public class PerfCheckTest {
 
   private HttpClient httpClient;
 
-  private ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
+  private ObjectMapper objectMapper = new ObjectMapper() //
+      .findAndRegisterModules() //
+      .disable( DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES );
 
   @Before
   public void initialize() throws Exception {

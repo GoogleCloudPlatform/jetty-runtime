@@ -44,7 +44,7 @@ import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.StatisticsHandler;
-import org.eclipse.jetty.server.session.HashSessionIdManager;
+import org.eclipse.jetty.server.session.DefaultSessionIdManager;
 import org.eclipse.jetty.server.session.SessionHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
@@ -266,7 +266,7 @@ public class PerfRunner {
     QueuedThreadPool serverThreads = new QueuedThreadPool();
     serverThreads.setName( "server" );
     server = new Server( serverThreads );
-    server.setSessionIdManager( new HashSessionIdManager() );
+    server.setSessionIdManager( new DefaultSessionIdManager(server) );
     connector = new ServerConnector( server, new HttpConnectionFactory( new HttpConfiguration() ) );
     String jettyPort = runnerArgs.getParams().get( "jettyPort" );
     int port = NumberUtils.toInt( jettyPort, 8080 );
