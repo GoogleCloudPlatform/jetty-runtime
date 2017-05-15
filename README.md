@@ -39,6 +39,21 @@ RUN java -jar "$JETTY_HOME/start.jar" --add-to-startd=jmx,stats
 ```
 Modules may be configured in a `Dockerfile` by editing the properties in the corresponding mod files in `/var/lib/jetty/start.d/` or the module can be deactivated by removing that file.
 
+### Enabling gzip compression
+The gzip handler is bundled with Jetty but not activated by default. To activate this module you have to set the environment
+variable `JETTY_MODULES_ENABLE=gzip`
+
+For example with docker:
+```console
+docker run -p 8080 -e JETTY_MODULES_ENABLE=gzip gcr.io/yourproject/yourimage
+```
+
+Or with GAE (app.yaml):
+```yaml
+env_variables:
+  JETTY_MODULES_ENABLE: 'gzip'
+```
+
 ## App Engine Flexible Environment
 When using App Engine Flexible, you can use the runtime without worrying about Docker by specifying `runtime: java` in your `app.yaml`:
 ```yaml
@@ -227,21 +242,6 @@ If no root WAR or root directory is found, the `docker-entrypoint.bash` script w
 image via a runtime mount:
 ```bash
 docker run -v /some-path/your-application:/app launcher.gcr.io/google/jetty  
-```
-
-### Enabling gzip compression
-The gzip handler is bundled with Jetty but not activated by default. To activate this module you have to set the environment
-variable `JETTY_MODULES_ENABLE=gzip`
-
-For example with docker:
-```console
-docker run -p 8080 -e JETTY_MODULES_ENABLE=gzip gcr.io/yourproject/yourimage
-```
-
-Or with GAE (app.yaml):
-```yaml
-env_variables:
-  JETTY_MODULES_ENABLE: 'gzip'
 ```
 
 # Development Guide
