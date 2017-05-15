@@ -229,6 +229,21 @@ image via a runtime mount:
 docker run -v /some-path/your-application:/app launcher.gcr.io/google/jetty  
 ```
 
+### Enabling gzip compression
+The gzip handler is bundled with Jetty but not activated by default. To activate this module you have to set the environment
+variable `JETTY_MODULES_ENABLE=gzip`
+
+For example with docker:
+```console
+docker run -p 8080 -e JETTY_MODULES_ENABLE=gzip gcr.io/yourproject/yourimage
+```
+
+Or with GAE (app.yaml):
+```yaml
+env_variables:
+  JETTY_MODULES_ENABLE: 'gzip'
+```
+
 # Development Guide
 
 * See [instructions](DEVELOPING.md) on how to build and test this image.
