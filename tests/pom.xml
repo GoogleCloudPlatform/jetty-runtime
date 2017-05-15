@@ -83,6 +83,9 @@
                   <ports>
                     <port>${local.app.port}:8080</port>
                   </ports>
+                  <env>
+                    <JETTY_MODULES_ENABLE>gzip</JETTY_MODULES_ENABLE>
+                  </env>
                 </run>
               </image>
             </images>
