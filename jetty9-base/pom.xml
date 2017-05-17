@@ -130,7 +130,7 @@
             </configuration>
           </execution>
           <execution>
-            <id>gcloud-jars</id>
+            <id>gcp-jars</id>
             <phase>package</phase>
             <goals>
               <goal>copy-dependencies</goal>
