@@ -12,3 +12,6 @@ handlers:
 - url: /.*
   script: ignored
   secure: optional
+
+env_variables:
+  JAVA_USER_OPTS: -Djava.util.logging.config.file=WEB-INF/logging.properties

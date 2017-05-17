@@ -1,11 +1,13 @@
 #!/bin/bash
 
 rm -fr $JETTY_BASE/webapps/root $JETTY_BASE/webapps/root.war
+trap "rm -rf $JETTY_BASE/webapps/root $JETTY_BASE/webapps/root.war" EXIT
 mkdir $JETTY_BASE/webapps/root
 echo original > $JETTY_BASE/webapps/root/index.html
 cd $JETTY_BASE/webapps/root
 jar cf ../root.war *
 cd ..
+
 
 rm -fr $JETTY_BASE/webapps/root
 source /setup-env.d/50-jetty.bash
@@ -30,7 +32,6 @@ if [ "$(cat $JETTY_BASE/webapps/root/index.html)" != "original" ]; then
   echo FAILED not unpacked when war newer
   exit 1
 fi
-
 
 echo OK
 

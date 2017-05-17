@@ -35,6 +35,12 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
+      <groupId>com.google.cloud</groupId>
+      <artifactId>google-cloud-logging</artifactId>
+      <version>${gcloud.api.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>com.google.cloud.runtimes.tests</groupId>
       <artifactId>gcloud-testing-core</artifactId>
       <version>${project.version}</version>
@@ -338,7 +344,7 @@
                   <executable>bash</executable>
                   <arguments>
                     <argument>-c</argument>
-                    <argument>gcloud beta container images delete `docker inspect --format='{{index .RepoDigests 0}}' ${jetty.test.image}` -q</argument>
+                    <argument>gcloud beta container images delete `docker inspect --format='{{index .RepoDigests 0}}' ${jetty.test.image}` -q --force-delete-tags</argument>
                   </arguments>
                 </configuration>
               </execution>
