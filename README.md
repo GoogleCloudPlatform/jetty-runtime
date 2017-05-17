@@ -1,3 +1,5 @@
+![Build Status](http://storage.googleapis.com/java-runtimes-kokoro-build-badges/jetty-runtime-master.png)
+
 # Google Cloud Platform Jetty Docker Image
 
 This repository contains the source for the Google-maintained Jetty [docker](https://docker.com) image.
