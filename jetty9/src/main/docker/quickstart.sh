@@ -1,7 +1,7 @@
 #!/bin/bash
 # Enable quickstart module for Jetty and eagerly generate the quickstart-web.xml
 
-# Generate configuration files for quickstart [ "$GENERATE_QUICKSTART" = "true" ] &&
+# Generate configuration files for quickstart
 if [ ! -e "$JETTY_BASE/webapps/root/WEB-INF/quickstart-web.xml" ]; then
   pushd ${JETTY_BASE}
   java -jar ${JETTY_HOME}/start.jar --add-to-start=quickstart

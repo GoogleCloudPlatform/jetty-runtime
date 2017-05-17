@@ -57,14 +57,15 @@ env_variables:
 ```
 
 ### Using Quickstart
-Jetty provides mechanisms (link to quickstart) to speed up the start time of your application by pre-scanning its content and generating configuration files.
-If you are using an extended image (link to extension) you can activate quickstart by adding this line to your Dockerfile.
+Jetty provides [mechanisms](http://www.eclipse.org/jetty/documentation/9.4.x/quickstart-webapp.html) to speed up the start time of your application by pre-scanning its content and generating configuration files.
+If you are using an [extended image](https://github.com/GoogleCloudPlatform/jetty-runtime/blob/master/README.md#extending-the-image) you can activate quickstart by adding this command to your Dockerfile.
 
 ```dockerfile
 RUN /docker-entrypoint.bash /scripts/jetty/quickstart.sh
 ```
 
-This command must appears after the command to add the war file.
+This command must appears after the command to add your war file.
+
 ## App Engine Flexible Environment
 When using App Engine Flexible, you can use the runtime without worrying about Docker by specifying `runtime: java` in your `app.yaml`:
 ```yaml
