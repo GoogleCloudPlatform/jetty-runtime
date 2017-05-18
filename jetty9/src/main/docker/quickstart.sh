@@ -1,6 +1,8 @@
 #!/bin/bash
 # Enable quickstart module for Jetty and eagerly generate the quickstart-web.xml
 
+source /docker-entrypoint.bash bash
+
 # Generate configuration files for quickstart
 if [ ! -e "$JETTY_BASE/webapps/root/WEB-INF/quickstart-web.xml" ]; then
   pushd ${JETTY_BASE}

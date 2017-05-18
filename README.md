@@ -61,7 +61,7 @@ Jetty provides [mechanisms](http://www.eclipse.org/jetty/documentation/9.4.x/qui
 If you are using an [extended image](https://github.com/GoogleCloudPlatform/jetty-runtime/blob/master/README.md#extending-the-image) you can activate quickstart by adding this command to your Dockerfile.
 
 ```dockerfile
-RUN /docker-entrypoint.bash /scripts/jetty/quickstart.sh
+RUN /scripts/jetty/quickstart.sh
 ```
 
 This command must appears after the command to add your war file.
