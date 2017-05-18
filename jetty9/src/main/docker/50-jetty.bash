@@ -66,3 +66,5 @@ if [ "$1" = "java" ]; then
   fi
 fi
 
+# Set CDBG_APP_WEB_INF_DIR, used by CDBG in format-env-appengine-vm.sh
+export CDBG_APP_WEB_INF_DIR="${JETTY_BASE}/webapps/root/WEB-INF"
