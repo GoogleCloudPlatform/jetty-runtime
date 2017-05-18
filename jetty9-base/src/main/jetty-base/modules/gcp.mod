@@ -44,3 +44,6 @@ jetty.httpConfig.sendServerVersion?=true
 
 # Don't send date header
 jetty.httpConfig.sendDateHeader?=false
+
+# Hide the gcloud libraries from deployed webapps
+jetty.webapp.addServerClasses+=,${jetty.base.uri}/lib/gcp/

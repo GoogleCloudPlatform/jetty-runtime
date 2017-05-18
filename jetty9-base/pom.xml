@@ -36,6 +36,17 @@
       <type>jar</type>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>com.google.cloud</groupId>
+      <artifactId>google-cloud-logging</artifactId>
+      <version>${gcloud.api.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
   </dependencies>
 
   <build>
@@ -96,7 +107,7 @@
           </execution>
           <execution>
             <id>gcp-jars</id>
-            <phase>pre-integration-test</phase>
+            <phase>package</phase>
             <goals>
               <goal>copy-dependencies</goal>
             </goals>
@@ -118,7 +129,7 @@
         <executions>
           <execution>
             <id>add-jetty-modules</id>
-            <phase>pre-integration-test</phase>
+            <phase>package</phase>
             <goals>
               <goal>exec</goal>
             </goals>
@@ -139,7 +150,7 @@
         <artifactId>maven-assembly-plugin</artifactId>
         <executions>
           <execution>
-            <phase>pre-integration-test</phase>
+            <phase>package</phase>
             <goals>
               <goal>single</goal>
             </goals>

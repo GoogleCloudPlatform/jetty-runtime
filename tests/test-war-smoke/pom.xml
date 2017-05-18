@@ -35,6 +35,12 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
+      <groupId>com.google.cloud</groupId>
+      <artifactId>google-cloud-logging</artifactId>
+      <version>${gcloud.api.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>com.google.cloud.runtimes.tests</groupId>
       <artifactId>gcloud-testing-core</artifactId>
       <version>${project.version}</version>
