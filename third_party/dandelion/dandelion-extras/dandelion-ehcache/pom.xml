@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+
+   <parent>
+      <artifactId>dandelion-extras</artifactId>
+      <groupId>com.google.cloud.runtime.jetty.third_party</groupId>
+      <version>1.1.2-SNAPSHOT</version>
+   </parent>
+
+   <artifactId>dandelion-ehcache</artifactId>
+   <name>Dandelion :: Extras :: Cache :: EhCache</name>
+   <description>Extra allowing to plug a back-end cache based on Ehcache in the Dandelion cache system.
+   </description>
+
+   <dependencies>
+      <!-- Internal dependencies -->
+      <dependency>
+         <groupId>com.google.cloud.runtime.jetty.third_party</groupId>
+         <artifactId>dandelion-core</artifactId>
+         <version>${project.version}</version>
+      </dependency>
+
+      <!-- Servlet API -->
+      <dependency>
+         <groupId>javax.servlet</groupId>
+         <artifactId>javax.servlet-api</artifactId>
+         <scope>provided</scope>
+      </dependency>
+
+      <!-- Ehcache -->
+      <dependency>
+         <groupId>net.sf.ehcache</groupId>
+         <artifactId>ehcache-core</artifactId>
+         <scope>provided</scope>
+      </dependency>
+   </dependencies>
+</project>

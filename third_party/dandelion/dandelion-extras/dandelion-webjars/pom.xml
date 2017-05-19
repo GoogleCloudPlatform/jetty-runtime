@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+
+   <parent>
+      <artifactId>dandelion-extras</artifactId>
+      <groupId>com.google.cloud.runtime.jetty.third_party</groupId>
+      <version>1.1.2-SNAPSHOT</version>
+   </parent>
+
+   <artifactId>dandelion-webjars</artifactId>
+   <packaging>jar</packaging>
+   <name>Dandelion :: Extras :: Locator :: Webjars</name>
+   <description>Extra providing a new asset locator for WebJars.</description>
+
+   <dependencies>
+      <!-- Internal dependencies -->
+      <dependency>
+         <groupId>com.google.cloud.runtime.jetty.third_party</groupId>
+         <artifactId>dandelion-core</artifactId>
+         <version>${project.version}</version>
+      </dependency>
+
+      <!-- Servlet API -->
+      <dependency>
+         <groupId>javax.servlet</groupId>
+         <artifactId>javax.servlet-api</artifactId>
+         <scope>provided</scope>
+      </dependency>
+
+      <!-- WebJars -->
+      <dependency>
+         <groupId>org.webjars</groupId>
+         <artifactId>webjars-locator</artifactId>
+      </dependency>
+
+      <!-- Test -->
+      <dependency>
+         <groupId>org.springframework</groupId>
+         <artifactId>spring-test</artifactId>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>org.assertj</groupId>
+         <artifactId>assertj-core</artifactId>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>org.webjars</groupId>
+         <artifactId>jquery</artifactId>
+         <version>1.11.0</version>
+         <scope>test</scope>
+      </dependency>
+   </dependencies>
+</project>

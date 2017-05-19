@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dialect xmlns="http://www.thymeleaf.org/extras/dialect"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://www.thymeleaf.org/extras/dialect
+                       http://www.thymeleaf.org/xsd/thymeleaf-extras-dialect-2.1.xsd"
+         prefix="ddl"
+         namespace-uri="http://www.thymeleaf.org/dandelion"
+         namespace-strict="false"
+         class="com.github.dandelion.thymeleaf.dialect.DandelionDialect">
+
+   <attribute-processor name="bundle-includes">
+      <documentation>
+         <![CDATA[
+            <p>Comma-separated list of bundles to activate in the current request.</p>
+         ]]>
+      </documentation>
+   </attribute-processor>
+
+   <attribute-processor name="bundle-excludes">
+      <documentation>
+         <![CDATA[
+            <p>Comma-separated list of bundles to exclude from the current request.</p>
+         ]]>
+      </documentation>
+   </attribute-processor>
+
+   <attribute-processor name="js-excludes">
+      <documentation>
+         <![CDATA[
+            <p>Comma-separated list of JavaScript assets to exclude from the current request.</p>
+         ]]>
+      </documentation>
+   </attribute-processor>
+   
+   <attribute-processor name="css-excludes">
+      <documentation>
+         <![CDATA[
+            <p>Comma-separated list of CSS assets to exclude from the current request.</p>
+         ]]>
+      </documentation>
+   </attribute-processor>
+   
+   <attribute-processor name="placeholder-include">
+      <restrictions tags="-html"/>
+      <documentation>
+         <![CDATA[
+            <p>Placeholder used to tell Dandelion where to inject the corresponding assets. Assets will be injected into the corresponding element.</p>
+         ]]>
+      </documentation>
+   </attribute-processor>
+   
+   <attribute-processor name="placeholder-replace">
+      <restrictions tags="-html"/>
+      <documentation>
+         <![CDATA[
+            <p>Placeholder used to tell Dandelion where to inject the corresponding assets. Assets will replace the corresponding element.</p>
+         ]]>
+      </documentation>
+   </attribute-processor>
+</dialect>

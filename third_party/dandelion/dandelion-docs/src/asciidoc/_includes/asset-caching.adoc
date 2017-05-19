@@ -1,0 +1,186 @@
+== 9. Asset caching
+
+[quote, HTTP Caching in Optimizing Content Efficiency, https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching]     
+Fetching something over the network is both slow and expensive: large responses require many roundtrips between the client and server, which delays when they are available and can be processed by the browser, and also incurs data costs for the visitor. As a result, the ability to cache and reuse previously fetched resources is a critical aspect of optimizing for performance.
+
+=== 9.1. Introducing asset caching
+
+Caching is one of the key issues of Dandelion-Core. Caching is involved at multiples levels, from server-side core functionalities such as <<5-asset-locators, asset locators>> to client browsers thanks to HTTP headers.
+
+All caching mechanisms are described in this section.
+
+==== 9.1.1. Server-side caching
+
+Server-side caching has two main purposes:
+
+* store the assocation between a request URI and its corresponding assets
+* store the asset contents
+
+See the following four steps to understand how it works:
+
+image::asset-caching.png[Caching, align=center]
+
+As you can see, a new entry is added in the *request store* on a per-page level. This looks quite aggressive but works in all cases. More fine-tuned strategies will be available in future versions.
+
+==== 9.1.2. Browser caching
+
+As far as possible, Dandelion-Core helps the browser determine if and when it can reuse a previously fetched response. For this to happen, Dandelion-Core acts on server responses by specifying an explicit caching policy for each resource. 
+
+The caching policy is set through HTTP headers, whose value changes depending on the <<opt-asset.cache, `cache`>> option.
+
+NOTE: The caching policy of resources fetched from external locations, such as http://en.wikipedia.org/wiki/Content_delivery_network[CDNs], is delegated to the external servers.
+
+The HTTP headers are set on all resources except those with the `text/html` content type.
+
+|===
+|HTTP header |Caching enabled |Caching disabled
+
+|`Cache-Control` | public, max-age=31536000 | no-cache, no-store
+|`Expires` | current date + 1 year | current date - 1 year
+|`Last-Modified` | start up time of the server | 
+|`Vary` | Accept-Encoding | Accept-Encoding
+
+|===
+
+NOTE: Note that asset caching is enabled by default in the `prod` profile and disabled by default in the `dev` one
+
+=== 9.2. Built-in server-side cache systems
+
+Dandelion-Core comes with two built-in server-side cache systems that are described below.
+
+==== 9.2.1. Memory
+
+Dandelion uses the _MemoryAssetCache_ service provider as the default implementation used for server-side caching.
+
+|===
+|Cache system name|`default`
+|Service provider|_MemoryAssetCache_
+|===
+
+This implementation uses two maps as stores, that use the http://en.wikipedia.org/wiki/Cache_algorithms[LRU algorythm] for the eviction of elements.
+
+* The first one caches asset contents. 
+* The second one caches the association between a request URI and the requested assets
+
+The max element of each of them can be configured thanks to the <<opt-cache.max.size, `cache.max.size`>> configuration option.
+
+==== 9.2.2. Ehcache
+
+Alternatively, if you already use http://ehcache.org/[Ehcache] in your application, it can be handy to use it as a main cache system for Dandelion-Core.
+
+The _dandelion-ehcache_ extra brings:
+
+* a new service provider for the _AssetCache_ SPI
+* a dependency to the http://ehcache.org/[Ehcache] project
+
+|===
+|Cache system name|`ehcache`
+|Service provider|_EhcacheAssetCache_
+|===
+
+First, update your project by adding the following dependency:
+
+.Example with a Maven project
+[source,xml,subs="+attributes"]
+----
+<dependency>
+  <groupId>com.github.dandelion</groupId>
+  <artifactId>dandelion-ehcache</artifactId>
+  <version>{project-version}</version>
+</dependency>
+----
+
+Once the artifact available in your classpath, you need to tell Dandelion-Core that you want to use the service provider bundled inside.
+
+For this purpose, update your <<12-configuration-options, configuration options>> as follows:
+
+.dandelion/dandelion.properties
+[source, properties]
+----
+cache.name=ehcache
+----
+
+Moreover, note that you can specify the location of the `ehcache.xml` file using the <<opt-cache.configuration.location, `cache.configuration.location`>> configuration option.
+
+=== 9.3. Plugging-in your own cache system
+
+Like most parts of the framework, Dandelion-Core provides an extension point allowing your to plug-in your own cache system thanks to the SPI mechanism.
+
+In order to plug-in your own cache system, just follow these steps:
+
+. Create a class that extends `AbstractAssetCache`
+
++
+[source, java]
+----
+package com.foo.asset.cache.impl;
+
+public class MyCacheSystem extends AbstractAssetCache {
+
+   @Override
+   public void initCache(Context context) {
+      ...
+   }
+
+   @Override
+   public String getCacheName() {
+      return "myowncachesystem";
+   }
+
+   @Override
+   public String getAssetContent(String cacheKey) {
+      ...
+   }
+
+   @Override
+   public Set<Asset> getRequestAssets(String cacheKey) {
+      ...
+   }
+
+   @Override
+   public void storeAssetContent(String cacheKey, String assetContent) {
+      ...
+   }
+
+   @Override
+   public void storeRequestAssets(String cacheKey, Set<Asset> assets) {
+      ...
+   }
+
+   @Override
+   public void remove(String cacheKey) {
+      ...
+   }
+
+   @Override
+   public void clearAll() {
+      ...
+   }
+}
+----
+
+. In the `META-INF/services` folder, create a text file (UTF-8 encoded) using the following convention:
+
++
+.Example with a Maven project
+[source, xml]
+----
+project-root
+|__ src
+   |__ main
+      |__ resources
+         |__ META-INF
+            |__ services
+               |__ com.github.dandelion.core.asset.cache.AssetCache
+----
+ 
++
+Inside this file, just add the fully qualified name of your own implementation. For example:
+
+ com.foo.asset.cache.impl.MyCacheSystem
+
+. Configure Dandelion-Core to use your custom implementation thanks to the <<opt-cache.name, `cache.name`>> configuration option.
+
+ cache.name=myowncachesystem
+
+And that's all! Dandelion, thanks to the SPI mechanism, will automatically pick up your implementation on the next restart.

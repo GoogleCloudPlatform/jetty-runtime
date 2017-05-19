@@ -1,0 +1,27 @@
+{
+    "bundle": "bundle-with-error",
+    "assets": [
+       {
+           "version": "1.0.0",
+           "locations": {
+           }
+       },
+       {
+           "version": "1.0.0",
+           "locations": {
+               "classpath": ""
+           }
+       },
+       {
+           "version": "1.0.0",
+           "locations": {
+               "": "dandelion/assets/a.js"
+           }
+       },
+       {
+           "locations": {
+               "api": ""
+           }
+       }
+   ]
+}

@@ -1,0 +1,132 @@
+== Appendix A: JSP taglib reference
+
+=== A.1. `<dandelion:bundle>` tag
+
+The `<dandelion:bundle>` tag allows you to include bundles in (or exclude them from) the current HTTP request.
+
+[discrete]
+==== Usage
+
+In order to include a bundle to the current HTTP request, use the `includes` attribute as follows:
+
+[source, xml]
+----
+<%@ taglib prefix="dandelion" uri="http://github.com/dandelion" %>
+...
+<dandelion:bundle includes="bundle-to-include, another-bundle-to-include" />
+...
+----
+
+In the same way, use the `excludes` attribute as follows to exclude a bundle from the current HTTP request:
+
+[source, xml]
+----
+<%@ taglib prefix="dandelion" uri="http://github.com/dandelion" %>
+...
+<dandelion:bundle excludes="bundle-to-exclude" />
+...
+----
+
+[discrete]
+==== Reference
+
+.`<dandelion:bundle>` tag reference
+[cols="2,8"]
+|===
+|Attribute |Description
+
+|[[jsp-bundle-includes]]*includes*
+|Comma-separated list of bundles to include in the current HTTP request
+
+|[[jsp-bundle-excludes]]*excludes*
+|Comma-separated list of bundles to exclude from the current HTTP request
+|===
+
+=== A.2. `<dandelion:asset>` tag
+
+The `<dandelion:asset>` tag allows you to exclude assets (JS and/or CSS) from the current HTTP request.
+
+[discrete]
+==== Usage
+
+In order to exclude one JS asset from the current request, use the `jsExcludes` as follows:
+
+[source, xml]
+----
+<%@ taglib prefix="dandelion" uri="http://github.com/dandelion" %>
+...
+<dandelion:asset jsExcludes="js-asset-to-exclude, another-js-asset-to-exclude" />
+...
+----
+
+And in order to exclude one CSS asset from the current HTTP request, use the `cssExcludes` as follows:
+
+[source, xml]
+----
+<%@ taglib prefix="dandelion" uri="http://github.com/dandelion" %>
+...
+<dandelion:asset cssExcludes="css-asset-to-exclude" />
+...
+----
+
+[discrete]
+==== Reference
+
+.`<dandelion:asset>` tag reference
+[cols="2,8"]
+|===
+|Attribute |Description
+
+|[[jsp-asset-jsExcludes]]*jsExcludes*
+|Comma-separated list of JS asset names to exclude from the current HTTP request
+
+|[[jsp-asset-cssExcludes]]*cssExcludes*
+|Comma-separated list of CSS asset names to exclude from the current HTTP request
+|===
+
+=== A.3. `<dandelion:placeholder>` tag
+
+The `<dandelion:placeholder>` tag allows you to configure custom placeholders that Dandelion-core will use to perform assets injection.
+
+[discrete]
+==== Usage
+
+By default, Dandelion-Core injects `<script>` tags at the end of the `<body>` section and `<link>` tags at the end of the `<head>` section. But in the example below, the injection is performed where the `<dandelion:placeholder>` tag is used.
+
+[source, xml]
+----
+<%@ taglib prefix="dandelion" uri="http://github.com/dandelion" %>
+<html>
+  <head>
+    ...
+  </head>
+  <body>
+    ...
+    <div> 
+      <dandelion:placeholder type="js" /> <1>
+    </div>
+  </body>
+</html>
+----
+<1> Since the `type` attribute is set to `js`, all JavaScript assets will be included in the surrounding `div`
+
+[NOTE]
+====
+A few rules need apply:
+
+* The same placeholder type can be used only once per page
+* Only `js` and `css` are allowed in the `type` attribute
+====
+
+[discrete]
+==== Reference
+
+.`<dandelion:placeholder>` tag reference
+[cols="2,8,5"]
+|===
+|Attribute |Description |Possible values
+
+|[[jsp-placeholder-type]]*type*
+|Type of placeholder to configure (*_Required_*)
+|`js` \| `css`
+|===

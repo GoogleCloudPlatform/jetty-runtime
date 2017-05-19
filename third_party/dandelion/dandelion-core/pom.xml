@@ -1,0 +1,78 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+
+   <parent>
+      <artifactId>dandelion</artifactId>
+      <groupId>com.google.cloud.runtime.jetty.third_party</groupId>
+      <version>1.1.2-SNAPSHOT</version>
+   </parent>
+
+   <artifactId>dandelion-core</artifactId>
+   <packaging>jar</packaging>
+   <name>Dandelion :: Core</name>
+   <description>Dandelion Core module providing all APIs and standard implementations.</description>
+
+   <dependencies>
+
+      <!-- Servlet API -->
+      <dependency>
+         <groupId>javax.servlet</groupId>
+         <artifactId>javax.servlet-api</artifactId>
+         <scope>provided</scope>
+      </dependency>
+
+      <!-- Commons-IO -->
+      <dependency>
+         <groupId>commons-io</groupId>
+         <artifactId>commons-io</artifactId>
+      </dependency>
+
+      <!-- Jackson -->
+      <dependency>
+         <groupId>com.fasterxml.jackson.core</groupId>
+         <artifactId>jackson-core</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>com.fasterxml.jackson.core</groupId>
+         <artifactId>jackson-annotations</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>com.fasterxml.jackson.core</groupId>
+         <artifactId>jackson-databind</artifactId>
+      </dependency>
+
+      <!-- Test -->
+      <dependency>
+         <groupId>org.springframework</groupId>
+         <artifactId>spring-test</artifactId>
+         <scope>test</scope>
+      </dependency>
+
+      <dependency>
+         <groupId>org.powermock</groupId>
+         <artifactId>powermock-module-junit4</artifactId>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>org.powermock</groupId>
+         <artifactId>powermock-api-mockito</artifactId>
+         <scope>test</scope>
+         <exclusions>
+            <exclusion>
+               <groupId>org.mockito</groupId>
+               <artifactId>mockito-all</artifactId>
+            </exclusion>
+         </exclusions>
+      </dependency>
+
+      <!-- Logging -->
+      <dependency>
+         <groupId>ch.qos.logback</groupId>
+         <artifactId>logback-classic</artifactId>
+         <version>1.1.2</version>
+         <scope>test</scope>
+      </dependency>
+
+   </dependencies>
+
+</project>

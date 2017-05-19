@@ -1,0 +1,38 @@
+= Dandelion-Core {project-version} Documentation
+Thibault Duchateau <https://github.com/tduchateau[@tduchateau]>
+
+:include-dir: _includes
+
+include::{include-dir}/introduction.adoc[]
+
+include::{include-dir}/requirements.adoc[]
+
+include::{include-dir}/installation.adoc[]
+
+include::{include-dir}/asset-bundles.adoc[]
+
+include::{include-dir}/asset-locators.adoc[]
+
+include::{include-dir}/asset-versioning.adoc[]
+
+include::{include-dir}/asset-processors.adoc[]
+
+include::{include-dir}/bundle-loaders.adoc[]
+
+include::{include-dir}/asset-caching.adoc[]
+
+include::{include-dir}/profiles.adoc[]
+
+include::{include-dir}/asset-generators.adoc[]
+
+include::{include-dir}/configuration-options.adoc[]
+ 
+include::{include-dir}/debugger.adoc[]
+
+include::{include-dir}/handlers.adoc[]
+
+include::{include-dir}/reference-jsp-taglib.adoc[]
+
+include::{include-dir}/reference-thymeleaf-dialect.adoc[]
+
+include::{include-dir}/reference-options.adoc[]
