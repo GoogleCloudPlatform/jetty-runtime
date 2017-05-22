@@ -15,3 +15,4 @@ handlers:
 
 env_variables:
   JAVA_USER_OPTS: -Djava.util.logging.config.file=WEB-INF/logging.properties
+  JETTY_MODULES_ENABLE: gzip
