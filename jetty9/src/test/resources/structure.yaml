@@ -66,6 +66,10 @@ fileExistenceTests:
   isDirectory: false
   shouldExist: true
   expectedContents: ['.*from setup-env-ext.bash.*End setup-env-ext.bash.*']
+- name: 'jetty quickstart exists'
+  path: '/scripts/jetty/quickstart.sh'
+  isDirectory: false
+  shouldExist: true
 
 licenseTests:
 - debian: true
