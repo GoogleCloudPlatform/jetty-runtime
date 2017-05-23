@@ -1,4 +1,3 @@
 --create-startd
---approve-all-licenses
---add-to-start=server,webapp,http,deploy,jsp,jstl,resources,logging-jul,jcl-slf4j
+--add-to-start=server,webapp,http,deploy,jsp,jstl,resources
 
