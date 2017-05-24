@@ -35,6 +35,6 @@ echo "Running integration tests on image: $IMAGE"
 
 echo "Running jetty smoke tests on image: $IMAGE"
 pushd tests/
-mvn install -Djetty.test.image=$IMAGE -Ptest.remote,test.local
+mvn -B install -Djetty.test.image=$IMAGE -Ptest.remote
 popd
 
