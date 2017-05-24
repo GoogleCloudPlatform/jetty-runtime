@@ -27,13 +27,15 @@ On the Stackdriver side of things we are interested in:
 
 Within the perf-runner the following information may be found in the streaming logs:
 
-* estimated qps every 30s for each hosts (grep log on INFO) format:
+* estimated qps every 10s for each hosts (grep log on INFO) format:
 
 ```
-2017-04-05 02:25:22.713:INFO:omjlgl.QpsListenerDisplay:pool-1-thread-1: ----------------------------------------
-2017-04-05 02:25:22.713:INFO:omjlgl.QpsListenerDisplay:pool-1-thread-1: --------    QPS estimation    ----------
-2017-04-05 02:25:22.713:INFO:omjlgl.QpsListenerDisplay:pool-1-thread-1: ---------------------------------------- 
-2017-04-05 02:25:22.713:INFO:omjlgl.QpsListenerDisplay:pool-1-thread-1: host 'cced3cb67b60' estimated QPS : 5534
+2017-05-24 04:55:15.907:INFO:omjlgl.QpsListenerDisplay:pool-3-thread-1: ----------------------------------------
+2017-05-24 04:55:15.907:INFO:omjlgl.QpsListenerDisplay:pool-3-thread-1: --------    QPS estimation    ----------
+2017-05-24 04:55:15.907:INFO:omjlgl.QpsListenerDisplay:pool-3-thread-1: ----------------------------------------
+2017-05-24 04:55:15.907:INFO:omjlgl.QpsListenerDisplay:pool-3-thread-1: host 'fd3a8aeda616' estimated_live QPS : 16059
+ 
+
 ```
 * request currently in queue (grep log on INFO) format:
 
@@ -43,19 +45,32 @@ Within the perf-runner the following information may be found in the streaming l
 2017-04-05 02:30:22.733:INFO:omjlgl.RequestQueuedListenerDisplay:pool-2-thread-1: ----------------------------------------
 ```
 
-* end summary of total QPS and response time (TODO change it to latency?) (grep log on INFO) format:
+* end summary of total QPS and latency time (grep log on INFO) format:
 
 ```
-2017-03-31 11:41:23.714:INFO:cgcrjp.PerfRunner:main: ----------------------------------------------------
-2017-03-31 11:41:23.714:INFO:cgcrjp.PerfRunner:main: -----------    Result Summary     ------------------
-2017-03-31 11:41:23.714:INFO:cgcrjp.PerfRunner:main: ----------------------------------------------------
-2017-03-31 11:41:23.714:INFO:cgcrjp.PerfRunner:main: CollectorInformations millis:totalCount=4948895, minValue=0, maxValue=40231, mean=3855, 
-stdDeviation=5501, value 50%=899, value 90%=2147, startTimeStamp=2017-03-31T11:26:02 UTC, endTimeStamp=2017-03-31T11:41:23 UTC
-2017-03-31 11:41:23.714:INFO:cgcrjp.PerfRunner:main: ---------------------------------------------------- 
-2017-03-31 11:41:23.714:INFO:cgcrjp.PerfRunner:main: -----------     Estimated QPS     ------------------
-2017-03-31 11:41:23.714:INFO:cgcrjp.PerfRunner:main: ----------------------------------------------------
-2017-03-31 11:41:23.714:INFO:cgcrjp.PerfRunner:main: host '2e0ce9d008e0' estimated QPS : 5373
-2017-03-31 11:41:23.714:INFO:cgcrjp.PerfRunner:main: ----------------------------------------------------
+2017-05-24 04:57:39.747:INFO:cgcrjp.PerfRunner:pool-1-thread-1: ----------------------------------------------------
+2017-05-24 04:57:39.747:INFO:cgcrjp.PerfRunner:pool-1-thread-1: --------    Latency Time Summary     ---------------
+2017-05-24 04:57:39.747:INFO:cgcrjp.PerfRunner:pool-1-thread-1: ----------------------------------------------------
+2017-05-24 04:57:39.754:INFO:cgcrjp.PerfRunner:pool-1-thread-1: CollectorInformations millis:totalCount=143961, minValue=1, maxValue=40835, mean=12052, stdDeviation=8238, value 50%=2147, value 90%=2147, startTimeStamp=2017-05-24T04:54:35 UTC, endTimeStamp=2017-05-24T04:57:39 UTC
+2017-05-24 04:57:39.754:INFO:cgcrjp.PerfRunner:pool-1-thread-1: ----------------------------------------------------
+2017-05-24 04:57:39.754:INFO:cgcrjp.PerfRunner:pool-1-thread-1: 
+2017-05-24 04:57:39.754:INFO:cgcrjp.PerfRunner:pool-1-thread-1: ----------------------------------------------------
+2017-05-24 04:57:39.754:INFO:cgcrjp.PerfRunner:pool-1-thread-1: -----------     Estimated QPS     ------------------
+2017-05-24 04:57:39.754:INFO:cgcrjp.PerfRunner:pool-1-thread-1: ----------------------------------------------------
+2017-05-24 04:57:39.754:INFO:cgcrjp.PerfRunner:pool-1-thread-1: host 'fd3a8aeda616' estimated QPS : 5491
+2017-05-24 04:57:39.754:INFO:cgcrjp.PerfRunner:pool-1-thread-1: ----------------------------------------------------
+2017-05-24 04:57:39.754:INFO:cgcrjp.PerfRunner:pool-1-thread-1: perfmetric:max_latency:40835
+2017-05-24 04:57:39.754:INFO:cgcrjp.PerfRunner:pool-1-thread-1: perfmetric:min_latency:1
+2017-05-24 04:57:39.754:INFO:cgcrjp.PerfRunner:pool-1-thread-1: perfmetric:ave_latency:12052
+2017-05-24 04:57:39.754:INFO:cgcrjp.PerfRunner:pool-1-thread-1: perfmetric:50_latency:12079 
+2017-05-24 04:57:39.754:INFO:cgcrjp.PerfRunner:pool-1-thread-1: perfmetric:90_latency:22800
+2017-05-24 04:57:39.754:INFO:cgcrjp.PerfRunner:pool-1-thread-1: ----------------------------------------------------
+2017-05-24 04:57:39.754:INFO:cgcrjp.PerfRunner:pool-1-thread-1: response 1xx family: 0
+2017-05-24 04:57:39.754:INFO:cgcrjp.PerfRunner:pool-1-thread-1: response 2xx family: 143961
+2017-05-24 04:57:39.754:INFO:cgcrjp.PerfRunner:pool-1-thread-1: response 3xx family: 0
+2017-05-24 04:57:39.754:INFO:cgcrjp.PerfRunner:pool-1-thread-1: response 4xx family: 0
+2017-05-24 04:57:39.754:INFO:cgcrjp.PerfRunner:pool-1-thread-1: response 5xx family: 857535
+
 ``` 
 
 Within the perf-server the following information may be found in the streaming logs:
@@ -161,3 +176,91 @@ The following are some configurations and their results from our testing.
 [width="100%", frame="topbot", options="header"]
 | perf-server | perf-runner | qps | latency |
 | resources.cpu=2, resources.memory_gb=8 | users=?, runner.instances=2, etc | 8-9k | ? |
+
+### Start Load testing 
+
+The load test service is installed remotely as a web application. It can run a load test on demand.
+
+Default port is 8080 (can be changed using command line argument -DjettyPort)
+
+Some simple http paths give you the state of the service and help you to start the load test
+
+* /status return a status with the following json content. 
+```
+{
+  "runId": "15ab73b0-403d-11e7-bd76-0242ac120002",
+  "timestamp": "2017-05-24T04:54:45.911+0000",
+  "startDate": "2017-05-24T04:54:35.880+0000",
+  "endDate": null,
+  "eta": "RUNNING",
+  "requestNumber": 3465,
+  "maxLatency": 6928,
+  "minLatency": 24,
+  "aveLatency": 2918,
+  "qps": 1573,
+  "latency50": 2854,
+  "latency90": 4995
+}
+```
+  eta field can have the following values: RUNNING,FINISHED or NOT_STARTED
+* /config GET will return the default configuration of the load test
+```
+{
+  "profileXmlPath": null,
+  "profileJsonPath": null,
+  "profileGroovyPath": "/loadgenerator_profile.groovy",
+  "host": "jetty-runtime-perf-app-dot-jetty9-work.appspot.com",
+  "port": 443,
+  "users": 2,
+  "transactionRate": 2000,
+  "transport": "HTTP",
+  "selectors": 1,
+  "threads": 18,
+  "runningTime": 3,
+  "runningTimeUnit": "MINUTES",
+  "runIteration": 0,
+  "reportHost": "localhost",
+  "scheme": "https",
+  "reportPort": 0,
+  "notInterrupt": false,
+  "statsFile": null,
+  "params": {
+    "jettyRun": "true",
+    "noSysExit": "true",
+    "bigQuery": "true",
+    "jettyPort": "8080"
+  },
+  "help": false,
+  "displayStatsAtEnd": false,
+  "collectServerStats": false,
+  "warmupNumber": 2,
+  "maxRequestsQueued": 410000,
+  "channelPerUser": -1
+}
+```
+* /run will start a load test (if already running http status 409)
+
+  * GET will start a load test with default configuration
+  * POST will start a load with the configuration posted as a json content 
+    (the json content is similar to what returned by /config GET)
+     
+## Result storage
+The result are stored in a BigQuery table called jetty9-work:jetty_runtime.loadgenerator_run.
+The table contain the following columns
+* runId: unique id to identify a load test
+* timestamp: timestamp of the current row
+* startDate: time when load was started
+* endDate: time when load finished
+* eta: the eta
+* requestNumber: request number send since previous row 
+* maxLatency: max latency in ms
+* minLatency: min latency in ms
+* aveLatency: average latency in ms
+* latency50: 50 percentile latency in ms
+* latency90: 90 percentile latency in ms
+* qps: queries number per second
+
+Each row contains values since previous row except for last row which contains the number for all requests.
+
+
+
