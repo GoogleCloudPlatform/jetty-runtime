@@ -44,4 +44,6 @@ export PATH=$DIR/google-cloud-sdk/bin:$PATH
 
 gcloud auth activate-service-account --key-file=$KEYFILE
 gcloud config set project $GCP_PROJECT
+export GOOGLE_APPLICATION_CREDENTIALS=$KEYFILE
+
 gcloud components install beta -q

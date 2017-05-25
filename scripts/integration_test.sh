@@ -31,7 +31,7 @@ fi
 
 # build the test app
 pushd $testAppDir
-mvn clean install
+mvn -B clean install
 popd
 
 # deploy to app engine
