@@ -260,9 +260,16 @@ docker run -v /some-path/your-application:/app launcher.gcr.io/google/jetty
 
 ### Enabling dry-run
 The image's default start command will first run the jetty start.jar as a --dry-run to generate the JVM
-start command before starting the jetty web server. If you wish to generate the start command at container
-build time, you can run the `/scripts/jetty/gen_start_command.sh` script to generate it for you. NOTE: Make
-sure that the web application and any additional custom jetty modules have been added BEFORE running this script.
+start command before starting the jetty web server. If you wish to generate the start command in your Dockerfile
+rather than at container start-time, you can run the `/scripts/jetty/gen_start_command.sh` script to generate it 
+for you, i.e. 
+
+```bash
+RUN export JETTY_START_COMMAND=$(/scripts/jetty/gen_start_command.sh)
+```
+
+NOTE: Make sure that the web application and any additional custom jetty modules have been added to the container
+BEFORE running this script.
 
 # Development Guide
 
