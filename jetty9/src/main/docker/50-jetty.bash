@@ -51,10 +51,10 @@ if [ "$PLATFORM" = "gae" ]; then
   JETTY_ARGS="$JETTY_ARGS --module=gcp"
 fi
 
-# If command line is running java, then assume it is jetty and mix in JETTY_ARGS
+# If command line is running java, then mix in JETTY_ARGS if appropriate
 if [ "$1" = "java" ]; then
   # If this is an invocation of start.jar, append JETTY_ARGS
-  if [ "$(echo $@ | egrep start.jar | wc -l )" != "0" ]; then
+  if [ "$(echo $@ | egrep start.jar | wc -l )" != "0" -a -n "$JETTY_ARGS" ]; then
     shift
     set -- java $@ $JETTY_ARGS
   fi
