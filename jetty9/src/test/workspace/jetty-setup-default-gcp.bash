@@ -1,5 +1,5 @@
 #!/bin/bash
-set - java -zero one two three
+set - java -Djetty.base=/var/lib/jetty -jar /opt/jetty-home/start.jar -zero one two three
 JAVA_OPTS="-java -options"
 PLATFORM=gae
 source /setup-env.d/50-jetty.bash
