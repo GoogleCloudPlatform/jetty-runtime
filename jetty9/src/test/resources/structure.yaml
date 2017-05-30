@@ -44,6 +44,10 @@ commandTests:
   command: ['/workspace/jetty9/src/test/workspace/jetty-setup-debugger.bash']
   expectedOutput: ['OK']
   exitCode: 0
+- name: 'jetty start script generates a start command'
+  setup: [[ 'chmod', '+x', '/workspace/jetty9/src/test/workspace/jetty-setup-start-script.bash' ]]
+  command: ['/workspace/jetty9/src/test/workspace/jetty-setup-start-script.bash']
+  exitCode: 0
 
 fileExistenceTests:
 - name: 'jetty start.jar exists'
@@ -73,6 +77,14 @@ fileExistenceTests:
   expectedContents: ['.*from setup-env-ext.bash.*End setup-env-ext.bash.*']
 - name: 'jetty quickstart exists'
   path: '/scripts/jetty/quickstart.sh'
+  isDirectory: false
+  shouldExist: true
+- name: 'jetty start script exists'
+  path: '/scripts/jetty/jetty_start.sh'
+  isDirectory: false
+  shouldExist: true
+- name: 'gen_start_command.sh script exists'
+  path: '/scripts/jetty/gen_start_command.sh'
   isDirectory: false
   shouldExist: true
 
