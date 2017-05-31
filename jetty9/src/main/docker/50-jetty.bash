@@ -59,7 +59,29 @@ if expr "$*" : '^java .*/start\.jar.*$' >/dev/null ; then
     set -- java $@ $JETTY_ARGS
   fi
 
-  # TODO check if this is a "terminating command". if so, just exec it as-is
+  # check if it is a terminating command
+  for A in "$@" ; do
+    case $A in
+      --add-to-start* |\
+      --create-files |\
+      --create-startd |\
+      --download |\
+      --dry-run |\
+      --exec-print |\
+      --help |\
+      --info |\
+      --list-all-modules |\
+      --list-classpath |\
+      --list-config |\
+      --list-modules* |\
+      --stop |\
+      --update-ini |\
+      --version |\
+      -v )\
+      # It is a terminating command, so exec directly
+      exec "$@"
+    esac
+  done
 
   # Check if a start command has already been generated
   if [ -f /jetty-start ] ; then
@@ -68,8 +90,8 @@ if expr "$*" : '^java .*/start\.jar.*$' >/dev/null ; then
       ********************************************************************
       WARNING: The $JETTY_BASE/start.d directory has been modified since
                the /jetty-start files was generated. Please either delete
-               the /jetty-start file or re-run /generate-jetty-start.sh
-               from a Dockerfile
+               the /jetty-start file or re-run
+               /scripts/jetty/generate-jetty-start.sh from a Dockerfile
       ********************************************************************
 EOWARN
     fi
