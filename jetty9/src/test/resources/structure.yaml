@@ -44,9 +44,10 @@ commandTests:
   command: ['/workspace/jetty9/src/test/workspace/jetty-setup-debugger.bash']
   expectedOutput: ['OK']
   exitCode: 0
-- name: 'jetty start script generates a start command'
-  setup: [[ 'chmod', '+x', '/workspace/jetty9/src/test/workspace/jetty-setup-start-script.bash' ]]
-  command: ['/workspace/jetty9/src/test/workspace/jetty-setup-start-script.bash']
+- name: 'check jetty dry-run'
+  setup: [[ 'chmod', '+x', '/workspace/jetty9/src/test/workspace/jetty-setup-dry-run.bash' ]]
+  command: ['/workspace/jetty9/src/test/workspace/jetty-setup-dry-run.bash']
+  expectedOutput: ['OK']
   exitCode: 0
 
 fileExistenceTests:
@@ -79,12 +80,8 @@ fileExistenceTests:
   path: '/scripts/jetty/quickstart.sh'
   isDirectory: false
   shouldExist: true
-- name: 'jetty start script exists'
-  path: '/scripts/jetty/jetty_start.sh'
-  isDirectory: false
-  shouldExist: true
-- name: 'gen_start_command.sh script exists'
-  path: '/scripts/jetty/gen_start_command.sh'
+- name: 'generate-jetty-start.sh script exists'
+  path: '/scripts/jetty/generate-jetty-start.sh'
   isDirectory: false
   shouldExist: true
 
