@@ -51,6 +51,15 @@ if [ "$PLATFORM" = "gae" ]; then
   JETTY_ARGS="$JETTY_ARGS --module=gcp"
 fi
 
+# If this is a java command
+if [ "$1" = "java" ]; then
+  # Check for jetty start.jar and prepend if missing
+  if [ "$(echo $@ | egrep start.jar | wc -l )" = "0" ]; then
+    shift
+    set -- java -Djetty.base=${JETTY_BASE} -jar ${JETTY_HOME}/start.jar $@
+  fi
+fi
+
 # If this is a jetty command
 if expr "$*" : '^java .*/start\.jar.*$' >/dev/null ; then
   # Append JETTY_ARGS if available
@@ -87,12 +96,12 @@ if expr "$*" : '^java .*/start\.jar.*$' >/dev/null ; then
   if [ -f /jetty-start ] ; then
     if [ $JETTY_BASE/start.d -nt /jetty-start ] ; then
       cat >&2 <<- 'EOWARN'
-      ********************************************************************
-      WARNING: The $JETTY_BASE/start.d directory has been modified since
-               the /jetty-start files was generated. Please either delete
-               the /jetty-start file or re-run
-               /scripts/jetty/generate-jetty-start.sh from a Dockerfile
-      ********************************************************************
+********************************************************************
+WARNING: The $JETTY_BASE/start.d directory has been modified since
+         the /jetty-start files was generated. Please either delete
+         the /jetty-start file or re-run
+         /scripts/jetty/generate-jetty-start.sh from a Dockerfile
+********************************************************************
 EOWARN
     fi
 
