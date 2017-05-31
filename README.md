@@ -264,7 +264,7 @@ start command before starting the jetty web server. If you wish to generate the 
 rather than at container start-time, you can run the `/scripts/jetty/generate-jetty-start.sh` script to generate it 
 for you, i.e. 
 
-```bash
+```Dockerfile
 RUN /scripts/jetty/generate-jetty-start.sh
 ```
 
