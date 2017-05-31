@@ -51,11 +51,33 @@ if [ "$PLATFORM" = "gae" ]; then
   JETTY_ARGS="$JETTY_ARGS --module=gcp"
 fi
 
-# If command line is running jetty, mix in JETTY_ARGS
-if [ "$1" = "java" ]; then
-  # Append JETTY_ARGS
-  if [ "$(echo $@ | egrep start.jar | wc -l )" != "0" -a -n "$JETTY_ARGS" ]; then
+# If this is a jetty command
+if expr "$*" : '^java .*/start\.jar.*$' >/dev/null ; then
+  # Append JETTY_ARGS if available
+  if [ -n "$JETTY_ARGS" ]; then
     shift
     set -- java $@ $JETTY_ARGS
+  fi
+
+  # TODO check if this is a "terminating command". if so, just exec it as-is
+
+  # Check if a start command has already been generated
+  if [ -f /jetty-start ] ; then
+    if [ $JETTY_BASE/start.d -nt /jetty-start ] ; then
+      cat >&2 <<- 'EOWARN'
+      ********************************************************************
+      WARNING: The $JETTY_BASE/start.d directory has been modified since
+               the /jetty-start files was generated. Please either delete
+               the /jetty-start file or re-run /generate-jetty-start.sh
+               from a Dockerfile
+      ********************************************************************
+EOWARN
+    fi
+
+    echo $(date +'%Y-%m-%d %H:%M:%S.000'):INFO:docker-entrypoint:jetty start command from /jetty-start
+    set -- $(cat /jetty-start)
+  else
+    # Do a jetty dry run to set the final command
+    set -- $("$@" --dry-run --exec-properties=$(mktemp --suffix=.properties))
   fi
 fi
