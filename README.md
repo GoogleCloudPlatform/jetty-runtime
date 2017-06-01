@@ -157,14 +157,14 @@ and the Java System Property `java.util.logging.config.file` updated to referenc
 When running in a GCP environment, the system property can be set in `app.yaml`:
 ```yaml
 env_variables:
-  JAVA_USER_OPTS: -Djava.util.logging.config.file=WEB-INF/logging.properties
+  JETTY_ARGS: -Djava.util.logging.config.file=WEB-INF/logging.properties
 ```
 
 If the image is run directly, then a `-e` argument to the `docker run` command can be used to set the system property:
 
 ```bash
 docker run \
-  -e JAVA_USER_OPTS=-Djava.util.logging.config.file=WEB-INF/logging.properties \
+  -e JETTY_ARGS=-Djava.util.logging.config.file=WEB-INF/logging.properties \
   ...
 ```
 
@@ -184,7 +184,7 @@ Alternately an entirely new location for the file can be provided and the enviro
 ```Dockerfile
 FROM gcr.io/google-appengine/jetty
 ADD logging.properties /etc/logging.properties
-ENV JAVA_USER_OPTS -Djava.util.logging.config.file=/etc/logging.properties
+ENV JETTY_ARGS -Djava.util.logging.config.file=/etc/logging.properties
 ...
 ```
 
@@ -193,7 +193,7 @@ A `logging.properties` file may be added to an existing images using the `docker
 ```shell 
 docker run -it --rm \
 -v /mylocaldir/logging.properties:/etc/logging.properties \
--e JAVA_USER_OPTS="-Djava.util.logging.config.file=/etc/logging.properties" \
+-e JETTY_ARGS="-Djava.util.logging.config.file=/etc/logging.properties" \
 ...
 ```
 
