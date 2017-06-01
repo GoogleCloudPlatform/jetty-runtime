@@ -123,10 +123,10 @@ Additional environment variables are used/set including:
 |`JETTY_PROPERTIES`|                 |Comma separated list of `name=value` pairs appended to `$JETTY_ARGS` |
 |`JETTY_MODULES_ENABLE`|            |Comma separated list of modules to enable by appending to `$JETTY_ARGS` |
 |`JETTY_MODULES_DISABLE`|           |Comma separated list of modules to disable by removing from `$JETTY_BASE/start.d` |
-|`JETTY_ARGS`      |                 |`-Djetty.base=$JETTY_BASE -jar $JETTY_HOME/start.jar` |
+|`JETTY_ARGS`      |                 |Arguments passed to jetty's `start.jar`. Any arguments used for custom jetty configuration should be passed here. |
 |`ROOT_WAR`        |                 |`$JETTY_BASE/webapps/root.war`                        |
 |`ROOT_DIR`        |                 |`$JETTY_BASE/webapps/root`                            |
-|`JAVA_OPTS`       |                 |`$JAVA_OPTS $JETTY_ARGS`                              |
+|`JAVA_OPTS`       |                 |JVM runtime arguments                                 |
 
 If a WAR file is found at `$ROOT_WAR`, it is unpacked to `$ROOT_DIR` if it is newer than the directory or the directory
 does not exist.  If there is no `$ROOT_WAR` or `$ROOT_DIR`, then `/app` is symbolic linked to `$ROOT_DIR`. If 
