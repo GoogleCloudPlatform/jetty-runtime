@@ -32,3 +32,9 @@ echo "Invoking build.sh with DOCKER_NAMESPACE=$DOCKER_NAMESPACE, TAG=$TAG"
 IMAGE=$DOCKER_NAMESPACE/jetty:$TAG
 echo "Running integration tests on image: $IMAGE"
 ./scripts/integration_test.sh $IMAGE
+
+echo "Running jetty smoke tests on image: $IMAGE"
+pushd tests/
+mvn -B install -Djetty.test.image=$IMAGE -Ptest.remote
+popd
+

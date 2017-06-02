@@ -39,6 +39,16 @@ commandTests:
   command: [ '/workspace/jetty9/src/test/workspace/jetty-setup-modules.bash' ]
   expectedOutput: ['OK']
   exitCode: 0
+- name: 'cloud debugger extra class path is set'
+  setup: [[ 'chmod', '+x', '/workspace/jetty9/src/test/workspace/jetty-setup-debugger.bash' ]]
+  command: ['/workspace/jetty9/src/test/workspace/jetty-setup-debugger.bash']
+  expectedOutput: ['OK']
+  exitCode: 0
+- name: 'check jetty dry-run'
+  setup: [[ 'chmod', '+x', '/workspace/jetty9/src/test/workspace/jetty-setup-dry-run.bash' ]]
+  command: ['/workspace/jetty9/src/test/workspace/jetty-setup-dry-run.bash']
+  expectedOutput: ['OK']
+  exitCode: 0
 
 fileExistenceTests:
 - name: 'jetty start.jar exists'
@@ -66,6 +76,14 @@ fileExistenceTests:
   isDirectory: false
   shouldExist: true
   expectedContents: ['.*from setup-env-ext.bash.*End setup-env-ext.bash.*']
+- name: 'jetty quickstart exists'
+  path: '/scripts/jetty/quickstart.sh'
+  isDirectory: false
+  shouldExist: true
+- name: 'generate-jetty-start.sh script exists'
+  path: '/scripts/jetty/generate-jetty-start.sh'
+  isDirectory: false
+  shouldExist: true
 
 licenseTests:
 - debian: true

@@ -33,12 +33,18 @@ RUN chown -R jetty:jetty $JETTY_HOME
 ENV JETTY_BASE ${jetty.base}
 ENV TMPDIR /tmp/jetty
 ADD jetty-base $JETTY_BASE
-ADD 50-jetty.bash /setup-env.d/
+ADD 15-debug-env-jetty.bash 50-jetty.bash 60-jetty-dry-run.bash /setup-env.d/
+ADD quickstart.sh /scripts/jetty/quickstart.sh
+ADD generate-jetty-start.sh /scripts/jetty/generate-jetty-start.sh
 WORKDIR $JETTY_BASE
 RUN mkdir -p webapps $TMPDIR \
  && java -jar $JETTY_HOME/start.jar --add-to-start=setuid \
  && chown -R jetty:jetty $JETTY_BASE $TMPDIR \
- && chmod +x /setup-env.d/50-jetty.bash
+ && chmod +x /setup-env.d/15-debug-env-jetty.bash \
+ && chmod +x /setup-env.d/50-jetty.bash \
+ && chmod +x /setup-env.d/60-jetty-dry-run.bash \
+ && chmod +x /scripts/jetty/quickstart.sh \
+ && chmod +x /scripts/jetty/generate-jetty-start.sh
 
 EXPOSE 8080
 CMD ["java","-Djetty.base=${jetty.base}","-jar","${jetty.home}/start.jar"]
