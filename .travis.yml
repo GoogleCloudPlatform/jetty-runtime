@@ -22,10 +22,6 @@ services:
 jdk:
   - oraclejdk8
 
-branches:
-  only:
-  - travis_remote
-
 script:
   # execute regular local build
   - mvn clean verify -B -V -q
