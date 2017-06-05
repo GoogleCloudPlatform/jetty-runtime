@@ -22,45 +22,6 @@ services:
 jdk:
   - oraclejdk8
 
-branches:
-  only:
-  - master
-  - travis_remote
-
-install:
-  # download Cloud SDK
-  - wget https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-137.0.0-linux-x86_64.tar.gz
-  - tar -xzvf google-cloud-sdk-137.0.0-linux-x86_64.tar.gz
-  - export PATH=$PWD/google-cloud-sdk/bin:$PATH
-  - export CLOUDSDK_CORE_DISABLE_USAGE_REPORTING=true
-  # update all Cloud SDK components
-  - gcloud components update -q
-  # install the beta component for "gcloud beta container images"
-  - gcloud components install beta -q
-  # do not run remote tests for pull requests
-  - |
-    if [ $TRAVIS_PULL_REQUEST = 'false' ]; then
-      export DO_REMOTE=true
-    else
-      export DO_REMOTE=false
-    fi
-  - echo DO_REMOTE = $DO_REMOTE
-  - |
-    if $DO_REMOTE; then
-      # decrypt the tavis-app-maven-plugin Cloud SDK project service account key
-      openssl aes-256-cbc -K $encrypted_ca118b112eec_key -iv $encrypted_ca118b112eec_iv -in config/travis-app-maven-plugin-caac78288652.json.enc -out config/travis-app-maven-plugin-caac78288652.json -d
-      # set Cloud SDK CLI authentication
-      gcloud auth activate-service-account --key-file config/travis-app-maven-plugin-caac78288652.json
-      # set default project
-      gcloud config set project travis-app-maven-plugin
-    fi
-
 script:
   # execute regular local build
   - mvn clean verify -B -V -q
-  # execute remote tests
-  - |
-    if $DO_REMOTE; then
-      # do the remote test, will use default image setting and should clean up remote test image resources
-      mvn clean verify -Ptest.local,test.remote,test.remote.deploy,test.remote.clean -B -q
-    fi
