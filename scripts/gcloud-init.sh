@@ -46,4 +46,4 @@ gcloud auth activate-service-account --key-file=$KEYFILE
 gcloud config set project $GCP_PROJECT
 export GOOGLE_APPLICATION_CREDENTIALS=$KEYFILE
 
-gcloud components install beta -q
+gcloud components install beta kubectl -q
