@@ -38,7 +38,7 @@ docker run jetty
 
 ## Running Tests
 Integration tests can be run via [Google Cloud Container Builder](https://cloud.google.com/container-builder/docs/overview). 
-These tests deploy a sample test application to App Engine using the provided runtime image, and 
+These tests deploy a sample test application to App Engine and to Google Container Engine using the provided runtime image, and 
 exercise various integrations with other GCP services. Note that the image under test must be pushed 
 to a gcr.io repository before the integration tests can run.
 
@@ -46,6 +46,18 @@ to a gcr.io repository before the integration tests can run.
 RUNTIME_IMAGE=gcr.io/my-project-id/jetty:my-tag
 gcloud docker -- push $RUNTIME_IMAGE
 ./scripts/integration_test.sh $RUNTIME_IMAGE
+```
+
+You also have the possibility to run the tests only on App Engine or only on Google Container Engine.
+
+* For App Engine:
+```bash
+$ ./scripts/gae_integration_test.sh $RUNTIME_IMAGE
+```
+
+* For Google Container Engine:
+```bash
+$ ./scripts/gke_integration_test.sh $RUNTIME_IMAGE
 ```
 Note that these tests are different and complementary to the integration tests in the `/tests` 
 directory. See [tests/README.md](tests/README.md) for more detail.
