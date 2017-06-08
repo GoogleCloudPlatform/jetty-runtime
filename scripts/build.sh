@@ -41,5 +41,6 @@ STAGING_IMAGE="${DOCKER_NAMESPACE}/${RUNTIME_NAME}_staging:${DOCKER_TAG}"
 gcloud container builds submit \
   --config=$projectRoot/cloudbuild.yaml \
   --substitutions="_IMAGE=$IMAGE,_DOCKER_TAG=$DOCKER_TAG,_STAGING_IMAGE=$STAGING_IMAGE" \
+  --timeout=20m \
   $projectRoot
 
