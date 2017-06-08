@@ -25,7 +25,7 @@ DOCKER_NAMESPACE=$1
 DOCKER_TAG=$2
 
 if [ -z "${DOCKER_NAMESPACE}" ]; then
-  echo "Usage: ${0} <docker_namespace> <docker_tag> [--local]"
+  echo "Usage: ${0} <docker_namespace> <docker_tag>"
   exit 1
 fi
 
@@ -33,22 +33,13 @@ if [ -z "${DOCKER_TAG}" ]; then
   DOCKER_TAG="${DOCKER_TAG_PREFIX}-$(date -u +%Y-%m-%d_%H_%M)"
 fi
 
-if [ "$3" == "--local" ]; then
-  LOCAL_BUILD=true
-fi
-
 IMAGE="${DOCKER_NAMESPACE}/${RUNTIME_NAME}:${DOCKER_TAG}"
 echo "IMAGE: $IMAGE"
 
-# build and test the runtime image
-if [ "$LOCAL_BUILD" = "true" ]; then
-  source $dir/cloudbuild_local.sh \
-    --config=$projectRoot/cloudbuild.yaml \
-    --substitutions="_IMAGE=$IMAGE,_DOCKER_TAG=$DOCKER_TAG"
-else
-  gcloud container builds submit \
-    --config=$projectRoot/cloudbuild.yaml \
-    --substitutions="_IMAGE=$IMAGE,_DOCKER_TAG=$DOCKER_TAG" \
-    $projectRoot
-fi
+STAGING_IMAGE="${DOCKER_NAMESPACE}/${RUNTIME_NAME}_staging:${DOCKER_TAG}"
+
+gcloud container builds submit \
+  --config=$projectRoot/cloudbuild.yaml \
+  --substitutions="_IMAGE=$IMAGE,_DOCKER_TAG=$DOCKER_TAG,_STAGING_IMAGE=$STAGING_IMAGE" \
+  $projectRoot
 
