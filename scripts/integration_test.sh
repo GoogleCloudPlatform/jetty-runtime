@@ -16,12 +16,7 @@
 
 set -e
 
-# Runs integration tests on a given runtime image
-
-dir=`dirname $0`
-projectRoot=$dir/..
-testAppDir=$projectRoot/tests/runtimes-common-testing
-deployDir=$testAppDir/target/deploy
+readonly dir=`dirname $0`
 
 imageUnderTest=$1
 if [ -z "${imageUnderTest}" ]; then
@@ -29,25 +24,7 @@ if [ -z "${imageUnderTest}" ]; then
   exit 1
 fi
 
-# build the test app
-pushd $testAppDir
-mvn -B clean install
-popd
+${dir}/gae_integration_test.sh ${imageUnderTest}
 
-# deploy to app engine
-pushd $deployDir
-export STAGING_IMAGE=$imageUnderTest
-envsubst '$STAGING_IMAGE' < Dockerfile.in > Dockerfile
-echo "Deploying to App Engine..."
-gcloud app deploy -q
-popd
-
-DEPLOYED_APP_URL="http://$(gcloud app describe | grep defaultHostname | awk '{print $2}')"
-echo "Running integration tests on application that is deployed at $DEPLOYED_APP_URL"
-
-# run in cloud container builder
-gcloud container builds submit \
-  --config $dir/integration_test.yaml \
-  --substitutions "_DEPLOYED_APP_URL=$DEPLOYED_APP_URL" \
-  $dir
+${dir}/gke_integration_test.sh ${imageUnderTest}
 
