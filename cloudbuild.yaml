@@ -4,10 +4,11 @@
 steps:
 # Perform maven build, omitting local docker operations
 - name: 'maven:3.3.9-jdk-8'
-  args: ['mvn', '-B', '-P-local-docker-build', '-P-test.local', '-Ddocker.tag.long=$_DOCKER_TAG', 'clean', 'install']
+  args: ['mvn', '-B', '-P-local-docker-build', '-P-test.local', '-Ddocker.tag.long=${_DOCKER_TAG}', 'clean', 'install']
 # Build the runtime container
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '--tag=${_IMAGE}', '--no-cache', 'jetty9/target/docker']
+  id: 'DOCKER_BUILD'
 
 # Test the built image
 
@@ -15,5 +16,26 @@ steps:
 # See https://github.com/GoogleCloudPlatform/runtimes-common/tree/master/structure_tests
 - name: 'gcr.io/gcp-runtimes/structure_test'
   args: ['--image', '${_IMAGE}', '-v', '--config', '/workspace/jetty9/target/test-classes/structure.yaml']
+  waitFor: 'DOCKER_BUILD'
+
+# Push the image to a staging repository so it can be used in integration tests
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['tag', '${_IMAGE}', '${_STAGING_IMAGE}' ]
+  waitFor: 'DOCKER_BUILD'
+  id: 'DOCKER_STAGE_TAG'
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', '${_STAGING_IMAGE}' ]
+  waitFor: 'DOCKER_STAGE_TAG'
+  id: 'DOCKER_STAGE'
+
+# Runtimes-common integration tests
+# See https://github.com/GoogleCloudPlatform/runtimes-common/tree/master/integration_tests
+- name: 'gcr.io/gcp-runtimes/integration_test:2017-03-23-134436'
+  args:
+    - '--image=${_STAGING_IMAGE}'
+    - '--directory=tests/runtimes-common-testing/target/deploy'
+    - '--skip-logging-tests' # blocked by b/33415496
+    - '--skip-monitoring-tests' # not yet implemented
+  waitFor: 'DOCKER_STAGE'
 
 images: ['${_IMAGE}']
