@@ -1,0 +1,16 @@
+FROM gcr.io/cloud-builders/java/mvn:3.5.0-jdk-8
+
+RUN apk --no-cache add python2 wget && \
+
+  # Setup Google Cloud SDK (latest)
+  mkdir -p /builder && \
+  wget -qO- https://dl.google.com/dl/cloudsdk/release/google-cloud-sdk.tar.gz | tar zxv -C /builder && \
+  CLOUDSDK_PYTHON="python2.7" /builder/google-cloud-sdk/install.sh \
+      --usage-reporting=false \
+      --bash-completion=false \
+      --disable-installation-options && \
+
+  # clean up
+  rm -rf ~/.config/gcloud
+
+ENV PATH=/builder/google-cloud-sdk/bin/:$PATH
