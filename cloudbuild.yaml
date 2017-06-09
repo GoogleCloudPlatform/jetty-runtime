@@ -53,6 +53,7 @@ steps:
 # Jetty smoke tests
 - name: 'mvn-gcloud'
   args:
+    - 'mvn'
     - '--batch-mode'
     - 'install'
     - '-Djetty.test.image=${_STAGING_IMAGE}'
