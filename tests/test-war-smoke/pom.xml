@@ -248,7 +248,7 @@
                     <argument>app.yaml</argument>
                     <argument>--version</argument>
                     <argument>${maven.build.timestamp}</argument>
-                    <argument>--no-stop-previous-version</argument>
+                    <argument>--stop-previous-version</argument>
                     <argument>--quiet</argument>
                   </arguments>
                 </configuration>
