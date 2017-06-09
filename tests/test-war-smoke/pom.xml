@@ -255,26 +255,6 @@
                   </arguments>
                 </configuration>
               </execution>
-              <!-- remove the service -->
-              <execution>
-                <id>remove-remote-service</id>
-                <phase>post-integration-test</phase>
-                <goals>
-                  <goal>exec</goal>
-                </goals>
-                <configuration>
-                  <executable>gcloud</executable>
-                  <arguments>
-                    <argument>app</argument>
-                    <argument>services</argument>
-                    <argument>delete</argument>
-                    <argument>smoke</argument>
-                    <argument>--quiet</argument>
-                    <argument>--project</argument>
-                    <argument>${app.deploy.project}</argument>
-                  </arguments>
-                </configuration>
-              </execution>
             </executions>
           </plugin>
         </plugins>
