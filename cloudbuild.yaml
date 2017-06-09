@@ -9,6 +9,7 @@ steps:
     - '-P-local-docker-build'
     - '-P-test.local'
     - '-Ddocker.tag.long=${_DOCKER_TAG}'
+    - '-Dint.test.staging.image=${_STAGING_IMAGE}'
     - 'clean'
     - 'install'
 # Build the runtime container
@@ -42,13 +43,24 @@ steps:
 
 # Runtimes-common integration tests
 # See https://github.com/GoogleCloudPlatform/runtimes-common/tree/master/integration_tests
+- name: 'gcr.io/cloud-builders/gcloud'
+  args:
+    - 'app'
+    - 'deploy'
+    - '--quiet'
+    - '--stop-previous-version'
+    - '--version=${_BUILD_TIMESTAMP}'
+    - '--project=${_GCP_TEST_PROJECT}'
+  dir: 'tests/runtimes-common-testing/target/deploy'
+  waitFor: 'DOCKER_STAGE'
+  id: 'AE_DEPLOY_INT_TEST'
 - name: 'gcr.io/gcp-runtimes/integration_test:2017-03-23-134436'
   args:
-    - '--image=${_STAGING_IMAGE}'
-    - '--directory=tests/runtimes-common-testing/target/deploy'
+    - '--no-deploy'
+    - '--url=http://${_BUILD_TIMESTAMP}-dot-int-test-dot-${_GCP_TEST_PROJECT}.appspot.com'
     - '--skip-logging-tests' # blocked by b/33415496
     - '--skip-monitoring-tests' # not yet implemented
-  waitFor: 'DOCKER_STAGE'
+  waitFor: 'AE_DEPLOY_INT_TEST'
 
 # Jetty smoke tests
 - name: 'mvn-gcloud'
@@ -57,6 +69,7 @@ steps:
     - '--batch-mode'
     - 'install'
     - '-Djetty.test.image=${_STAGING_IMAGE}'
+    - '-Dapp.deploy.project=${_GCP_TEST_PROJECT}'
     - '-Ptest.remote'
   dir: 'tests/'
   waitFor: ['DOCKER_STAGE', 'DOCKER_BUILD_MVN_GCLOUD']

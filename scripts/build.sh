@@ -23,14 +23,25 @@ RUNTIME_NAME="jetty"
 DOCKER_TAG_PREFIX="9.4"
 DOCKER_NAMESPACE=$1
 DOCKER_TAG=$2
+GCP_TEST_PROJECT=$3
 
+usage() {
+  echo "Usage: ${0} <docker_namespace> <docker_tag> [gcp_test_project]"
+}
+
+# TODO real parsing?
 if [ -z "${DOCKER_NAMESPACE}" ]; then
-  echo "Usage: ${0} <docker_namespace> <docker_tag>"
+  usage
   exit 1
 fi
 
+BUILD_TIMESTAMP="$(date -u +%Y-%m-%d_%H_%M)"
 if [ -z "${DOCKER_TAG}" ]; then
-  DOCKER_TAG="${DOCKER_TAG_PREFIX}-$(date -u +%Y-%m-%d_%H_%M)"
+  DOCKER_TAG="${DOCKER_TAG_PREFIX}-${BUILD_TIMESTAMP}"
+fi
+
+if [ -z "${GCP_TEST_PROJECT}" ]; then
+  GCP_TEST_PROJECT="$(gcloud config list --format='value(core.project)')"
 fi
 
 IMAGE="${DOCKER_NAMESPACE}/${RUNTIME_NAME}:${DOCKER_TAG}"
@@ -40,7 +51,12 @@ STAGING_IMAGE="${DOCKER_NAMESPACE}/${RUNTIME_NAME}_staging:${DOCKER_TAG}"
 
 gcloud container builds submit \
   --config=$projectRoot/cloudbuild.yaml \
-  --substitutions="_IMAGE=$IMAGE,_DOCKER_TAG=$DOCKER_TAG,_STAGING_IMAGE=$STAGING_IMAGE" \
+  --substitutions=\
+"_IMAGE=$IMAGE,"\
+"_DOCKER_TAG=$DOCKER_TAG,"\
+"_STAGING_IMAGE=$STAGING_IMAGE,"\
+"_GCP_TEST_PROJECT=$GCP_TEST_PROJECT,"\
+"_BUILD_TIMESTAMP=$(echo $BUILD_TIMESTAMP | sed 's/_/-/g')"\
   --timeout=20m \
   $projectRoot
 

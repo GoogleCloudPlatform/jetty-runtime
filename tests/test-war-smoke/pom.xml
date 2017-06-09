@@ -250,6 +250,8 @@
                     <argument>${maven.build.timestamp}</argument>
                     <argument>--stop-previous-version</argument>
                     <argument>--quiet</argument>
+                    <argument>--project</argument>
+                    <argument>${app.deploy.project}</argument>
                   </arguments>
                 </configuration>
               </execution>
@@ -268,6 +270,8 @@
                     <argument>delete</argument>
                     <argument>smoke</argument>
                     <argument>--quiet</argument>
+                    <argument>--project</argument>
+                    <argument>${app.deploy.project}</argument>
                   </arguments>
                 </configuration>
               </execution>
