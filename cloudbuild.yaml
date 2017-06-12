@@ -76,6 +76,7 @@ steps:
     - '--batch-mode'
     - 'install'
     - '-Djetty.test.image=${_STAGING_IMAGE}'
+    - '-Dapp.deploy.version=${_BUILD_TIMESTAMP}'
     - '-Dapp.deploy.project=${_GCP_TEST_PROJECT}'
     - '-Ptest.remote'
   dir: 'tests/'

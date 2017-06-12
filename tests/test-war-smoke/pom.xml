@@ -24,6 +24,9 @@
     <version>0.1.0-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
+  <properties>
+    <app.deploy.version>${maven.build.timestamp}</app.deploy.version>
+  </properties>
   <artifactId>test-war-smoke</artifactId>
   <packaging>war</packaging>
   <name>Jetty-Runtime :: Tests :: Smoke Tests (Servlet 3.1)</name>
@@ -247,7 +250,7 @@
                     <argument>deploy</argument>
                     <argument>app.yaml</argument>
                     <argument>--version</argument>
-                    <argument>${maven.build.timestamp}</argument>
+                    <argument>${app.deploy.version}</argument>
                     <argument>--stop-previous-version</argument>
                     <argument>--quiet</argument>
                     <argument>--project</argument>
