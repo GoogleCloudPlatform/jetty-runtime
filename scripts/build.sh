@@ -17,7 +17,8 @@
 set -e
 
 dir=$(dirname $0)
-projectRoot=$dir/..
+projectRoot=${dir}/..
+buildConfigDir=${projectRoot}/build/config
 
 RUNTIME_NAME="jetty"
 DOCKER_TAG_PREFIX="9.4"
@@ -51,7 +52,7 @@ TEST_AE_SERVICE_2="${AE_SERVICE_BASE}-v2"
 set +e
 set -x
 gcloud container builds submit \
-  --config=$projectRoot/cloudbuild.yaml \
+  --config=${buildConfigDir}/build.yaml \
   --substitutions=\
 "_IMAGE=$IMAGE,"\
 "_DOCKER_TAG=$DOCKER_TAG,"\
@@ -66,7 +67,7 @@ testResult=$?
 
 # once build has completed, kick off async cleanup build
 gcloud container builds submit \
-  --config=$projectRoot/cleanup.yaml \
+  --config=${buildConfigDir}/cleanup.yaml \
   --substitutions=\
 "_GCP_TEST_PROJECT=$GCP_TEST_PROJECT,"\
 "_TEST_AE_SERVICE_1=$TEST_AE_SERVICE_1,"\
