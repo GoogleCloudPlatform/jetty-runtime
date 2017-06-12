@@ -21,17 +21,13 @@ projectRoot=$dir/..
 
 RUNTIME_NAME="jetty"
 DOCKER_TAG_PREFIX="9.4"
+
 DOCKER_NAMESPACE=$1
 DOCKER_TAG=$2
 GCP_TEST_PROJECT=$3
 
-usage() {
-  echo "Usage: ${0} <docker_namespace> <docker_tag> [gcp_test_project]"
-}
-
-# TODO real parsing?
 if [ -z "${DOCKER_NAMESPACE}" ]; then
-  usage
+  echo "Usage: ${0} <docker_namespace> <docker_tag> [gcp_test_project]"
   exit 1
 fi
 
@@ -48,7 +44,7 @@ IMAGE="${DOCKER_NAMESPACE}/${RUNTIME_NAME}:${DOCKER_TAG}"
 echo "IMAGE: $IMAGE"
 
 STAGING_IMAGE="${DOCKER_NAMESPACE}/${RUNTIME_NAME}_staging:${DOCKER_TAG}"
-AE_SERVICE_BASE="$(echo $BUILD_TIMESTAMP | sed 's/_/-/g')"
+AE_SERVICE_BASE="$(echo $BUILD_TIMESTAMP | sed 's/_//g')"
 TEST_AE_SERVICE_1="${AE_SERVICE_BASE}-v1"
 TEST_AE_SERVICE_2="${AE_SERVICE_BASE}-v2"
 
