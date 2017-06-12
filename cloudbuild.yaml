@@ -11,6 +11,7 @@ steps:
     - '-P-test.local'
     - '-Ddocker.tag.long=${_DOCKER_TAG}'
     - '-Dint.test.staging.image=${_STAGING_IMAGE}'
+    - '-Dint.test.service=${_TEST_AE_SERVICE_1}'
     - 'clean'
     - 'install'
 
@@ -51,8 +52,6 @@ steps:
     - 'app'
     - 'deploy'
     - '--quiet'
-    - '--stop-previous-version'
-    - '--version=${_BUILD_TIMESTAMP}'
     - '--project=${_GCP_TEST_PROJECT}'
   dir: 'tests/runtimes-common-testing/target/deploy'
   waitFor: 'DOCKER_STAGE'
@@ -63,7 +62,7 @@ steps:
   id: 'INT_TEST'
   args:
     - '--no-deploy'
-    - '--url=http://${_BUILD_TIMESTAMP}-dot-int-test-dot-${_GCP_TEST_PROJECT}.appspot.com'
+    - '--url=http://${_TEST_AE_SERVICE_1}-dot-${_GCP_TEST_PROJECT}.appspot.com'
     - '--skip-logging-tests' # blocked by b/33415496
     - '--skip-monitoring-tests' # not yet implemented
   waitFor: 'AE_DEPLOY_INT_TEST'
@@ -73,10 +72,11 @@ steps:
   id: 'JETTY_SMOKE_TEST'
   args:
     - 'mvn'
-    - '--batch-mode'
+    - 'clean'
     - 'install'
+    - '--batch-mode'
     - '-Djetty.test.image=${_STAGING_IMAGE}'
-    - '-Dapp.deploy.version=${_BUILD_TIMESTAMP}'
+    - '-Dapp.deploy.service=${_TEST_AE_SERVICE_2}'
     - '-Dapp.deploy.project=${_GCP_TEST_PROJECT}'
     - '-Ptest.remote'
   dir: 'tests/'

@@ -69,7 +69,7 @@ public class AbstractIntegrationTest {
       // service id is required, currently can only pull from app.yaml
       String serviceId = null;
 
-      Path appYamlPath = MavenTestingUtils.getProjectFilePath("src/main/appengine/app.yaml");
+      Path appYamlPath = MavenTestingUtils.getProjectFilePath("target/appengine-staging/app.yaml");
       if (Files.exists(appYamlPath)) {
         try (BufferedReader reader = Files.newBufferedReader(appYamlPath, StandardCharsets.UTF_8)) {
           Yaml yaml = new Yaml();

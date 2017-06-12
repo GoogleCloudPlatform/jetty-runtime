@@ -251,7 +251,7 @@
                     <argument>app.yaml</argument>
                     <argument>--version</argument>
                     <argument>${app.deploy.version}</argument>
-                    <argument>--stop-previous-version</argument>
+                    <argument>--no-stop-previous-version</argument>
                     <argument>--quiet</argument>
                     <argument>--project</argument>
                     <argument>${app.deploy.project}</argument>

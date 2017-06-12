@@ -48,7 +48,12 @@ IMAGE="${DOCKER_NAMESPACE}/${RUNTIME_NAME}:${DOCKER_TAG}"
 echo "IMAGE: $IMAGE"
 
 STAGING_IMAGE="${DOCKER_NAMESPACE}/${RUNTIME_NAME}_staging:${DOCKER_TAG}"
+AE_SERVICE_BASE="$(echo $BUILD_TIMESTAMP | sed 's/_/-/g')"
+TEST_AE_SERVICE_1="${AE_SERVICE_BASE}-v1"
+TEST_AE_SERVICE_2="${AE_SERVICE_BASE}-v2"
 
+set +e
+set -x
 gcloud container builds submit \
   --config=$projectRoot/cloudbuild.yaml \
   --substitutions=\
@@ -56,7 +61,21 @@ gcloud container builds submit \
 "_DOCKER_TAG=$DOCKER_TAG,"\
 "_STAGING_IMAGE=$STAGING_IMAGE,"\
 "_GCP_TEST_PROJECT=$GCP_TEST_PROJECT,"\
-"_BUILD_TIMESTAMP=$(echo $BUILD_TIMESTAMP | sed 's/_/-/g')"\
+"_TEST_AE_SERVICE_1=$TEST_AE_SERVICE_1,"\
+"_TEST_AE_SERVICE_2=$TEST_AE_SERVICE_2"\
   --timeout=20m \
   $projectRoot
 
+testResult=$?
+
+# once build has completed, kick off async cleanup build
+gcloud container builds submit \
+  --config=$projectRoot/cleanup.yaml \
+  --substitutions=\
+"_GCP_TEST_PROJECT=$GCP_TEST_PROJECT,"\
+"_TEST_AE_SERVICE_1=$TEST_AE_SERVICE_1,"\
+"_TEST_AE_SERVICE_2=$TEST_AE_SERVICE_2"\
+  --async \
+  --no-source
+
+exit $testResult
