@@ -23,6 +23,11 @@ PROJECT_ID=my-project
 TAG=my-tag
 ./scripts/build.sh gcr.io/$PROJECT_ID $TAG
 ```
+The configured Cloud Build execution will build the Jetty docker container, then create and teardown various GCP resources for 
+integration testing. Before running, make sure you have done the following:
+ * enabled the Cloud Container Builder API
+ * initialized App Engine for your GCP project (run `gcloud app create`), and successfully deployed to it at least once
+ * provided the Container Builder Service account (cloudbuild.gserviceaccount.com) with the appropriate permissions needed to deploy App Engine applications. This includes at least "App Engine Admin" and "Cloud Container Builder", but simply adding the "Project Editor" role works fine as well.
 
 ## Running the Jetty image
 The resulting image is called jetty (with more specific tags also created)
