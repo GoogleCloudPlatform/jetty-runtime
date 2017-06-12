@@ -42,8 +42,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class LoggingIntegrationTest extends AbstractIntegrationTest {
-  
-  
+
+
   @Test
   @RemoteOnly
   public void testLogging() throws Exception {
@@ -63,6 +63,9 @@ public class LoggingIntegrationTest extends AbstractIntegrationTest {
     String traceId = lines.stream().filter(s -> s.startsWith("X-Cloud-Trace-Context: ")).findFirst()
         .get().split("[ /]")[1];
     assertThat(traceId, Matchers.notNullValue());
+
+    // wait for logs to propagate
+    Thread.sleep(20 * 1000);
 
     LoggingOptions options = LoggingOptions.getDefaultInstance();
 
