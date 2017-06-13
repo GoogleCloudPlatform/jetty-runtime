@@ -16,6 +16,35 @@
 
 set -e
 
+usage() {
+  echo "Usage: ${0} -d <docker_namespace> [-t <docker_tag>] [-p <gcp_test_project>]"
+  exit 1
+}
+
+# Parse arguments to this script
+while [[ $# -gt 1 ]]; do
+  key="$1"
+  case $key in
+    -d|--docker-namespace)
+    DOCKER_NAMESPACE="$2"
+    shift
+    ;;
+    -t|--tag)
+    DOCKER_TAG="$2"
+    shift # past argument
+    ;;
+    -p|--project)
+    GCP_TEST_PROJECT="$2"
+    shift # past argument
+    ;;
+    *)
+    # unknown option
+    usage
+    ;;
+  esac
+  shift
+done
+
 dir=$(dirname $0)
 projectRoot=${dir}/..
 buildConfigDir=${projectRoot}/build/config
@@ -23,13 +52,8 @@ buildConfigDir=${projectRoot}/build/config
 RUNTIME_NAME="jetty"
 DOCKER_TAG_PREFIX="9.4"
 
-DOCKER_NAMESPACE=$1
-DOCKER_TAG=$2
-GCP_TEST_PROJECT=$3
-
 if [ -z "${DOCKER_NAMESPACE}" ]; then
-  echo "Usage: ${0} <docker_namespace> <docker_tag> [gcp_test_project]"
-  exit 1
+  usage
 fi
 
 BUILD_TIMESTAMP="$(date -u +%Y-%m-%d_%H_%M)"
@@ -44,7 +68,7 @@ fi
 IMAGE="${DOCKER_NAMESPACE}/${RUNTIME_NAME}:${DOCKER_TAG}"
 echo "IMAGE: $IMAGE"
 
-STAGING_IMAGE="${DOCKER_NAMESPACE}/${RUNTIME_NAME}_staging:${DOCKER_TAG}"
+STAGING_IMAGE="gcr.io/${GCP_TEST_PROJECT}/${RUNTIME_NAME}_staging:${DOCKER_TAG}"
 AE_SERVICE_BASE="$(echo $BUILD_TIMESTAMP | sed 's/_//g')"
 TEST_AE_SERVICE_1="${AE_SERVICE_BASE}-v1"
 TEST_AE_SERVICE_2="${AE_SERVICE_BASE}-v2"
