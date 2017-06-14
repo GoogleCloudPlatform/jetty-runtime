@@ -42,8 +42,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class LoggingIntegrationTest extends AbstractIntegrationTest {
-  
-  
+
+
   @Test
   @RemoteOnly
   public void testLogging() throws Exception {
@@ -64,10 +64,15 @@ public class LoggingIntegrationTest extends AbstractIntegrationTest {
         .get().split("[ /]")[1];
     assertThat(traceId, Matchers.notNullValue());
 
+    // wait for logs to propagate
+    Thread.sleep(10 * 1000);
+
     LoggingOptions options = LoggingOptions.getDefaultInstance();
 
+    String moduleId = System.getProperty("app.deploy.service");
     String filter =
-        "resource.type=gae_app AND resource.labels.module_id=smoke" + " AND textPayload:" + id;
+        "resource.type=gae_app AND resource.labels.module_id=" + moduleId
+        + " AND textPayload:" + id;
 
     int expected = 2;
     try (Logging logging = options.getService()) {
@@ -76,7 +81,7 @@ public class LoggingIntegrationTest extends AbstractIntegrationTest {
         if (entry.getSeverity() == Severity.INFO) {
           assertThat(entry.getLogName(), is("gae_app.log"));
           assertThat(entry.getResource().getType(), is("gae_app"));
-          assertThat(entry.getResource().getLabels().get("module_id"), is("smoke"));
+          assertThat(entry.getResource().getLabels().get("module_id"), is(moduleId));
           assertThat(entry.getResource().getLabels().get("zone"), Matchers.notNullValue());
           assertThat(entry.getLabels().get("appengine.googleapis.com/trace_id"), is(traceId));
           assertThat(entry.getLabels().get("appengine.googleapis.com/instance_name"),

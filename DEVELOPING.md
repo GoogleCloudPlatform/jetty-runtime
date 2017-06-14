@@ -23,11 +23,11 @@ PROJECT_ID=my-project
 TAG=my-tag
 ./scripts/build.sh gcr.io/$PROJECT_ID $TAG
 ```
-
-If you would like to simulate the cloud build locally, pass in the `--local` argument.
-```
-./scripts/build.sh gcr.io/$PROJECT_ID $TAG --local
-```
+The configured Cloud Build execution will build the Jetty docker container, then create and teardown various GCP resources for 
+integration testing. Before running, make sure you have done the following:
+ * enabled the Cloud Container Builder API
+ * initialized App Engine for your GCP project (run `gcloud app create`), and successfully deployed to it at least once
+ * provided the Container Builder Service account (cloudbuild.gserviceaccount.com) with the appropriate permissions needed to deploy App Engine applications. This includes at least "App Engine Admin" and "Cloud Container Builder", but simply adding the "Project Editor" role works fine as well.
 
 ## Running the Jetty image
 The resulting image is called jetty (with more specific tags also created)
@@ -37,16 +37,6 @@ docker run jetty
 ```
 
 ## Running Tests
-Integration tests can be run via [Google Cloud Container Builder](https://cloud.google.com/container-builder/docs/overview). 
-These tests deploy a sample test application to App Engine using the provided runtime image, and 
-exercise various integrations with other GCP services. Note that the image under test must be pushed 
-to a gcr.io repository before the integration tests can run.
-
-```bash
-RUNTIME_IMAGE=gcr.io/my-project-id/jetty:my-tag
-gcloud docker -- push $RUNTIME_IMAGE
-./scripts/integration_test.sh $RUNTIME_IMAGE
-```
-Note that these tests are different and complementary to the integration tests in the `/tests` 
-directory. See [tests/README.md](tests/README.md) for more detail.
+Integration tests are run as part of the [Google Cloud Container Builder](https://cloud.google.com/container-builder/docs/overview) 
+execution that is run in the `build.sh` script.
 

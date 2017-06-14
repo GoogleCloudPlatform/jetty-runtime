@@ -16,39 +16,87 @@
 
 set -e
 
+usage() {
+  echo "Usage: ${0} -d <docker_namespace> [-t <docker_tag>] [-p <gcp_test_project>]"
+  exit 1
+}
+
+# Parse arguments to this script
+while [[ $# -gt 1 ]]; do
+  key="$1"
+  case $key in
+    -d|--docker-namespace)
+    DOCKER_NAMESPACE="$2"
+    shift
+    ;;
+    -t|--tag)
+    DOCKER_TAG="$2"
+    shift # past argument
+    ;;
+    -p|--project)
+    GCP_TEST_PROJECT="$2"
+    shift # past argument
+    ;;
+    *)
+    # unknown option
+    usage
+    ;;
+  esac
+  shift
+done
+
 dir=$(dirname $0)
-projectRoot=$dir/..
+projectRoot=${dir}/..
+buildConfigDir=${projectRoot}/build/config
 
 RUNTIME_NAME="jetty"
 DOCKER_TAG_PREFIX="9.4"
-DOCKER_NAMESPACE=$1
-DOCKER_TAG=$2
 
 if [ -z "${DOCKER_NAMESPACE}" ]; then
-  echo "Usage: ${0} <docker_namespace> <docker_tag> [--local]"
-  exit 1
+  usage
 fi
 
+BUILD_TIMESTAMP="$(date -u +%Y-%m-%d_%H_%M)"
 if [ -z "${DOCKER_TAG}" ]; then
-  DOCKER_TAG="${DOCKER_TAG_PREFIX}-$(date -u +%Y-%m-%d_%H_%M)"
+  DOCKER_TAG="${DOCKER_TAG_PREFIX}-${BUILD_TIMESTAMP}"
 fi
 
-if [ "$3" == "--local" ]; then
-  LOCAL_BUILD=true
+if [ -z "${GCP_TEST_PROJECT}" ]; then
+  GCP_TEST_PROJECT="$(gcloud config list --format='value(core.project)')"
 fi
 
 IMAGE="${DOCKER_NAMESPACE}/${RUNTIME_NAME}:${DOCKER_TAG}"
 echo "IMAGE: $IMAGE"
 
-# build and test the runtime image
-if [ "$LOCAL_BUILD" = "true" ]; then
-  source $dir/cloudbuild_local.sh \
-    --config=$projectRoot/cloudbuild.yaml \
-    --substitutions="_IMAGE=$IMAGE,_DOCKER_TAG=$DOCKER_TAG"
-else
-  gcloud container builds submit \
-    --config=$projectRoot/cloudbuild.yaml \
-    --substitutions="_IMAGE=$IMAGE,_DOCKER_TAG=$DOCKER_TAG" \
-    $projectRoot
-fi
+STAGING_IMAGE="gcr.io/${GCP_TEST_PROJECT}/${RUNTIME_NAME}_staging:${DOCKER_TAG}"
+AE_SERVICE_BASE="$(echo $BUILD_TIMESTAMP | sed 's/_//g')"
+TEST_AE_SERVICE_1="${AE_SERVICE_BASE}-v1"
+TEST_AE_SERVICE_2="${AE_SERVICE_BASE}-v2"
 
+set +e
+set -x
+gcloud container builds submit \
+  --config=${buildConfigDir}/build.yaml \
+  --substitutions=\
+"_IMAGE=$IMAGE,"\
+"_DOCKER_TAG=$DOCKER_TAG,"\
+"_STAGING_IMAGE=$STAGING_IMAGE,"\
+"_GCP_TEST_PROJECT=$GCP_TEST_PROJECT,"\
+"_TEST_AE_SERVICE_1=$TEST_AE_SERVICE_1,"\
+"_TEST_AE_SERVICE_2=$TEST_AE_SERVICE_2"\
+  --timeout=20m \
+  $projectRoot
+
+testResult=$?
+
+# once build has completed, kick off async cleanup build
+gcloud container builds submit \
+  --config=${buildConfigDir}/cleanup.yaml \
+  --substitutions=\
+"_GCP_TEST_PROJECT=$GCP_TEST_PROJECT,"\
+"_TEST_AE_SERVICE_1=$TEST_AE_SERVICE_1,"\
+"_TEST_AE_SERVICE_2=$TEST_AE_SERVICE_2"\
+  --async \
+  --no-source
+
+exit $testResult

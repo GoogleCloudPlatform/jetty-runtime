@@ -1,0 +1,85 @@
+# Cloud Builder pipeline
+# https://cloud.google.com/container-builder/docs/overview
+
+steps:
+# Perform maven build, omitting local docker operations
+- name: 'gcr.io/cloud-builders/java/mvn:3.5.0-jdk-8'
+  id: 'MAVEN_BUILD'
+  args:
+    - '--batch-mode'
+    - '-P-local-docker-build'
+    - '-P-test.local'
+    - '-Ddocker.tag.long=${_DOCKER_TAG}'
+    - '-Dint.test.staging.image=${_STAGING_IMAGE}'
+    - '-Dint.test.service=${_TEST_AE_SERVICE_1}'
+    - 'clean'
+    - 'install'
+
+# Build the runtime container
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'DOCKER_BUILD'
+  args: ['build', '--tag=${_IMAGE}', '--no-cache', 'jetty9/target/docker']
+
+# Test the built image
+
+# Build a maven/gcloud image to be used for running tests
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'DOCKER_BUILD_MVN_GCLOUD'
+  args: ['build', '-t', 'mvn-gcloud', '-f', 'build/Dockerfile.mvn-gcloud', '.']
+  waitFor: '-'
+
+# Runtimes-common structure tests
+# See https://github.com/GoogleCloudPlatform/runtimes-common/tree/master/structure_tests
+- name: 'gcr.io/gcp-runtimes/structure_test'
+  id: 'STRUCTURE_TEST'
+  args: ['--image', '${_IMAGE}', '-v', '--config', '/workspace/jetty9/target/test-classes/structure.yaml']
+  waitFor: 'DOCKER_BUILD'
+
+# Push the image to a staging repository so it can be used in integration tests
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'DOCKER_STAGE_TAG'
+  args: ['tag', '${_IMAGE}', '${_STAGING_IMAGE}' ]
+  waitFor: 'DOCKER_BUILD'
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'DOCKER_STAGE'
+  args: ['push', '${_STAGING_IMAGE}' ]
+  waitFor: 'DOCKER_STAGE_TAG'
+
+  # deploy test application for integration tests
+- name: 'gcr.io/cloud-builders/gcloud'
+  id: 'AE_DEPLOY_INT_TEST'
+  args:
+    - 'app'
+    - 'deploy'
+    - '--quiet'
+    - '--project=${_GCP_TEST_PROJECT}'
+  dir: 'tests/runtimes-common-testing/target/deploy'
+  waitFor: 'DOCKER_STAGE'
+
+# Runtimes-common integration tests
+# See https://github.com/GoogleCloudPlatform/runtimes-common/tree/master/integration_tests
+- name: 'gcr.io/gcp-runtimes/integration_test:2017-03-23-134436'
+  id: 'INT_TEST'
+  args:
+    - '--no-deploy'
+    - '--url=http://${_TEST_AE_SERVICE_1}-dot-${_GCP_TEST_PROJECT}.appspot.com'
+    - '--skip-logging-tests' # blocked by b/33415496
+    - '--skip-monitoring-tests' # not yet implemented
+  waitFor: 'AE_DEPLOY_INT_TEST'
+
+# Jetty smoke tests
+- name: 'mvn-gcloud'
+  id: 'JETTY_SMOKE_TEST'
+  args:
+    - 'mvn'
+    - 'clean'
+    - 'install'
+    - '--batch-mode'
+    - '-Djetty.test.image=${_STAGING_IMAGE}'
+    - '-Dapp.deploy.service=${_TEST_AE_SERVICE_2}'
+    - '-Dapp.deploy.project=${_GCP_TEST_PROJECT}'
+    - '-Ptest.remote'
+  dir: 'tests/'
+  waitFor: ['DOCKER_STAGE', 'DOCKER_BUILD_MVN_GCLOUD']
+
+images: ['${_IMAGE}']
