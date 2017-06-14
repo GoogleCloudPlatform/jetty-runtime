@@ -25,16 +25,5 @@ source $dir/gcloud-init.sh
 
 cd github/jetty-runtime
 export TAG=$(git rev-parse --short HEAD)
-
-echo "Invoking build.sh with DOCKER_NAMESPACE=$DOCKER_NAMESPACE, TAG=$TAG"
-./scripts/build.sh $DOCKER_NAMESPACE $TAG
-
-IMAGE=$DOCKER_NAMESPACE/jetty:$TAG
-echo "Running integration tests on image: $IMAGE"
-./scripts/integration_test.sh $IMAGE
-
-echo "Running jetty smoke tests on image: $IMAGE"
-pushd tests/
-mvn -B install -Djetty.test.image=$IMAGE -Ptest.remote
-popd
+./scripts/build.sh --docker-namespace $DOCKER_NAMESPACE --tag $TAG
 
