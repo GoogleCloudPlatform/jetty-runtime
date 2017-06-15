@@ -45,7 +45,7 @@ while [[ $# -gt 1 ]]; do
   shift
 done
 
-dir=$(dirname $0)
+dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 projectRoot=${dir}/..
 buildConfigDir=${projectRoot}/build/config
 
