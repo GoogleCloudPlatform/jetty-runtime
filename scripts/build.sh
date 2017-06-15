@@ -30,7 +30,7 @@ while [[ $# -gt 1 ]]; do
     shift
     ;;
     -t|--tag)
-    DOCKER_TAG="$2"
+    TAG="$2"
     shift # past argument
     ;;
     -p|--project)
@@ -50,25 +50,25 @@ projectRoot=${dir}/..
 buildConfigDir=${projectRoot}/build/config
 
 RUNTIME_NAME="jetty"
-DOCKER_TAG_PREFIX="9.4"
+TAG_PREFIX="9.4"
 
 if [ -z "${DOCKER_NAMESPACE}" ]; then
   usage
 fi
 
 BUILD_TIMESTAMP="$(date -u +%Y-%m-%d_%H_%M)"
-if [ -z "${DOCKER_TAG}" ]; then
-  DOCKER_TAG="${DOCKER_TAG_PREFIX}-${BUILD_TIMESTAMP}"
+if [ -z "${TAG}" ]; then
+  export TAG="${TAG_PREFIX}-${BUILD_TIMESTAMP}"
 fi
 
 if [ -z "${GCP_TEST_PROJECT}" ]; then
   GCP_TEST_PROJECT="$(gcloud config list --format='value(core.project)')"
 fi
 
-IMAGE="${DOCKER_NAMESPACE}/${RUNTIME_NAME}:${DOCKER_TAG}"
+IMAGE="${DOCKER_NAMESPACE}/${RUNTIME_NAME}:${TAG}"
 echo "IMAGE: $IMAGE"
 
-STAGING_IMAGE="gcr.io/${GCP_TEST_PROJECT}/${RUNTIME_NAME}_staging:${DOCKER_TAG}"
+STAGING_IMAGE="gcr.io/${GCP_TEST_PROJECT}/${RUNTIME_NAME}_staging:${TAG}"
 AE_SERVICE_BASE="$(echo $BUILD_TIMESTAMP | sed 's/_//g')"
 TEST_AE_SERVICE_1="${AE_SERVICE_BASE}-v1"
 TEST_AE_SERVICE_2="${AE_SERVICE_BASE}-v2"
@@ -79,7 +79,7 @@ gcloud container builds submit \
   --config=${buildConfigDir}/build.yaml \
   --substitutions=\
 "_IMAGE=$IMAGE,"\
-"_DOCKER_TAG=$DOCKER_TAG,"\
+"_DOCKER_TAG=$TAG,"\
 "_STAGING_IMAGE=$STAGING_IMAGE,"\
 "_GCP_TEST_PROJECT=$GCP_TEST_PROJECT,"\
 "_TEST_AE_SERVICE_1=$TEST_AE_SERVICE_1,"\
