@@ -1,0 +1,7 @@
+FROM gcr.io/cloud-builders/gcloud
+
+RUN gcloud config set compute/zone us-east1-b
+RUN gcloud components install kubectl -q
+
+RUN apt-get -y update && \
+    apt-get install -y curl
