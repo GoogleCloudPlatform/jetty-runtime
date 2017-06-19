@@ -36,13 +36,13 @@ fi
 # build the test app
 pushd ${testAppDir}
 cd ..
-mvn clean install -Djetty.test.image=$imageUnderTest -DskipTests
+mvn clean install -Djetty.test.image=$imageUnderTest -DskipTests --batch-mode
 popd
 
 # build app container locally
 pushd $deployDir
 echo "Building app container..."
-docker build -t $APP_IMAGE .
+docker build -t $APP_IMAGE . || gcloud docker -- build -t $APP_IMAGE .
 
 # run app container locally to test shutdown logging
 echo "Starting app container..."
