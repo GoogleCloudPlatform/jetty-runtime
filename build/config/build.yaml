@@ -108,14 +108,14 @@ steps:
 # Create a GKE cluster
 - name: 'mvn-gcloud'
   id: 'GKE_CLUSTER'
-  entrypoint: './build/scripts/create.sh'
+  entrypoint: './build/scripts/gke/create.sh'
   env: ['CLUSTER_NAME=${_CLUSTER_NAME}']
   waitFor: 'DOCKER_BUILD_MVN_GCLOUD'
 
 # Deploy the test application to GKE
 - name: 'mvn-gcloud'
   id: 'GKE_DEPLOYMENT'
-  entrypoint: './build/scripts/deploy.sh'
+  entrypoint: './build/scripts/gke/deploy.sh'
   env: ['STAGING_IMAGE=${_STAGING_IMAGE}-test-app',
         'GKE_TEST_APPLICATION=${_GKE_TEST_APPLICATION}',
         'CLUSTER_NAME=${_CLUSTER_NAME}']
@@ -123,7 +123,7 @@ steps:
 
 - name: 'mvn-gcloud'
   id: 'GKE_WAIT_APPLICATION'
-  entrypoint: "./build/scripts/wait.sh"
+  entrypoint: "./build/scripts/gke/wait.sh"
   env: ['GKE_TEST_APPLICATION=${_GKE_TEST_APPLICATION}',
         'CLUSTER_NAME=${_CLUSTER_NAME}']
   waitFor: ['GKE_DEPLOYMENT']
@@ -132,7 +132,7 @@ steps:
 # See https://github.com/GoogleCloudPlatform/runtimes-common/tree/master/integration_tests
 - name: 'gcr.io/gcp-runtimes/integration_test:2017-03-23-134436'
   id: 'GKE_INT_TEST'
-  entrypoint: './build/scripts/test.sh'
+  entrypoint: './build/scripts/gke/test.sh'
   args:
     - '--no-deploy'
     - '--skip-logging-tests' # blocked by b/33415496
