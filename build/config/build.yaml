@@ -40,15 +40,15 @@ steps:
   args: ['push', '${_STAGING_IMAGE}' ]
   waitFor: 'DOCKER_STAGE_TAG'
 
-#
-# App Engine Integration tests
-#
-
 # Build a maven/gcloud image to be used for running tests
 - name: 'gcr.io/cloud-builders/docker'
   id: 'DOCKER_BUILD_MVN_GCLOUD'
   args: ['build', '-t', 'mvn-gcloud', '-f', 'build/Dockerfile.mvn-gcloud', '.']
   waitFor: '-'
+
+#
+# App Engine Integration tests
+#
 
 # deploy test application for integration tests
 - name: 'gcr.io/cloud-builders/gcloud'
@@ -94,12 +94,6 @@ steps:
 # GKE Integration tests
 #
 
-# Build a gcloud/kubernetes image to deploy GKE
-- name: 'gcr.io/cloud-builders/docker'
-  id: 'DOCKER_BUILD_GCLOUD_KUBERNETES'
-  args: ['build', '-t', 'gcloud-kubernetes', '-f', 'build/Dockerfile.gcloud-kubernetes', 'build']
-  waitFor: '-'
-
 # Create a Docker image with the test application
 - name: 'gcr.io/cloud-builders/docker'
   id: 'DOCKER_BUILD_TEST_APPLICATION'
@@ -112,22 +106,22 @@ steps:
   waitFor: ['DOCKER_BUILD_TEST_APPLICATION']
 
 # Create a GKE cluster
-- name: 'gcloud-kubernetes'
+- name: 'mvn-gcloud'
   id: 'GKE_CLUSTER'
   entrypoint: './build/scripts/create.sh'
   env: ['CLUSTER_NAME=${_CLUSTER_NAME}']
-  waitFor: 'DOCKER_BUILD_GCLOUD_KUBERNETES'
+  waitFor: 'DOCKER_BUILD_MVN_GCLOUD'
 
 # Deploy the test application to GKE
-- name: 'gcloud-kubernetes'
+- name: 'mvn-gcloud'
   id: 'GKE_DEPLOYMENT'
   entrypoint: './build/scripts/deploy.sh'
   env: ['STAGING_IMAGE=${_STAGING_IMAGE}-test-app',
         'GKE_TEST_APPLICATION=${_GKE_TEST_APPLICATION}',
         'CLUSTER_NAME=${_CLUSTER_NAME}']
-  waitFor: ['DOCKER_PUSH_TEST_APPLICATION', 'DOCKER_BUILD_GCLOUD_KUBERNETES', 'GKE_CLUSTER']
+  waitFor: ['DOCKER_PUSH_TEST_APPLICATION', 'DOCKER_BUILD_MVN_GCLOUD', 'GKE_CLUSTER']
 
-- name: 'gcloud-kubernetes'
+- name: 'mvn-gcloud'
   id: 'GKE_WAIT_APPLICATION'
   entrypoint: "./build/scripts/wait.sh"
   env: ['GKE_TEST_APPLICATION=${_GKE_TEST_APPLICATION}',
