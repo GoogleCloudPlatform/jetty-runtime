@@ -82,12 +82,4 @@ steps:
   dir: 'tests/'
   waitFor: ['DOCKER_STAGE', 'DOCKER_BUILD_MVN_GCLOUD']
 
-# Local docker integration tests
-- name: 'mvn-gcloud'
-  id: 'LOCAL_DOCKER_INTEGRATION_TEST'
-  entrypoint: 'scripts/local_integration_test.sh'
-  args:
-    - '${_STAGING_IMAGE}'
-  waitFor: ['DOCKER_STAGE', 'DOCKER_BUILD_MVN_GCLOUD']
-
 images: ['${_IMAGE}']
