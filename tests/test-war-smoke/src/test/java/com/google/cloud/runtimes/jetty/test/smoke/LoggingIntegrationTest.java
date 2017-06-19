@@ -67,7 +67,9 @@ public class LoggingIntegrationTest extends AbstractIntegrationTest {
     // wait for logs to propagate
     Thread.sleep(10 * 1000);
 
-    LoggingOptions options = LoggingOptions.getDefaultInstance();
+    LoggingOptions options = LoggingOptions.newBuilder()
+        .setProjectId(System.getProperty("app.deploy.project"))
+        .build();
 
     String moduleId = System.getProperty("app.deploy.service");
     String filter =
