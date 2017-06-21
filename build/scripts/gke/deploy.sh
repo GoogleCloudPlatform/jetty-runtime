@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-gcloud container clusters get-credentials ${CLUSTER_NAME}
+gcloud container clusters get-credentials ${CLUSTER_NAME} --project=${GCP_PROJECT}
 
 kubectl run ${GKE_TEST_APPLICATION} --image=${STAGING_IMAGE} --port=8080 --expose=true \
             --service-overrides='{ "apiVersion": "v1", "spec": { "type":  "LoadBalancer" } }' \

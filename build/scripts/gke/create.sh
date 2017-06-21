@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-TEST_CLUSTER_EXISTENCE=$(gcloud container clusters list | awk "/$CLUSTER_NAME/")
+TEST_CLUSTER_EXISTENCE=$(gcloud container clusters list --project=${GCP_PROJECT} | awk "/$CLUSTER_NAME/")
 if [ -z "$TEST_CLUSTER_EXISTENCE" ]; then
-  gcloud container clusters create "$CLUSTER_NAME" --num-nodes=1 --disk-size=10
+  gcloud container clusters create "$CLUSTER_NAME" --num-nodes=1 --disk-size=10 --project=${GCP_PROJECT}
 fi
