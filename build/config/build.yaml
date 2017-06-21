@@ -77,7 +77,6 @@ steps:
   id: 'JETTY_SMOKE_TEST'
   args:
     - 'mvn'
-    - 'clean'
     - 'install'
     - '--batch-mode'
     - '-Djetty.test.image=${_STAGING_IMAGE}'
