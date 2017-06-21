@@ -25,7 +25,7 @@ RUN apt-get -y update && \
     rm -rf ~/.config/gcloud && \
 
     # Kubernetes
-    gcloud config set compute/zone us-east1-b && \
-    gcloud components install kubectl -q
+    /builder/google-cloud-sdk/bin/gcloud config set compute/zone us-east1-b && \
+    /builder/google-cloud-sdk/bin/gcloud components install kubectl -q
 
 ENV PATH=/builder/google-cloud-sdk/bin/:$PATH
