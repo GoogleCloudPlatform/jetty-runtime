@@ -86,6 +86,7 @@ steps:
     - '-Ptest.remote'
     - '-pl'
     - 'test-war-smoke'
+    - '-am'
   dir: 'tests/'
   waitFor: ['DOCKER_STAGE', 'DOCKER_BUILD_MVN_GCLOUD']
 
