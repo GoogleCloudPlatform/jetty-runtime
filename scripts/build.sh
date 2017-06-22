@@ -99,7 +99,8 @@ gcloud container builds submit \
   --substitutions=\
 "_GCP_TEST_PROJECT=$GCP_TEST_PROJECT,"\
 "_TEST_AE_SERVICE_1=$TEST_AE_SERVICE_1,"\
-"_TEST_AE_SERVICE_2=$TEST_AE_SERVICE_2"\
+"_TEST_AE_SERVICE_2=$TEST_AE_SERVICE_2,"\
+"_CLUSTER_NAME=$CLUSTER_NAME,"\
   --async \
   --no-source
 
