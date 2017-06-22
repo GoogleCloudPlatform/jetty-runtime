@@ -77,12 +77,15 @@ steps:
   id: 'JETTY_SMOKE_TEST'
   args:
     - 'mvn'
+    - 'clean'
     - 'install'
     - '--batch-mode'
     - '-Djetty.test.image=${_STAGING_IMAGE}'
     - '-Dapp.deploy.service=${_TEST_AE_SERVICE_2}'
     - '-Dapp.deploy.project=${_GCP_TEST_PROJECT}'
     - '-Ptest.remote'
+    - '-pl'
+    - 'test-war-smoke'
   dir: 'tests/'
   waitFor: ['DOCKER_STAGE', 'DOCKER_BUILD_MVN_GCLOUD']
 
