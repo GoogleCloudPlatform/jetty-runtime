@@ -72,6 +72,8 @@ STAGING_IMAGE="gcr.io/${GCP_TEST_PROJECT}/${RUNTIME_NAME}_staging:${TAG}"
 AE_SERVICE_BASE="$(echo $BUILD_TIMESTAMP | sed 's/_//g')"
 TEST_AE_SERVICE_1="${AE_SERVICE_BASE}-v1"
 TEST_AE_SERVICE_2="${AE_SERVICE_BASE}-v2"
+GKE_TEST_APPLICATION="jetty-integration-test-app-$(date -u +%Y-%m-%d-%H-%M)"
+CLUSTER_NAME="jetty-runtime-integration-cluster"
 
 set +e
 set -x
@@ -81,11 +83,13 @@ gcloud container builds submit \
 "_IMAGE=$IMAGE,"\
 "_DOCKER_TAG=$TAG,"\
 "_STAGING_IMAGE=$STAGING_IMAGE,"\
-"_GCP_TEST_PROJECT=$GCP_TEST_PROJECT,"\
 "_TEST_AE_SERVICE_1=$TEST_AE_SERVICE_1,"\
-"_TEST_AE_SERVICE_2=$TEST_AE_SERVICE_2"\
+"_TEST_AE_SERVICE_2=$TEST_AE_SERVICE_2,"\
+"_GCP_TEST_PROJECT=$GCP_TEST_PROJECT,"\
+"_GKE_TEST_APPLICATION=$GKE_TEST_APPLICATION,"\
+"_CLUSTER_NAME=$CLUSTER_NAME,"\
   --timeout=20m \
-  $projectRoot
+  ${projectRoot}
 
 testResult=$?
 
@@ -95,7 +99,8 @@ gcloud container builds submit \
   --substitutions=\
 "_GCP_TEST_PROJECT=$GCP_TEST_PROJECT,"\
 "_TEST_AE_SERVICE_1=$TEST_AE_SERVICE_1,"\
-"_TEST_AE_SERVICE_2=$TEST_AE_SERVICE_2"\
+"_TEST_AE_SERVICE_2=$TEST_AE_SERVICE_2,"\
+"_CLUSTER_NAME=$CLUSTER_NAME,"\
   --async \
   --no-source
 
