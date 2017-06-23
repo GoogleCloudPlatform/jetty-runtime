@@ -49,6 +49,9 @@ commandTests:
   command: ['/workspace/jetty9/src/test/workspace/jetty-setup-dry-run.bash']
   expectedOutput: ['OK']
   exitCode: 0
+- name: 'APP_DESTINATION is set'
+  command: ['env']
+  expectedOutput: ['APP_DESTINATION=/var/lib/jetty/webapps/root.war']
 
 fileExistenceTests:
 - name: 'jetty start.jar exists'
