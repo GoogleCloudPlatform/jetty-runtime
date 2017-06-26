@@ -21,7 +21,7 @@ cd jetty-runtime
 # initiate the cloud build, passing in the docker namespace and tag for the resulting image
 PROJECT_ID=my-project
 TAG=my-tag
-./scripts/build.sh gcr.io/$PROJECT_ID $TAG
+./scripts/build.sh -d gcr.io/$PROJECT_ID -t $TAG
 ```
 The configured Cloud Build execution will build the Jetty docker container, then create and teardown various GCP resources for 
 integration testing. Before running, make sure you have done the following:
