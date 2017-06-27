@@ -221,6 +221,12 @@ When deployed in other environments, logging enhancers can be manually configure
 
 When using Stackdriver logging, it is recommended that `io.grpc` and `sun.net` logging level is kept at INFO level, as both these packages are used by Stackdriver internals and can result in verbose and/or initialisation problems. 
 
+## Session Storage
+This image can be configured to use [Google Cloud Datastore](https://cloud.google.com/datastore/docs/) for clustered session storage by enabling the `gcp-datastore-sessions` jetty module. You can do this in your app.yaml:
+```yaml
+env_variables:
+  JETTY_MODULES_ENABLE: gcp-datastore-sessions
+```
 
 ## Extending the image
 The image produced by this project may be automatically used/extended by the Cloud SDK and/or App Engine maven plugin. 
