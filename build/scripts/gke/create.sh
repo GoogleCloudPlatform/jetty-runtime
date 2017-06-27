@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright 2016 Google Inc. All rights reserved.
+# Copyright 2017 Google Inc. All rights reserved.
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,16 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Build script for CI-like environments. Sets up local dependencies required for performing a
-# continuous-integration build.
-set -e
-
-dir=$(dirname $0)
-
-# downloads, unpacks, installs the cloud SDK
-source $dir/gcloud-init.sh
-
-cd github/jetty-runtime
-export TAG=$(git rev-parse --short HEAD)
-./scripts/build.sh --docker-namespace $DOCKER_NAMESPACE --tag $TAG
-
+TEST_CLUSTER_EXISTENCE=$(gcloud container clusters list --project=${GCP_PROJECT} | awk "/$CLUSTER_NAME/")
+if [ -z "$TEST_CLUSTER_EXISTENCE" ]; then
+  gcloud container clusters create "$CLUSTER_NAME" --num-nodes=1 --disk-size=10 --project=${GCP_PROJECT}
+fi

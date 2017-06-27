@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright 2016 Google Inc. All rights reserved.
+# Copyright 2017 Google Inc. All rights reserved.
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,7 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-set -e
+DEPLOYED_APP_URL=$(cat target/gke-app-ip.txt)
 
-cloudBuildScript="https://raw.githubusercontent.com/GoogleCloudPlatform/python-runtime/master/scripts/local_cloudbuild.py"
-curl -s $cloudBuildScript | python3 - "$@" --output_script=`mktemp`
+/testsuite/driver.py --url=${DEPLOYED_APP_URL} $@

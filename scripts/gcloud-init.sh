@@ -20,18 +20,8 @@ set -ex
 
 DIR=$(pwd)
 
-if [ -z $GCLOUD_FILE ]; then
-  echo '$GCLOUD_FILE environment variable must be set.'
-  exit 1
-fi
-
-if [ -z $KEYFILE ]; then
-  echo '$KEYFILE environment variable must be set.'
-  exit 1
-fi
-
-if [ -z $GCP_PROJECT ]; then
-  echo '$GCP_PROJECT environment variable must be set.'
+if [ -z $GCLOUD_FILE -o -z $KEYFILE -o -z $GCP_PROJECT ]; then
+  echo '$GCLOUD_FILE, $KEYFILE, and $GCP_PROJECT environment variables must be set.'
   exit 1
 fi
 
@@ -44,4 +34,6 @@ export PATH=$DIR/google-cloud-sdk/bin:$PATH
 
 gcloud auth activate-service-account --key-file=$KEYFILE
 gcloud config set project $GCP_PROJECT
+export GOOGLE_APPLICATION_CREDENTIALS=$KEYFILE
+
 gcloud components install beta -q

@@ -1,3 +1,5 @@
+![Build Status](http://storage.googleapis.com/java-runtimes-kokoro-build-badges/jetty-runtime-master.png)
+
 # Google Cloud Platform Jetty Docker Image
 
 This repository contains the source for the Google-maintained Jetty [docker](https://docker.com) image.
@@ -54,6 +56,18 @@ env_variables:
   JETTY_MODULES_ENABLE: 'gzip'
 ```
 
+### Using Quickstart
+Jetty provides [mechanisms](http://www.eclipse.org/jetty/documentation/9.4.x/quickstart-webapp.html) to speed up the start time of your application by pre-scanning its content and generating configuration files.
+If you are using an [extended image](https://github.com/GoogleCloudPlatform/jetty-runtime/blob/master/README.md#extending-the-image) you can active quickstart by executing `/scripts/jetty/quickstart.sh` in your Dockerfile, after the application WAR is added.
+
+```dockerfile
+FROM launcher.gcr.io/google/jetty
+ADD your-application.war $JETTY_BASE/webapps/root.war
+
+# generate quickstart-web.xml
+RUN /scripts/jetty/quickstart.sh
+```
+
 ## App Engine Flexible Environment
 When using App Engine Flexible, you can use the runtime without worrying about Docker by specifying `runtime: java` in your `app.yaml`:
 ```yaml
@@ -67,11 +81,11 @@ write the Dockerfile like this:
 
 ```dockerfile
 FROM launcher.gcr.io/google/jetty
-ADD your-application.war $JETTY_BASE/webapps/root.war
+ADD your-application.war $APP_DESTINATION
 ```
-      
+ 
 That will add the WAR in the correct location for the Docker container.
-      
+
 Once you have this configuration, you can use the Google Cloud SDK to deploy this directory containing the 2 configuration files and the WAR using:
 ```
 gcloud app deploy app.yaml
@@ -83,7 +97,7 @@ For other Docker hosts, you'll need to create a Dockerfile based on this image t
 
 ```dockerfile
 FROM launcher.gcr.io/google/jetty
-COPY your-application.war $JETTY_BASE/webapps/root.war
+COPY your-application.war $APP_DESTINATION
 ```
 You can then build the docker container using `docker build` or [Google Cloud Container Builder](https://cloud.google.com/container-builder/docs/).
 By default, the CMD is set to start the Jetty server. You can change this by specifying your own `CMD` or `ENTRYPOINT`.
@@ -109,10 +123,10 @@ Additional environment variables are used/set including:
 |`JETTY_PROPERTIES`|                 |Comma separated list of `name=value` pairs appended to `$JETTY_ARGS` |
 |`JETTY_MODULES_ENABLE`|            |Comma separated list of modules to enable by appending to `$JETTY_ARGS` |
 |`JETTY_MODULES_DISABLE`|           |Comma separated list of modules to disable by removing from `$JETTY_BASE/start.d` |
-|`JETTY_ARGS`      |                 |`-Djetty.base=$JETTY_BASE -jar $JETTY_HOME/start.jar` |
+|`JETTY_ARGS`      |                 |Arguments passed to jetty's `start.jar`. Any arguments used for custom jetty configuration should be passed here. |
 |`ROOT_WAR`        |                 |`$JETTY_BASE/webapps/root.war`                        |
 |`ROOT_DIR`        |                 |`$JETTY_BASE/webapps/root`                            |
-|`JAVA_OPTS`       |                 |`$JAVA_OPTS $JETTY_ARGS`                              |
+|`JAVA_OPTS`       |                 |JVM runtime arguments                                 |
 
 If a WAR file is found at `$ROOT_WAR`, it is unpacked to `$ROOT_DIR` if it is newer than the directory or the directory
 does not exist.  If there is no `$ROOT_WAR` or `$ROOT_DIR`, then `/app` is symbolic linked to `$ROOT_DIR`. If 
@@ -143,14 +157,14 @@ and the Java System Property `java.util.logging.config.file` updated to referenc
 When running in a GCP environment, the system property can be set in `app.yaml`:
 ```yaml
 env_variables:
-  JAVA_USER_OPTS: -Djava.util.logging.config.file=WEB-INF/logging.properties
+  JETTY_ARGS: -Djava.util.logging.config.file=WEB-INF/logging.properties
 ```
 
 If the image is run directly, then a `-e` argument to the `docker run` command can be used to set the system property:
 
 ```bash
 docker run \
-  -e JAVA_USER_OPTS=-Djava.util.logging.config.file=WEB-INF/logging.properties \
+  -e JETTY_ARGS=-Djava.util.logging.config.file=WEB-INF/logging.properties \
   ...
 ```
 
@@ -170,7 +184,7 @@ Alternately an entirely new location for the file can be provided and the enviro
 ```Dockerfile
 FROM gcr.io/google-appengine/jetty
 ADD logging.properties /etc/logging.properties
-ENV JAVA_USER_OPTS -Djava.util.logging.config.file=/etc/logging.properties
+ENV JETTY_ARGS -Djava.util.logging.config.file=/etc/logging.properties
 ...
 ```
 
@@ -179,7 +193,7 @@ A `logging.properties` file may be added to an existing images using the `docker
 ```shell 
 docker run -it --rm \
 -v /mylocaldir/logging.properties:/etc/logging.properties \
--e JAVA_USER_OPTS="-Djava.util.logging.config.file=/etc/logging.properties" \
+-e JETTY_ARGS="-Djava.util.logging.config.file=/etc/logging.properties" \
 ...
 ```
 
@@ -225,7 +239,7 @@ A standard war file may be deployed as the root context in an extended image by 
 in the docker build directory and using a `Dockerfile` like:
 ```dockerfile
 FROM launcher.gcr.io/google/jetty
-COPY your-application.war $JETTY_BASE/webapps/root.war
+COPY your-application.war $APP_DESTINATION
 ```
 
 ### Adding the root application to an image
@@ -243,6 +257,19 @@ image via a runtime mount:
 ```bash
 docker run -v /some-path/your-application:/app launcher.gcr.io/google/jetty  
 ```
+
+### Enabling dry-run
+The image's default start command will first run the jetty start.jar as a --dry-run to generate the JVM
+start command before starting the jetty web server. If you wish to generate the start command in your Dockerfile
+rather than at container start-time, you can run the `/scripts/jetty/generate-jetty-start.sh` script to generate it 
+for you, i.e. 
+
+```Dockerfile
+RUN /scripts/jetty/generate-jetty-start.sh
+```
+
+NOTE: Make sure that the web application and any additional custom jetty modules have been added to the container
+BEFORE running this script.
 
 # Development Guide
 

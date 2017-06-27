@@ -70,4 +70,3 @@ if [ "$1" = "java" ]; then
     set -- java $@ $JETTY_ARGS
   fi
 fi
-

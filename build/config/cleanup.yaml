@@ -1,0 +1,12 @@
+# Cloud Container Builder pipeline for cleaning up GCP resources
+
+steps:
+
+# Delete app engine services
+- name: 'gcr.io/cloud-builders/gcloud'
+  args: ['app', 'services', 'delete', '${_TEST_AE_SERVICE_1}', '${_TEST_AE_SERVICE_2}', '--project', '${_GCP_TEST_PROJECT}', '--quiet']
+
+# Delete GKE Cluster
+- name: 'gcr.io/cloud-builders/gcloud'
+  args: ['container', 'clusters', 'delete', '${_CLUSTER_NAME}', '-z', 'us-east1-b', '--quiet']
+  waitFor: '-'

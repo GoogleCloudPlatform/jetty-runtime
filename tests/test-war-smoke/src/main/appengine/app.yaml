@@ -1,6 +1,6 @@
 runtime: custom
 env: flex
-service: smoke
+service: ${app.deploy.service}
 
 health_check:
   enable_health_check: False

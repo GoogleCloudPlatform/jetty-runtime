@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright 2016 Google Inc. All rights reserved.
+# Copyright 2017 Google Inc. All rights reserved.
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,16 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Build script for CI-like environments. Sets up local dependencies required for performing a
-# continuous-integration build.
-set -e
+gcloud container clusters get-credentials ${CLUSTER_NAME} --project=${GCP_PROJECT}
 
-dir=$(dirname $0)
-
-# downloads, unpacks, installs the cloud SDK
-source $dir/gcloud-init.sh
-
-cd github/jetty-runtime
-export TAG=$(git rev-parse --short HEAD)
-./scripts/build.sh --docker-namespace $DOCKER_NAMESPACE --tag $TAG
-
+kubectl run ${GKE_TEST_APPLICATION} --image=${STAGING_IMAGE} --port=8080 --expose=true \
+            --service-overrides='{ "apiVersion": "v1", "spec": { "type":  "LoadBalancer" } }' \
+            --requests 'cpu=50m,memory=128Mi'
