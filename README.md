@@ -197,7 +197,7 @@ docker run -it --rm \
 ...
 ```
 
-### Enhanced Stackdriver Logging (BETA!)
+### Enhanced Stackdriver Logging (BETA)
 When running on the Google Cloud Platform Flex environment, the Java Util Logging can be configured to send logs to Google Stackdriver Logging by providing a `logging.properties` file that configures a [LoggingHandler](http://googlecloudplatform.github.io/google-cloud-java/0.10.0/apidocs/com/google/cloud/logging/LoggingHandler.html) as follows:
 ```
 .level=INFO
@@ -221,7 +221,7 @@ When deployed in other environments, logging enhancers can be manually configure
 
 When using Stackdriver logging, it is recommended that `io.grpc` and `sun.net` logging level is kept at INFO level, as both these packages are used by Stackdriver internals and can result in verbose and/or initialisation problems. 
 
-## Session Storage
+## Distributed Session Storage (BETA)
 This image can be configured to use [Google Cloud Datastore](https://cloud.google.com/datastore/docs/) for clustered session storage by enabling the `gcp-datastore-sessions` jetty module. You can do this in your app.yaml:
 ```yaml
 env_variables:
