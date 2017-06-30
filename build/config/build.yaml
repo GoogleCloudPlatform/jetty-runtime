@@ -22,12 +22,6 @@ steps:
 
 # Test the built image
 
-# Build a maven/gcloud image to be used for running tests
-- name: 'gcr.io/cloud-builders/docker'
-  id: 'DOCKER_BUILD_MVN_GCLOUD'
-  args: ['build', '-t', 'mvn-gcloud', '-f', 'build/Dockerfile.mvn-gcloud', '.']
-  waitFor: '-'
-
 # Runtimes-common structure tests
 # See https://github.com/GoogleCloudPlatform/runtimes-common/tree/master/structure_tests
 - name: 'gcr.io/gcp-runtimes/structure_test'
@@ -40,12 +34,23 @@ steps:
   id: 'DOCKER_STAGE_TAG'
   args: ['tag', '${_IMAGE}', '${_STAGING_IMAGE}' ]
   waitFor: 'DOCKER_BUILD'
+
 - name: 'gcr.io/cloud-builders/docker'
   id: 'DOCKER_STAGE'
   args: ['push', '${_STAGING_IMAGE}' ]
   waitFor: 'DOCKER_STAGE_TAG'
 
-  # deploy test application for integration tests
+# Build a maven/gcloud image to be used for running tests
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'DOCKER_BUILD_MVN_GCLOUD'
+  args: ['build', '-t', 'mvn-gcloud', '-f', 'build/Dockerfile.mvn-gcloud', '.']
+  waitFor: '-'
+
+#
+# App Engine Integration tests
+#
+
+# deploy test application for integration tests
 - name: 'gcr.io/cloud-builders/gcloud'
   id: 'AE_DEPLOY_INT_TEST'
   args:
@@ -59,7 +64,7 @@ steps:
 # Runtimes-common integration tests
 # See https://github.com/GoogleCloudPlatform/runtimes-common/tree/master/integration_tests
 - name: 'gcr.io/gcp-runtimes/integration_test:2017-03-23-134436'
-  id: 'INT_TEST'
+  id: 'AE_INT_TEST'
   args:
     - '--no-deploy'
     - '--url=http://${_TEST_AE_SERVICE_1}-dot-${_GCP_TEST_PROJECT}.appspot.com'
@@ -79,7 +84,69 @@ steps:
     - '-Dapp.deploy.service=${_TEST_AE_SERVICE_2}'
     - '-Dapp.deploy.project=${_GCP_TEST_PROJECT}'
     - '-Ptest.remote'
+    - '-pl'
+    - 'test-war-smoke'
+    - '-am'
   dir: 'tests/'
   waitFor: ['DOCKER_STAGE', 'DOCKER_BUILD_MVN_GCLOUD']
+
+#
+# End of App Engine Integration tests
+
+#
+# GKE Integration tests
+#
+
+# Create a Docker image with the test application
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'DOCKER_BUILD_TEST_APPLICATION'
+  args: ['build', '--tag=${_STAGING_IMAGE}-test-app', '--no-cache', 'tests/runtimes-common-testing/target/deploy']
+  waitFor: ['DOCKER_STAGE_TAG']
+
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'DOCKER_PUSH_TEST_APPLICATION'
+  args: ['push', '${_STAGING_IMAGE}-test-app']
+  waitFor: ['DOCKER_BUILD_TEST_APPLICATION']
+
+# Create a GKE cluster
+- name: 'mvn-gcloud'
+  id: 'GKE_CLUSTER'
+  entrypoint: './build/scripts/gke/create.sh'
+  env: ['CLUSTER_NAME=${_CLUSTER_NAME}', 'GCP_PROJECT=${_GCP_TEST_PROJECT}']
+  waitFor: 'DOCKER_BUILD_MVN_GCLOUD'
+
+# Deploy the test application to GKE
+- name: 'mvn-gcloud'
+  id: 'GKE_DEPLOYMENT'
+  entrypoint: './build/scripts/gke/deploy.sh'
+  env: ['STAGING_IMAGE=${_STAGING_IMAGE}-test-app',
+        'GKE_TEST_APPLICATION=${_GKE_TEST_APPLICATION}',
+        'CLUSTER_NAME=${_CLUSTER_NAME}',
+        'GCP_PROJECT=${_GCP_TEST_PROJECT}']
+  waitFor: ['DOCKER_PUSH_TEST_APPLICATION', 'DOCKER_BUILD_MVN_GCLOUD', 'GKE_CLUSTER']
+
+- name: 'mvn-gcloud'
+  id: 'GKE_WAIT_APPLICATION'
+  entrypoint: "./build/scripts/gke/wait.sh"
+  env: ['GKE_TEST_APPLICATION=${_GKE_TEST_APPLICATION}',
+        'CLUSTER_NAME=${_CLUSTER_NAME}',
+        'GCP_PROJECT=${_GCP_TEST_PROJECT}']
+  waitFor: ['GKE_DEPLOYMENT']
+
+# Runtimes-common integration tests
+# See https://github.com/GoogleCloudPlatform/runtimes-common/tree/master/integration_tests
+- name: 'gcr.io/gcp-runtimes/integration_test:2017-03-23-134436'
+  id: 'GKE_INT_TEST'
+  entrypoint: './build/scripts/gke/test.sh'
+  args:
+    - '--no-deploy'
+    - '--skip-logging-tests' # blocked by b/33415496
+    - '--skip-monitoring-tests' # not yet implemented
+  waitFor: 'GKE_WAIT_APPLICATION'
+
+#
+# End of GKE Integration tests
+
+
 
 images: ['${_IMAGE}']

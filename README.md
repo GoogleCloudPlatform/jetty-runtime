@@ -81,11 +81,11 @@ write the Dockerfile like this:
 
 ```dockerfile
 FROM launcher.gcr.io/google/jetty
-ADD your-application.war $JETTY_BASE/webapps/root.war
+ADD your-application.war $APP_DESTINATION
 ```
-      
+ 
 That will add the WAR in the correct location for the Docker container.
-      
+
 Once you have this configuration, you can use the Google Cloud SDK to deploy this directory containing the 2 configuration files and the WAR using:
 ```
 gcloud app deploy app.yaml
@@ -97,7 +97,7 @@ For other Docker hosts, you'll need to create a Dockerfile based on this image t
 
 ```dockerfile
 FROM launcher.gcr.io/google/jetty
-COPY your-application.war $JETTY_BASE/webapps/root.war
+COPY your-application.war $APP_DESTINATION
 ```
 You can then build the docker container using `docker build` or [Google Cloud Container Builder](https://cloud.google.com/container-builder/docs/).
 By default, the CMD is set to start the Jetty server. You can change this by specifying your own `CMD` or `ENTRYPOINT`.
@@ -239,7 +239,7 @@ A standard war file may be deployed as the root context in an extended image by 
 in the docker build directory and using a `Dockerfile` like:
 ```dockerfile
 FROM launcher.gcr.io/google/jetty
-COPY your-application.war $JETTY_BASE/webapps/root.war
+COPY your-application.war $APP_DESTINATION
 ```
 
 ### Adding the root application to an image
