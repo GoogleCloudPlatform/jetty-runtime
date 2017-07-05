@@ -18,16 +18,17 @@
 [depend]
 server
 http-forwarded
+gcloud
 
 [optional]
 resources
 deploy
 
-[xml]
-etc/gcp.xml
-
 [lib]
 lib/gcp/*.jar
+
+[xml]
+etc/gcp.xml
 
 [ini]
 # Configure secure port redirection to 443 if not explicitly set

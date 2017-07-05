@@ -39,6 +39,11 @@ commandTests:
   command: [ '/workspace/jetty9/src/test/workspace/jetty-setup-modules.bash' ]
   expectedOutput: ['OK']
   exitCode: 0
+- name: 'check jetty sessions setup'
+  setup: [[ 'chmod', '+x', '/workspace/jetty9/src/test/workspace/jetty-setup-sessions.bash' ]]
+  command: [ '/workspace/jetty9/src/test/workspace/jetty-setup-sessions.bash' ]
+  expectedOutput: ['OK']
+  exitCode: 0
 - name: 'cloud debugger extra class path is set'
   setup: [[ 'chmod', '+x', '/workspace/jetty9/src/test/workspace/jetty-setup-debugger.bash' ]]
   command: ['/workspace/jetty9/src/test/workspace/jetty-setup-debugger.bash']
@@ -73,6 +78,14 @@ fileExistenceTests:
 - name: '50-jetty.bash exists'
   path: '/setup-env.d/50-jetty.bash'
   isDirectory: false
+  shouldExist: true
+- name: 'gcloud lib exists'
+  path: '${jetty.base}/lib/gcloud'
+  isDirectory: true
+  shouldExist: true
+- name: 'gcp lib exists'
+  path: '${jetty.base}/lib/gcp'
+  isDirectory: true
   shouldExist: true
 - name: 'docker entrypoint exists'
   path: '/docker-entrypoint.bash'

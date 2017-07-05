@@ -35,7 +35,8 @@ public class ClassLoaderServlet extends HttpServlet {
     resp.setContentType("text/plain");
 
     String[] hidden = {
-        "com.google.cloud.logging.Logging", 
+        "com.google.cloud.logging.Logging",
+        "com.google.cloud.datastore.Datastore",
         "org.eclipse.jetty.server.Server",
         "com.google.cloud.BaseService", 
         "io.netty.channel.Channel",
