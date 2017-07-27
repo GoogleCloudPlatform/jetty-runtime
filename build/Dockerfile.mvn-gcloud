@@ -16,16 +16,13 @@ RUN apt-get -y update && \
         --bash-completion=false \
         --disable-installation-options && \
 
+    /builder/google-cloud-sdk/bin/gcloud components install kubectl -q && \
     /builder/google-cloud-sdk/bin/gcloud components update --version "${CLOUD_SDK_VERSION}" && \
     /builder/google-cloud-sdk/bin/gcloud config set component_manager/disable_update_check 1 && \
+    /builder/google-cloud-sdk/bin/gcloud config set compute/zone us-east1-b && \
 
     # Clean up
     apt-get -y remove gcc python-dev python-setuptools wget && \
-    rm -rf /var/lib/apt/lists/* && \
-    rm -rf ~/.config/gcloud && \
-
-    # Kubernetes
-    /builder/google-cloud-sdk/bin/gcloud config set compute/zone us-east1-b && \
-    /builder/google-cloud-sdk/bin/gcloud components install kubectl -q
+    rm -rf /var/lib/apt/lists/*
 
 ENV PATH=/builder/google-cloud-sdk/bin/:$PATH
