@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-gcloud container clusters get-credentials ${CLUSTER_NAME} --project=${GCP_PROJECT}
+gcloud container clusters get-credentials ${CLUSTER_NAME} --project=${GCP_PROJECT} --zone=us-east1-b
 
 echo "Waiting for the load balancer to be accessible (expected time: ~1min)"
 DEPLOYED_APP_IP=""
