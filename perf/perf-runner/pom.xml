@@ -31,7 +31,7 @@
 		<resources.cpu>20</resources.cpu>
 		<resources.memory_gb>60</resources.memory_gb>
 		<httpClientSelectors>1</httpClientSelectors>
-		<maxRequestsQueued>410000</maxRequestsQueued>
+		<maxRequestsQueued>500000</maxRequestsQueued>
 	</properties>
 
 	<dependencies>
@@ -39,6 +39,11 @@
 			<groupId>org.mortbay.jetty.loadgenerator</groupId>
 			<artifactId>jetty-load-generator-starter</artifactId>
 			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>22.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.github.stephenc.eaio-uuid</groupId>

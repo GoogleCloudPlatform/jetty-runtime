@@ -21,6 +21,9 @@ import static com.google.cloud.runtime.jetty.perf.PerfRunner.fromNanostoMillis;
 import org.eclipse.jetty.client.api.Request;
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.Logger;
+import org.mortbay.jetty.load.generator.HTTP1ClientTransportBuilder;
+import org.mortbay.jetty.load.generator.HTTP2ClientTransportBuilder;
+import org.mortbay.jetty.load.generator.HTTPClientTransportBuilder;
 import org.mortbay.jetty.load.generator.LoadGenerator;
 import org.mortbay.jetty.load.generator.Resource;
 import org.mortbay.jetty.load.generator.listeners.CollectorInformations;
@@ -38,6 +41,7 @@ public class LoadGeneratorRunner extends LoadGeneratorStarter {
 
   private static final Logger LOGGER = Log.getLogger( LoadGeneratorRunner.class );
   String host;
+  LoadGeneratorStarterArgs runnerArgs;
 
   private GlobalSummaryListener globalSummaryListener = new GlobalSummaryListener() //
       .addExcludeHttpStatusFamily( 100, 300, 500 ); //
@@ -59,6 +63,7 @@ public class LoadGeneratorRunner extends LoadGeneratorStarter {
   public LoadGeneratorRunner( LoadGeneratorStarterArgs runnerArgs,
                               ExecutorService executorService, PerfRunner perfRunner ) {
     super( runnerArgs );
+    this.runnerArgs = runnerArgs;
     this.executorService = executorService;
     this.latencyTimeDisplayListener.addValueListener( ( latencyHistogram, totalHistogram )  -> {
       LOGGER.info( "host '" + host );
@@ -136,5 +141,38 @@ public class LoadGeneratorRunner extends LoadGeneratorStarter {
   @Override
   public ExecutorService getExecutorService() {
     return this.executorService;
+  }
+
+  public HTTPClientTransportBuilder getHttpClientTransportBuilder() {
+    boolean useRateLimiter = Boolean.parseBoolean( runnerArgs.getParams().get( "useRateLimiter" ) );
+    int transactionRate = getStarterArgs().getTransactionRate();
+    switch ( getStarterArgs().getTransport() ) {
+      case HTTP:
+      case HTTPS: {
+        if ( transactionRate > 1 && useRateLimiter ) {
+          LOGGER.info( "use RateLimiter" );
+          return new Http1RateLimiter( transactionRate ) //
+              .selectors( getStarterArgs().getSelectors() );
+        } else {
+          LOGGER.info( "NOT use RateLimiter" );
+          return new HTTP1ClientTransportBuilder().selectors( getStarterArgs().getSelectors() );
+        }
+      }
+      case H2C:
+      case H2: {
+        if ( transactionRate > 1 && useRateLimiter ) {
+          LOGGER.info( "use RateLimiter" );
+          return new Http2RateLimiter( transactionRate ) //
+              .selectors( getStarterArgs().getSelectors() );
+        } else {
+          LOGGER.info( "NOT use RateLimiter" );
+          return new HTTP2ClientTransportBuilder().selectors( getStarterArgs().getSelectors() );
+        }
+      } default: {
+        // nothing this weird case already handled by #provideClientTransport
+      }
+
+    }
+    throw new IllegalArgumentException( "unknown getHttpClientTransportBuilder" );
   }
 }
