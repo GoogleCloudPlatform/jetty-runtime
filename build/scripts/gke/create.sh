@@ -16,5 +16,5 @@
 
 TEST_CLUSTER_EXISTENCE=$(gcloud container clusters list --project=${GCP_PROJECT} | awk "/$CLUSTER_NAME/")
 if [ -z "$TEST_CLUSTER_EXISTENCE" ]; then
-  gcloud container clusters create "$CLUSTER_NAME" --num-nodes=1 --disk-size=10 --project=${GCP_PROJECT}
+  gcloud container clusters create "$CLUSTER_NAME" --num-nodes=1 --disk-size=10 --project=${GCP_PROJECT} --zone=us-east1-b
 fi
