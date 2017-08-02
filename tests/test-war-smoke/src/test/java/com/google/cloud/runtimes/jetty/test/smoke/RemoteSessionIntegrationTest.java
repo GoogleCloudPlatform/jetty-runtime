@@ -67,7 +67,10 @@ public class RemoteSessionIntegrationTest extends AbstractIntegrationTest {
 
   @Before
   public void setUp() throws Exception {
-    datastore = DatastoreOptions.getDefaultInstance().getService();
+    datastore = DatastoreOptions.newBuilder()
+        .setProjectId(System.getenv("app.deploy.project"))
+        .build()
+        .getService();
     keyFactory = datastore.newKeyFactory().setKind("GCloudSession");
     objectMapper = new ObjectMapper();
   }
