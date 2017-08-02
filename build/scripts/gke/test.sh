@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+set -e
+
 DEPLOYED_APP_URL=$(cat target/gke-app-ip.txt)
 
 /testsuite/driver.py --url=${DEPLOYED_APP_URL} $@
