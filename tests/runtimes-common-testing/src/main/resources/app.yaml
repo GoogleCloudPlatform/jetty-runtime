@@ -2,8 +2,5 @@ runtime: custom
 env: flex
 service: ${int.test.service}
 
-health_check:
-  enable_health_check: False
-
 manual_scaling:
   instances: 1
