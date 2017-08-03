@@ -10,21 +10,15 @@ RUN apt-get -y update && \
 
     # Setup Google Cloud SDK (latest)
     mkdir -p /builder && \
-    wget -qO- https://dl.google.com/dl/cloudsdk/release/google-cloud-sdk.tar.gz | tar zxv -C /builder && \
+    wget -qO- "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-${CLOUD_SDK_VERSION}-linux-x86_64.tar.gz" | tar zxv -C /builder && \
     CLOUDSDK_PYTHON="python2.7" /builder/google-cloud-sdk/install.sh \
         --usage-reporting=false \
         --bash-completion=false \
         --disable-installation-options && \
 
-    /builder/google-cloud-sdk/bin/gcloud components update --version "${CLOUD_SDK_VERSION}" && \
     /builder/google-cloud-sdk/bin/gcloud config set component_manager/disable_update_check 1 && \
 
-    # Clean up
-    apt-get -y remove gcc python-dev python-setuptools wget && \
-    rm -rf /var/lib/apt/lists/* && \
-    rm -rf ~/.config/gcloud && \
-
-    # Kubernetes
+    # Kubernetes configuration
     /builder/google-cloud-sdk/bin/gcloud config set compute/zone us-east1-b && \
     /builder/google-cloud-sdk/bin/gcloud components install kubectl -q
 
