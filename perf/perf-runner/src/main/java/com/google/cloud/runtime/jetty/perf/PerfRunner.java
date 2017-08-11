@@ -29,6 +29,7 @@ import com.google.cloud.bigquery.Table;
 import com.google.cloud.bigquery.TableId;
 import com.google.cloud.bigquery.TableInfo;
 
+import com.beust.jcommander.DynamicParameter;
 import com.beust.jcommander.JCommander;
 
 import com.eaio.uuid.UUID;
@@ -36,7 +37,7 @@ import com.eaio.uuid.UUID;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.server.HttpConfiguration;
@@ -55,6 +56,7 @@ import org.eclipse.jetty.util.log.Logger;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 
+import org.mortbay.jetty.load.generator.LoadGenerator;
 import org.mortbay.jetty.load.generator.listeners.CollectorInformations;
 import org.mortbay.jetty.load.generator.listeners.Utils;
 import org.mortbay.jetty.load.generator.starter.LoadGeneratorStarterArgs;
@@ -170,6 +172,11 @@ public class PerfRunner {
     ExecutorService executorService = Executors.newCachedThreadPool();
     try {
       LoadGeneratorRunner runner = new LoadGeneratorRunner( config, executorService, this );
+      LoadGenerator.Builder builder = LoadGeneratorRunner.prepare( config );
+      builder.executor( runner.getExecutorService() );
+      runner.getLoadGeneratorListeners().forEach( listener -> builder.listener( listener ) );
+      runner.getResourceListeners().forEach( listener -> builder.resourceListener( listener ) );
+      runner.getListeners().forEach( listener -> builder.requestListener( listener ) );
       String hostname = "";
       try {
         hostname = InetAddress.getLocalHost().getHostName();
@@ -179,7 +186,7 @@ public class PerfRunner {
       Instant startInstant = Instant.now();
       runner.host = hostname;
       try {
-        runner.run();
+        LoadGeneratorRunner.run( builder );
         this.runEndDate = new Date();
         synchronized ( this.runStatus ) {
           this.runStatus.endDate = this.runEndDate;
@@ -261,7 +268,7 @@ public class PerfRunner {
     }
   }
 
-  public PerfRunner startJetty(LoadGeneratorStarterArgs runnerArgs) throws Exception {
+  public PerfRunner startJetty(LoadGeneratorStarterConfig runnerArgs) throws Exception {
 
     QueuedThreadPool serverThreads = new QueuedThreadPool();
     serverThreads.setName( "server" );
@@ -508,7 +515,16 @@ public class PerfRunner {
   }
 
   public static class LoadGeneratorStarterConfig extends LoadGeneratorStarterArgs {
-    //
+    @DynamicParameter(names = "-D", description = "Dynamic parameters go here")
+    private Map<String,String> params = new HashMap<>(  );
+
+    public Map<String, String> getParams() {
+      return params;
+    }
+
+    public void setParams( Map<String, String> params ) {
+      this.params = params;
+    }
   }
 
   /**
@@ -534,7 +550,7 @@ public class PerfRunner {
 
     String transactionRate = env.get( "PERF_TRANSACTION_RATE" );
     if (transactionRate != null ) {
-      runnerArgs.setTransactionRate(Integer.parseInt( transactionRate ));
+      runnerArgs.setResourceRate(Integer.parseInt( transactionRate ));
     }
 
     String transport = env.get( "PERF_TRANSPORT" );
@@ -554,7 +570,7 @@ public class PerfRunner {
 
     String runIteration = env.get( "PERF_RUN_ITERATION" );
     if (runIteration != null ) {
-      runnerArgs.setRunIteration(Integer.parseInt( runIteration ));
+      runnerArgs.setIterations(Integer.parseInt( runIteration ));
     }
 
   }

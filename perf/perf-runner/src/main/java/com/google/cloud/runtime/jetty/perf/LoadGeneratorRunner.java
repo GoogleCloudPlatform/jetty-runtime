@@ -32,8 +32,9 @@ import org.mortbay.jetty.load.generator.listeners.RequestQueuedListenerDisplay;
 import org.mortbay.jetty.load.generator.listeners.latency.LatencyTimeDisplayListener;
 import org.mortbay.jetty.load.generator.listeners.report.GlobalSummaryListener;
 import org.mortbay.jetty.load.generator.starter.LoadGeneratorStarter;
-import org.mortbay.jetty.load.generator.starter.LoadGeneratorStarterArgs;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -41,7 +42,7 @@ public class LoadGeneratorRunner extends LoadGeneratorStarter {
 
   private static final Logger LOGGER = Log.getLogger( LoadGeneratorRunner.class );
   String host;
-  LoadGeneratorStarterArgs runnerArgs;
+  PerfRunner.LoadGeneratorStarterConfig runnerArgs;
 
   private GlobalSummaryListener globalSummaryListener = new GlobalSummaryListener() //
       .addExcludeHttpStatusFamily( 100, 300, 500 ); //
@@ -60,9 +61,8 @@ public class LoadGeneratorRunner extends LoadGeneratorStarter {
       new LatencyTimeDisplayListener( 10, 10, TimeUnit.SECONDS )
           .addExcludeHttpStatusFamily( 100, 300, 500 ); //
 
-  public LoadGeneratorRunner( LoadGeneratorStarterArgs runnerArgs,
+  public LoadGeneratorRunner( PerfRunner.LoadGeneratorStarterConfig runnerArgs,
                               ExecutorService executorService, PerfRunner perfRunner ) {
-    super( runnerArgs );
     this.runnerArgs = runnerArgs;
     this.executorService = executorService;
     this.latencyTimeDisplayListener.addValueListener( ( latencyHistogram, totalHistogram )  -> {
@@ -107,22 +107,19 @@ public class LoadGeneratorRunner extends LoadGeneratorStarter {
     });
   }
 
-  @Override
-  protected Request.Listener[] getListeners() {
-    return new Request.Listener[]{qpsListenerDisplay, //
+  protected List<Request.Listener> getListeners() {
+    return Arrays.asList(qpsListenerDisplay, //
                                   requestQueuedListenerDisplay, //
                                   latencyTimeDisplayListener, //
-                                  globalSummaryListener};
+                                  globalSummaryListener);
   }
 
-  @Override
-  protected LoadGenerator.Listener[] getLoadGeneratorListeners() {
-    return new LoadGenerator.Listener[]{qpsListenerDisplay, requestQueuedListenerDisplay};
+  protected List<LoadGenerator.Listener> getLoadGeneratorListeners() {
+    return Arrays.asList(qpsListenerDisplay, requestQueuedListenerDisplay);
   }
 
-  @Override
-  protected Resource.Listener[] getResourceListeners() {
-    return new Resource.Listener[]{globalSummaryListener, latencyTimeDisplayListener };
+  protected List<Resource.Listener> getResourceListeners() {
+    return Arrays.asList(globalSummaryListener, latencyTimeDisplayListener);
   }
 
   public CollectorInformations getLatencyTimeSummary() {
@@ -138,24 +135,23 @@ public class LoadGeneratorRunner extends LoadGeneratorStarter {
     return qpsListenerDisplay;
   }
 
-  @Override
   public ExecutorService getExecutorService() {
     return this.executorService;
   }
 
   public HTTPClientTransportBuilder getHttpClientTransportBuilder() {
     boolean useRateLimiter = Boolean.parseBoolean( runnerArgs.getParams().get( "useRateLimiter" ) );
-    int transactionRate = getStarterArgs().getTransactionRate();
-    switch ( getStarterArgs().getTransport() ) {
+    int transactionRate = runnerArgs.getResourceRate();
+    switch ( runnerArgs.getTransport() ) {
       case HTTP:
       case HTTPS: {
         if ( transactionRate > 1 && useRateLimiter ) {
           LOGGER.info( "use RateLimiter" );
           return new Http1RateLimiter( transactionRate ) //
-              .selectors( getStarterArgs().getSelectors() );
+              .selectors( runnerArgs.getSelectors() );
         } else {
           LOGGER.info( "NOT use RateLimiter" );
-          return new HTTP1ClientTransportBuilder().selectors( getStarterArgs().getSelectors() );
+          return new HTTP1ClientTransportBuilder().selectors( runnerArgs.getSelectors() );
         }
       }
       case H2C:
@@ -163,10 +159,10 @@ public class LoadGeneratorRunner extends LoadGeneratorStarter {
         if ( transactionRate > 1 && useRateLimiter ) {
           LOGGER.info( "use RateLimiter" );
           return new Http2RateLimiter( transactionRate ) //
-              .selectors( getStarterArgs().getSelectors() );
+              .selectors( runnerArgs.getSelectors() );
         } else {
           LOGGER.info( "NOT use RateLimiter" );
-          return new HTTP2ClientTransportBuilder().selectors( getStarterArgs().getSelectors() );
+          return new HTTP2ClientTransportBuilder().selectors( runnerArgs.getSelectors() );
         }
       } default: {
         // nothing this weird case already handled by #provideClientTransport

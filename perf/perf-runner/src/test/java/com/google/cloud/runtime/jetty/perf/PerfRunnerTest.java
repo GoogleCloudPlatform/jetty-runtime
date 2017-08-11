@@ -103,13 +103,13 @@ public class PerfRunnerTest {
     args.add( "10");
     args.add( "--running-time-unit");
     args.add( "s" );
-    args.add( "--transaction-rate" );
+    args.add( "--resource-rate" );
     args.add( "3" );
     args.add( "--transport");
     args.add( "http");
     args.add( "--users");
     args.add( "3");
-    args.add( "--profile-groovy-path");
+    args.add( "--resource-groovy-path");
     args.add( "src/test/resources/loadgenerator_profile.groovy");
     args.add( "-DreturnExit=true" );
     args.add( "-DrunOnStart=true" );
