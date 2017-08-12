@@ -19,7 +19,7 @@
 		<mainClass>com.google.cloud.runtime.jetty.perf.PerfRunner</mainClass>
 	  <host>jetty-runtime-perf-app-dot-jetty9-work.appspot.com</host>
 		<port>443</port>
-		<transaction_rate>2800</transaction_rate>
+		<resource_rate>2800</resource_rate>
 		<scheme>https</scheme>
 		<users>12</users>
 		<jettyPort>8080</jettyPort>

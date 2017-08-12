@@ -18,6 +18,7 @@ package com.google.cloud.runtime.jetty.perf;
 
 import static com.google.cloud.runtime.jetty.perf.PerfRunner.fromNanostoMillis;
 
+import org.HdrHistogram.Histogram;
 import org.eclipse.jetty.client.api.Request;
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.Logger;
@@ -26,7 +27,6 @@ import org.mortbay.jetty.load.generator.HTTP2ClientTransportBuilder;
 import org.mortbay.jetty.load.generator.HTTPClientTransportBuilder;
 import org.mortbay.jetty.load.generator.LoadGenerator;
 import org.mortbay.jetty.load.generator.Resource;
-import org.mortbay.jetty.load.generator.listeners.CollectorInformations;
 import org.mortbay.jetty.load.generator.listeners.QpsListenerDisplay;
 import org.mortbay.jetty.load.generator.listeners.RequestQueuedListenerDisplay;
 import org.mortbay.jetty.load.generator.listeners.latency.LatencyTimeDisplayListener;
@@ -60,6 +60,8 @@ public class LoadGeneratorRunner extends LoadGeneratorStarter {
   LatencyTimeDisplayListener latencyTimeDisplayListener =
       new LatencyTimeDisplayListener( 10, 10, TimeUnit.SECONDS )
           .addExcludeHttpStatusFamily( 100, 300, 500 ); //
+
+  private Monitor.Start monitor = Monitor.start();
 
   public LoadGeneratorRunner( PerfRunner.LoadGeneratorStarterConfig runnerArgs,
                               ExecutorService executorService, PerfRunner perfRunner ) {
@@ -103,7 +105,13 @@ public class LoadGeneratorRunner extends LoadGeneratorStarter {
                                       qps ) //
                 .startDate( perfRunner.runStartDate );
       }
+      Monitor.Stop stop = monitor.stop();
+      LOGGER.info( String.format( "request jit=%s ms, cpu=%.2f%%%n",
+                                  stop.deltaJitTime,
+                                  stop.cpuPercent ) );
+      monitor = Monitor.start();
       perfRunner.bigQueryRecord( perfRunner.runStatus );
+
     });
   }
 
@@ -122,9 +130,9 @@ public class LoadGeneratorRunner extends LoadGeneratorStarter {
     return Arrays.asList(globalSummaryListener, latencyTimeDisplayListener);
   }
 
-  public CollectorInformations getLatencyTimeSummary() {
-    return new CollectorInformations( globalSummaryListener.getLatencyTimeHistogram() //
-                                          .getIntervalHistogram() );
+  public Histogram getLatencyTimeHistogramSummary() {
+    return globalSummaryListener.getLatencyTimeHistogram() //
+        .getIntervalHistogram();
   }
 
   public GlobalSummaryListener getGlobalSummaryListener() {

@@ -35,7 +35,10 @@ import com.beust.jcommander.JCommander;
 import com.eaio.uuid.UUID;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import org.HdrHistogram.Histogram;
 
 import org.apache.commons.lang3.math.NumberUtils;
 
@@ -50,12 +53,14 @@ import org.eclipse.jetty.server.session.SessionHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.servlet.StatisticsServlet;
+import org.eclipse.jetty.toolchain.perf.HistogramSnapshot;
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.Logger;
 
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 
+import org.mortbay.jetty.load.generator.HTTPClientTransportBuilder;
 import org.mortbay.jetty.load.generator.LoadGenerator;
 import org.mortbay.jetty.load.generator.listeners.CollectorInformations;
 import org.mortbay.jetty.load.generator.listeners.Utils;
@@ -203,7 +208,15 @@ public class PerfRunner {
         runner.latencyTimeDisplayListener.onEnd( null );
       }
 
-      CollectorInformations latencyTimeSummary = runner.getLatencyTimeSummary();
+      Histogram histogram = runner.getLatencyTimeHistogramSummary();
+
+      CollectorInformations latencyTimeSummary = new CollectorInformations( histogram );
+
+      HistogramSnapshot snapshot = new HistogramSnapshot( histogram, //
+                                                          20, //
+                                                          "Latency Time Summary", //
+                                                          "\u00B5s", //
+                                                          TimeUnit.NANOSECONDS::toMicros);
 
       long totalRequestCommitted = runner.getGlobalSummaryListener().getRequestCommitTotal();
       long start = latencyTimeSummary.getStartTimeStamp();
@@ -215,6 +228,8 @@ public class PerfRunner {
       LOGGER.info( "--------    Latency Time Summary     ---------------" );
       LOGGER.info( "----------------------------------------------------" );
       LOGGER.info( "" + latencyTimeSummary.toString() );
+      LOGGER.info( "----------------------------------------------------" );
+      LOGGER.info( snapshot.toString() );
       LOGGER.info( "----------------------------------------------------" );
       LOGGER.info( "" );
       LOGGER.info( "----------------------------------------------------" );
@@ -245,6 +260,8 @@ public class PerfRunner {
                        + runner.getGlobalSummaryListener().getResponses4xx().longValue() );
       LOGGER.info( "response 5xx family: "
                        + runner.getGlobalSummaryListener().getResponses5xx().longValue() );
+
+
       LOGGER.info( "" );
 
       synchronized ( this.runStatus ) {
@@ -514,6 +531,19 @@ public class PerfRunner {
     }
   }
 
+  public static class LoadDisplay implements Runnable {
+    private Monitor.Start monitor = Monitor.start();
+
+    @Override
+    public void run() {
+      Monitor.Stop stop = monitor.stop();
+      LOGGER.info( String.format( "jit=%s ms, cpu=%.2f%%%n", //
+                                  stop.deltaJitTime, //
+                                  stop.cpuPercent));
+      monitor = Monitor.start();
+    }
+  }
+
   public static class LoadGeneratorStarterConfig extends LoadGeneratorStarterArgs {
     @DynamicParameter(names = "-D", description = "Dynamic parameters go here")
     private Map<String,String> params = new HashMap<>(  );
@@ -525,6 +555,13 @@ public class PerfRunner {
     public void setParams( Map<String, String> params ) {
       this.params = params;
     }
+
+    @Override
+    @JsonIgnore
+    public HTTPClientTransportBuilder getHttpClientTransportBuilder() {
+      return super.getHttpClientTransportBuilder();
+    }
+
   }
 
   /**
