@@ -200,11 +200,10 @@ docker run -it --rm \
 ### Enhanced Stackdriver Logging (BETA)
 When running on the Google Cloud Platform Flex environment, the Java Util Logging can be configured to send logs to Google Stackdriver Logging by providing a `logging.properties` file that configures a [LoggingHandler](http://googlecloudplatform.github.io/google-cloud-java/0.10.0/apidocs/com/google/cloud/logging/LoggingHandler.html) as follows:
 ```
-.level=INFO
-io.grpc.netty.level=INFO
-sun.net.level=INFO
-
 handlers=com.google.cloud.logging.LoggingHandler
+
+# Optional configuration
+.level=INFO
 com.google.cloud.logging.LoggingHandler.level=FINE
 com.google.cloud.logging.LoggingHandler.log=gae_app.log
 com.google.cloud.logging.LoggingHandler.formatter=java.util.logging.SimpleFormatter
