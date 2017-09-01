@@ -78,7 +78,7 @@ Remote testing is disabled by default but can be enabled to work in conjunction 
 From the base `jetty-runtime` directory:
 
 ```
-> mvn install -Ptest.remote,test.remote.deploy,test.remote.clean
+> mvn install -Ptest.remote,test.remote.deploy,test.remote.clean -Dapp.deploy.service=smoke
 ```
 
 This will activate the remote testing profile. Under this scenario, for each test artifact the `appengine-maven-plugin` is used to deploy an instance of the application to the Google Flexible environment and then run appropriate test cases.  The containers for each webapp will be built through using the cloud builder mechanism available in GCP.  This means the image to be tested (as referenced in the jetty.test.image property) will need to be deployed to the appropriate gcr.io location.  Remote testing can make use of the entire scope of services available to Google Flex.  
@@ -94,7 +94,7 @@ Note: should the build fail a remote deployed artifact may remain deployed and n
 Remote testing can also be run from the `jetty-runtime/tests` directory, but must explicitly define which remote image to use:
 
 ```
-> mvn install -Ptest.remote -Djetty.test.image=gcr.io/{project}/{container}:{tag}
+> mvn install -Ptest.remote -Djetty.test.image=gcr.io/{project}/{container}:{tag} -Dapp.deploy.service=smoke
 ```
 
 Test Case Requirements and Conventions
