@@ -40,12 +40,6 @@ steps:
   args: ['push', '${_STAGING_IMAGE}' ]
   waitFor: 'DOCKER_STAGE_TAG'
 
-# Build a maven/gcloud image to be used for running tests
-- name: 'gcr.io/cloud-builders/docker'
-  id: 'DOCKER_BUILD_MVN_GCLOUD'
-  args: ['build', '-t', 'mvn-gcloud', '-f', 'build/Dockerfile.mvn-gcloud', '.']
-  waitFor: '-'
-
 #
 # App Engine Integration tests
 #
@@ -73,7 +67,7 @@ steps:
   waitFor: 'AE_DEPLOY_INT_TEST'
 
 # Jetty smoke tests
-- name: 'mvn-gcloud'
+- name: 'gcr.io/java-runtime-test/mvn-gcloud-builder'
   id: 'JETTY_SMOKE_TEST'
   args:
     - 'mvn'
@@ -88,7 +82,7 @@ steps:
     - 'test-war-smoke'
     - '-am'
   dir: 'tests/'
-  waitFor: ['DOCKER_STAGE', 'DOCKER_BUILD_MVN_GCLOUD']
+  waitFor: ['DOCKER_STAGE']
 
 #
 # End of App Engine Integration tests
@@ -109,23 +103,23 @@ steps:
   waitFor: ['DOCKER_BUILD_TEST_APPLICATION']
 
 # Create a GKE cluster
-- name: 'mvn-gcloud'
+- name: 'gcr.io/java-runtime-test/mvn-gcloud-builder'
   id: 'GKE_CLUSTER'
   entrypoint: './build/scripts/gke/create.sh'
   env: ['CLUSTER_NAME=${_CLUSTER_NAME}', 'GCP_PROJECT=${_GCP_TEST_PROJECT}']
-  waitFor: 'DOCKER_BUILD_MVN_GCLOUD'
+  waitFor: '-'
 
 # Deploy the test application to GKE
-- name: 'mvn-gcloud'
+- name: 'gcr.io/java-runtime-test/mvn-gcloud-builder'
   id: 'GKE_DEPLOYMENT'
   entrypoint: './build/scripts/gke/deploy.sh'
   env: ['STAGING_IMAGE=${_STAGING_IMAGE}-test-app',
         'GKE_TEST_APPLICATION=${_GKE_TEST_APPLICATION}',
         'CLUSTER_NAME=${_CLUSTER_NAME}',
         'GCP_PROJECT=${_GCP_TEST_PROJECT}']
-  waitFor: ['DOCKER_PUSH_TEST_APPLICATION', 'DOCKER_BUILD_MVN_GCLOUD', 'GKE_CLUSTER']
+  waitFor: ['DOCKER_PUSH_TEST_APPLICATION', 'GKE_CLUSTER']
 
-- name: 'mvn-gcloud'
+- name: 'gcr.io/java-runtime-test/mvn-gcloud-builder'
   id: 'GKE_WAIT_APPLICATION'
   entrypoint: "./build/scripts/gke/wait.sh"
   env: ['GKE_TEST_APPLICATION=${_GKE_TEST_APPLICATION}',
@@ -146,7 +140,5 @@ steps:
 
 #
 # End of GKE Integration tests
-
-
 
 images: ['${_IMAGE}']
