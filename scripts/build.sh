@@ -88,7 +88,7 @@ gcloud container builds submit \
 "_GCP_TEST_PROJECT=$GCP_TEST_PROJECT,"\
 "_GKE_TEST_APPLICATION=$GKE_TEST_APPLICATION,"\
 "_CLUSTER_NAME=$CLUSTER_NAME,"\
-  --timeout=25m \
+  --timeout=45m \
   ${projectRoot}
 
 testResult=$?
