@@ -8,5 +8,5 @@ steps:
 
 # Delete GKE Cluster
 - name: 'gcr.io/cloud-builders/gcloud'
-  args: ['container', 'clusters', 'delete', '${_CLUSTER_NAME}', '-z', 'us-east1-b', '--quiet']
+  args: ['container', 'clusters', 'delete', '${_CLUSTER_NAME}', '-z', '${_GCP_ZONE}', '--quiet']
   waitFor: '-'
