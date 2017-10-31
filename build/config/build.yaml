@@ -112,7 +112,7 @@ steps:
 - name: 'mvn-gcloud'
   id: 'GKE_CLUSTER'
   entrypoint: './build/scripts/gke/create.sh'
-  env: ['CLUSTER_NAME=${_CLUSTER_NAME}', 'GCP_PROJECT=${_GCP_TEST_PROJECT}']
+  env: ['CLUSTER_NAME=${_CLUSTER_NAME}', 'GCP_PROJECT=${_GCP_TEST_PROJECT}', 'GCP_ZONE=${_GCP_ZONE}']
   waitFor: 'DOCKER_BUILD_MVN_GCLOUD'
 
 # Deploy the test application to GKE
@@ -122,7 +122,7 @@ steps:
   env: ['STAGING_IMAGE=${_STAGING_IMAGE}-test-app',
         'GKE_TEST_APPLICATION=${_GKE_TEST_APPLICATION}',
         'CLUSTER_NAME=${_CLUSTER_NAME}',
-        'GCP_PROJECT=${_GCP_TEST_PROJECT}']
+        'GCP_PROJECT=${_GCP_TEST_PROJECT}', 'GCP_ZONE=${_GCP_ZONE}']
   waitFor: ['DOCKER_PUSH_TEST_APPLICATION', 'DOCKER_BUILD_MVN_GCLOUD', 'GKE_CLUSTER']
 
 - name: 'mvn-gcloud'
@@ -130,7 +130,7 @@ steps:
   entrypoint: "./build/scripts/gke/wait.sh"
   env: ['GKE_TEST_APPLICATION=${_GKE_TEST_APPLICATION}',
         'CLUSTER_NAME=${_CLUSTER_NAME}',
-        'GCP_PROJECT=${_GCP_TEST_PROJECT}']
+        'GCP_PROJECT=${_GCP_TEST_PROJECT}', 'GCP_ZONE=${_GCP_ZONE}']
   waitFor: ['GKE_DEPLOYMENT']
 
 # Runtimes-common integration tests

@@ -16,7 +16,7 @@
 
 set -e
 
-gcloud container clusters get-credentials ${CLUSTER_NAME} --project=${GCP_PROJECT} --zone=us-east1-b
+gcloud container clusters get-credentials ${CLUSTER_NAME} --project=${GCP_PROJECT} --zone=${GCP_ZONE}
 
 kubectl run ${GKE_TEST_APPLICATION} --image=${STAGING_IMAGE} --port=8080 --expose=true \
             --service-overrides='{ "apiVersion": "v1", "spec": { "type":  "LoadBalancer" } }' \

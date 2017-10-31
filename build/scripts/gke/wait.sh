@@ -16,7 +16,7 @@
 
 set -e
 
-gcloud container clusters get-credentials ${CLUSTER_NAME} --project=${GCP_PROJECT} --zone=us-east1-b
+gcloud container clusters get-credentials ${CLUSTER_NAME} --project=${GCP_PROJECT} --zone=${GCP_ZONE}
 
 echo "Waiting for the load balancer to be accessible (expected time: ~1min)"
 DEPLOYED_APP_IP=""

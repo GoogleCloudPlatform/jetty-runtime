@@ -51,6 +51,9 @@ buildConfigDir=${projectRoot}/build/config
 
 RUNTIME_NAME="jetty"
 TAG_PREFIX="9.4"
+GCP_ZONE="us-east1-b"
+
+sed "s/\[INSERT_GCP_ZONE\]/$GCP_ZONE/g" build/Dockerfile.mvn-gcloud.template > build/Dockerfile.mvn-gcloud
 
 if [ -z "${DOCKER_NAMESPACE}" ]; then
   usage
@@ -86,6 +89,7 @@ gcloud container builds submit \
 "_TEST_AE_SERVICE_1=$TEST_AE_SERVICE_1,"\
 "_TEST_AE_SERVICE_2=$TEST_AE_SERVICE_2,"\
 "_GCP_TEST_PROJECT=$GCP_TEST_PROJECT,"\
+"_GCP_ZONE=$GCP_ZONE,"\
 "_GKE_TEST_APPLICATION=$GKE_TEST_APPLICATION,"\
 "_CLUSTER_NAME=$CLUSTER_NAME,"\
   --timeout=45m \
@@ -98,6 +102,7 @@ gcloud container builds submit \
   --config=${buildConfigDir}/cleanup.yaml \
   --substitutions=\
 "_GCP_TEST_PROJECT=$GCP_TEST_PROJECT,"\
+"_GCP_ZONE=$GCP_ZONE,"\
 "_TEST_AE_SERVICE_1=$TEST_AE_SERVICE_1,"\
 "_TEST_AE_SERVICE_2=$TEST_AE_SERVICE_2,"\
 "_CLUSTER_NAME=$CLUSTER_NAME,"\
