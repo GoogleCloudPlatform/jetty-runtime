@@ -226,6 +226,8 @@ This image can be configured to use [Google Cloud Datastore](https://cloud.googl
 env_variables:
   JETTY_MODULES_ENABLE: gcp-datastore-sessions
 ```
+Jetty will use the default namespace in Datastore, but you can also choose a namespace to use by using the
+`jetty.session.gcloud.namespace` property.
 
 ## Extending the image
 The image produced by this project may be automatically used/extended by the Cloud SDK and/or App Engine maven plugin. 
