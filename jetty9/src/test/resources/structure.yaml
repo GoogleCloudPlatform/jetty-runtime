@@ -54,9 +54,9 @@ commandTests:
   command: ['/workspace/jetty9/src/test/workspace/jetty-setup-dry-run.bash']
   expectedOutput: ['OK']
   exitCode: 0
-- name: 'APP_DESTINATION is set'
+- name: 'APP_DESTINATION_PATH is set'
   command: ['env']
-  expectedOutput: ['APP_DESTINATION=/var/lib/jetty/webapps/']
+  expectedOutput: ['APP_DESTINATION_PATH=/var/lib/jetty/webapps/']
 - name: 'APP_WAR is set'
   command: ['env']
   expectedOutput: ['APP_WAR=root.war']
@@ -66,6 +66,9 @@ commandTests:
 - name: 'APP_DESTINATION_WAR is set'
   command: ['env']
   expectedOutput: ['APP_DESTINATION_WAR=/var/lib/jetty/webapps/root.war']
+- name: 'APP_DESTINATION is set'
+  command: ['env']
+  expectedOutput: ['APP_DESTINATION=/var/lib/jetty/webapps/root.war']
 - name: 'APP_DESTINATION_EXPLODED_WAR is set'
   command: ['env']
   expectedOutput: ['APP_DESTINATION_EXPLODED_WAR=/var/lib/jetty/webapps/root/']

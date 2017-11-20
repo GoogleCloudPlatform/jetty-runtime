@@ -49,9 +49,12 @@ RUN mkdir -p webapps $TMPDIR \
 # Set path where apps should be added to the container
 ENV APP_WAR root.war
 ENV APP_EXPLODED_WAR root/
-ENV APP_DESTINATION $JETTY_BASE/webapps/
-ENV APP_DESTINATION_WAR $APP_DESTINATION$APP_WAR
-ENV APP_DESTINATION_EXPLODED_WAR $APP_DESTINATION$APP_EXPLODED_WAR
+ENV APP_DESTINATION_PATH $JETTY_BASE/webapps/
+ENV APP_DESTINATION_WAR $APP_DESTINATION_PATH$APP_WAR
+ENV APP_DESTINATION_EXPLODED_WAR $APP_DESTINATION_PATH$APP_EXPLODED_WAR
+
+# This env var is here to not break users of previous versions where only a .war was expected
+ENV APP_DESTINATION $APP_DESTINATION_WAR
 
 EXPOSE 8080
 CMD ["java","-Djetty.base=${jetty.base}","-jar","${jetty.home}/start.jar"]
