@@ -81,10 +81,16 @@ write the Dockerfile like this:
 
 ```dockerfile
 FROM launcher.gcr.io/google/jetty
-ADD your-application.war $APP_DESTINATION
+ADD your-application.war $APP_DESTINATION_WAR
 ```
  
 That will add the WAR in the correct location for the Docker container.
+
+You can also use exploded-war artifacts:
+
+```dockerfile
+ADD your-application $APP_DESTINATION_EXPLODED_WAR
+```
 
 Once you have this configuration, you can use the Google Cloud SDK to deploy this directory containing the 2 configuration files and the WAR using:
 ```
@@ -97,9 +103,9 @@ For other Docker hosts, you'll need to create a Dockerfile based on this image t
 
 ```dockerfile
 FROM launcher.gcr.io/google/jetty
-COPY your-application.war $APP_DESTINATION
+COPY your-application.war $APP_DESTINATION_WAR
 ```
-You can then build the docker container using `docker build` or [Google Cloud Container Builder](https://cloud.google.com/container-builder/docs/).
+If your artifact is an exploded-war, then use the `APP_DESTINATION_EXPLODED_WAR` environment variable instead. You can then build the docker container using `docker build` or [Google Cloud Container Builder](https://cloud.google.com/container-builder/docs/).
 By default, the CMD is set to start the Jetty server. You can change this by specifying your own `CMD` or `ENTRYPOINT`.
 
 ## Entry Point Features
@@ -246,8 +252,14 @@ A standard war file may be deployed as the root context in an extended image by 
 in the docker build directory and using a `Dockerfile` like:
 ```dockerfile
 FROM launcher.gcr.io/google/jetty
-COPY your-application.war $APP_DESTINATION
+COPY your-application.war $APP_DESTINATION_WAR
 ```
+
+An exploded-war can also be used:
+```dockerfile
+COPY your-application $APP_DESTINATION_EXPLODED_WAR
+```
+
 
 ### Adding the root application to an image
 If the application exists as directory (i.e. an expanded war file), then directory must
