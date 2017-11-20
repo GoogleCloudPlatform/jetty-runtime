@@ -47,7 +47,11 @@ RUN mkdir -p webapps $TMPDIR \
  && chmod +x /scripts/jetty/generate-jetty-start.sh
 
 # Set path where apps should be added to the container
-ENV APP_DESTINATION $JETTY_BASE/webapps/root.war
+ENV APP_WAR root.war
+ENV APP_EXPLODED_WAR root/
+ENV APP_DESTINATION $JETTY_BASE/webapps/
+ENV APP_DESTINATION_WAR $APP_DESTINATION$APP_WAR
+ENV APP_DESTINATION_EXPLODED_WAR $APP_DESTINATION$APP_EXPLODED_WAR
 
 EXPOSE 8080
 CMD ["java","-Djetty.base=${jetty.base}","-jar","${jetty.home}/start.jar"]

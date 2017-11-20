@@ -56,7 +56,19 @@ commandTests:
   exitCode: 0
 - name: 'APP_DESTINATION is set'
   command: ['env']
-  expectedOutput: ['APP_DESTINATION=/var/lib/jetty/webapps/root.war']
+  expectedOutput: ['APP_DESTINATION=/var/lib/jetty/webapps/']
+- name: 'APP_WAR is set'
+  command: ['env']
+  expectedOutput: ['APP_WAR=root.war']
+- name: 'APP_EXPLODED_WAR is set'
+  command: ['env']
+  expectedOutput: ['APP_EXPLODED_WAR=root/']
+- name: 'APP_DESTINATION_WAR is set'
+  command: ['env']
+  expectedOutput: ['APP_DESTINATION_WAR=/var/lib/jetty/webapps/root.war']
+- name: 'APP_DESTINATION_EXPLODED_WAR is set'
+  command: ['env']
+  expectedOutput: ['APP_DESTINATION_EXPLODED_WAR=/var/lib/jetty/webapps/root/']
 
 fileExistenceTests:
 - name: 'jetty start.jar exists'
