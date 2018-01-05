@@ -30,6 +30,19 @@
   <artifactId>test-war-smoke</artifactId>
   <packaging>war</packaging>
   <name>Jetty-Runtime :: Tests :: Smoke Tests (Servlet 3.1)</name>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>com.google.cloud</groupId>
+        <artifactId>google-cloud-bom</artifactId>
+        <version>${gcloud.api.bom.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
   <dependencies>
     <dependency>
       <groupId>javax.servlet</groupId>
@@ -40,7 +53,6 @@
     <dependency>
       <groupId>com.google.cloud</groupId>
       <artifactId>google-cloud-logging</artifactId>
-      <version>${gcloud.api.version}</version>
       <exclusions>
         <exclusion>
           <groupId>commons-logging</groupId>
@@ -66,7 +78,6 @@
     <dependency>
       <groupId>com.google.cloud</groupId>
       <artifactId>google-cloud-datastore</artifactId>
-      <version>${gcloud.api.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>

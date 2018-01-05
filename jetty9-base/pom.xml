@@ -28,6 +28,18 @@
   <artifactId>jetty9-base</artifactId>
   <packaging>jar</packaging>
 
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>com.google.cloud</groupId>
+        <artifactId>google-cloud-bom</artifactId>
+        <version>${gcloud.api.bom.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
   <dependencies>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
@@ -39,7 +51,6 @@
     <dependency>
       <groupId>com.google.cloud</groupId>
       <artifactId>google-cloud-logging</artifactId>
-      <version>${gcloud.api.version}</version>
       <exclusions>
         <exclusion>
           <groupId>commons-logging</groupId>
@@ -58,7 +69,6 @@
     <dependency>
       <groupId>com.google.cloud</groupId>
       <artifactId>google-cloud-datastore</artifactId>
-      <version>${gcloud.api.version}</version>
       <exclusions>
         <exclusion>
           <groupId>javax.servlet</groupId>
