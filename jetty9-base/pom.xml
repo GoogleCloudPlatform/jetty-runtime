@@ -39,7 +39,6 @@
     <dependency>
       <groupId>com.google.cloud</groupId>
       <artifactId>google-cloud-logging</artifactId>
-      <version>${gcloud.api.version}</version>
       <exclusions>
         <exclusion>
           <groupId>commons-logging</groupId>
@@ -58,7 +57,6 @@
     <dependency>
       <groupId>com.google.cloud</groupId>
       <artifactId>google-cloud-datastore</artifactId>
-      <version>${gcloud.api.version}</version>
       <exclusions>
         <exclusion>
           <groupId>javax.servlet</groupId>
