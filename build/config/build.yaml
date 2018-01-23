@@ -3,7 +3,7 @@
 
 steps:
 # Perform maven build, omitting local docker operations
-- name: 'gcr.io/cloud-builders/java/mvn:3.5.0-jdk-8'
+- name: 'gcr.io/cloud-builders/mvn:3.5.0-jdk-8'
   id: 'MAVEN_BUILD'
   args:
     - '--batch-mode'
