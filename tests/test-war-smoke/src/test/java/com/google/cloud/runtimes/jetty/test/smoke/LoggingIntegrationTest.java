@@ -65,7 +65,7 @@ public class LoggingIntegrationTest extends AbstractIntegrationTest {
     assertThat(traceId, Matchers.notNullValue());
 
     // wait for logs to propagate
-    Thread.sleep(10 * 1000);
+    Thread.sleep(30 * 1000);
 
     LoggingOptions options = LoggingOptions.newBuilder()
         .setProjectId(System.getProperty("app.deploy.project"))
