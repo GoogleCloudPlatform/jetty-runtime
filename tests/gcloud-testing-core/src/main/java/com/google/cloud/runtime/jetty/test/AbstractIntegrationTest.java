@@ -128,8 +128,10 @@ public class AbstractIntegrationTest {
   @BeforeClass
   public static void waitForServerUp() throws Exception {
     HttpUrlUtil.waitForServerUp(SERVER_URI, TIMEOUT_SECONDS, TimeUnit.SECONDS);
-    // wait for HTTPS as well
-    HttpUrlUtil.waitForServerUp(new URI(SERVER_URI.toASCIIString().replace("http:", "https:")),
-            TIMEOUT_SECONDS, TimeUnit.SECONDS);
+    // wait for HTTPS as well, but only for remote
+    if (!SERVER_URI.toASCIIString().startsWith("http://localhost")) {
+      HttpUrlUtil.waitForServerUp(new URI(SERVER_URI.toASCIIString().replace("http:", "https:")),
+          TIMEOUT_SECONDS, TimeUnit.SECONDS);
+    }
   }
 }
