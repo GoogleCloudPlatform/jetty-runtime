@@ -16,16 +16,35 @@
 
 #
 # Fetch and execute the structure test framework run script.
-#
+set -e
+
 dir=`dirname $0`
-scriptPath=https://raw.githubusercontent.com/GoogleCloudPlatform/runtimes-common/a5efef7f1f2cfd60814641fcff8239ea301e661d/structure_tests/ext_run.sh
+scriptPath=https://storage.googleapis.com/container-structure-test/v1.1.0/container-structure-test
 destDir=$dir/../target
-fileName=$destDir/run_structure_tests.sh
+fileName=$destDir/container-structure-test
 
 if [ ! -d $destDir ]
 then
   mkdir -p $destDir
 fi
 
-curl $scriptPath > $fileName
-bash $fileName "$@"
+wget -O $fileName --no-verbose $scriptPath
+chmod +x $fileName
+
+IMAGE=$1
+WORKSPACE=$2
+CONFIG=$3
+TEST_IMAGE="${IMAGE}-struct-test"
+
+pushd `pwd`
+cd $WORKSPACE
+echo "Creating temporary image $TEST_IMAGE"
+cat <<EOF > Dockerfile
+FROM $IMAGE
+ADD . /workspace
+EOF
+docker build -t $TEST_IMAGE .
+rm Dockerfile
+popd
+
+$fileName test --image $TEST_IMAGE --config $CONFIG
