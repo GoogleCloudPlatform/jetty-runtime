@@ -37,14 +37,8 @@ CONFIG=$3
 TEST_IMAGE="${IMAGE}-struct-test"
 
 pushd `pwd`
-cd $WORKSPACE
 echo "Creating temporary image $TEST_IMAGE"
-cat <<EOF > Dockerfile
-FROM $IMAGE
-ADD . /workspace
-EOF
-docker build -t $TEST_IMAGE .
-rm Dockerfile
+docker build --build-arg=RUNTIME_IMAGE=$IMAGE -f $dir/structure_test/Dockerfile -t $TEST_IMAGE $WORKSPACE
 popd
 
 $fileName test --image $TEST_IMAGE --config $CONFIG
