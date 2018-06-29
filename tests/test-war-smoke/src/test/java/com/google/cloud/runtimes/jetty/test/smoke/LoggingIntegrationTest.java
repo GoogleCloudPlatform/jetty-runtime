@@ -85,7 +85,7 @@ public class LoggingIntegrationTest extends AbstractIntegrationTest {
           assertThat(entry.getResource().getType(), is("gae_app"));
           assertThat(entry.getResource().getLabels().get("module_id"), is(moduleId));
           assertThat(entry.getResource().getLabels().get("zone"), Matchers.notNullValue());
-          assertThat(entry.getLabels().get("appengine.googleapis.com/trace_id"), is(traceId));
+          assertThat(entry.getTrace(), is(traceId));
           assertThat(entry.getLabels().get("appengine.googleapis.com/instance_name"),
               Matchers.notNullValue());
 
