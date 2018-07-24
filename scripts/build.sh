@@ -80,7 +80,7 @@ CLUSTER_NAME="jetty-runtime-integration-cluster"
 
 set +e
 set -x
-gcloud container builds submit \
+gcloud builds submit \
   --config=${buildConfigDir}/build.yaml \
   --substitutions=\
 "_IMAGE=$IMAGE,"\
@@ -98,7 +98,7 @@ gcloud container builds submit \
 testResult=$?
 
 # once build has completed, kick off async cleanup build
-gcloud container builds submit \
+gcloud builds submit \
   --config=${buildConfigDir}/cleanup.yaml \
   --substitutions=\
 "_GCP_TEST_PROJECT=$GCP_TEST_PROJECT,"\
