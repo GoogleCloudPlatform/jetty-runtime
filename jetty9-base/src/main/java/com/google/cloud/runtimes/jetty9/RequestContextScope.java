@@ -27,17 +27,20 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * A Jetty {@link ContextScopeListener} that is called whenever
- * a container managed thread enters or exits the scope of a context and/or request.
- * Used to maintain {@link ThreadLocal} references to the current request and 
- * Google traceID, primarily for logging.
- * @see TracingLogHandler
+ * A Jetty {@link ContextScopeListener} that is called whenever a container managed thread enters or
+ * exits the scope of a context and/or request. Used to maintain {@link ThreadLocal} references to
+ * the current request and Google traceID, primarily for logging.
+ *
+ * @see TraceLoggingEnhancer
  */
 public class RequestContextScope implements ContextHandler.ContextScopeListener {
+
   static final Logger logger = Logger.getLogger(RequestContextScope.class.getName());
 
   private static final String X_CLOUD_TRACE = "x-cloud-trace-context";
   private static final ThreadLocal<Integer> contextDepth = new ThreadLocal<>();
+
+  private final String projectId = System.getProperty("app.deploy.project", "unknown");
 
   @Override
   public void enterScope(Context context, Request request, Object reason) {
@@ -48,16 +51,21 @@ public class RequestContextScope implements ContextHandler.ContextScopeListener 
       Integer depth = contextDepth.get();
       if (depth == null || depth.intValue() == 0) {
         depth = 1;
-        String traceId = (String) request.getAttribute(X_CLOUD_TRACE);
-        if (traceId == null) {
-          traceId = request.getHeader(X_CLOUD_TRACE);
-          if (traceId != null) {
-            int slash = traceId.indexOf('/');
-            if (slash >= 0) {
-              traceId = traceId.substring(0, slash);
+        String currentTraceId = (String) request.getAttribute(X_CLOUD_TRACE);
+        if (currentTraceId == null) {
+          // extract xCloud Trace in format: TRACE_ID/SPAN_ID;o=TRACE_TRUE
+          String cloudTrace = request.getHeader(X_CLOUD_TRACE);
+          if (cloudTrace != null) {
+            int split = cloudTrace.indexOf('/');
+            if (split < 0) {
+              split = cloudTrace.indexOf(';');
             }
-            request.setAttribute(X_CLOUD_TRACE, traceId);
-            TraceLoggingEnhancer.setCurrentTraceId(traceId);
+            String traceId = split >= 0 ? cloudTrace.substring(0, split) : cloudTrace;
+            if (traceId != null) {
+              currentTraceId = String.format("projects/%s/traces/%s", projectId, traceId);
+              request.setAttribute(X_CLOUD_TRACE, currentTraceId);
+              TraceLoggingEnhancer.setCurrentTraceId(currentTraceId);
+            }
           }
         } else {
           depth = depth + 1;
