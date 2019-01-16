@@ -16,6 +16,7 @@
 
 package com.google.cloud.runtimes.jetty9;
 
+import com.google.cloud.ServiceOptions;
 import com.google.cloud.logging.TraceLoggingEnhancer;
 
 import org.eclipse.jetty.server.Request;
@@ -40,7 +41,7 @@ public class RequestContextScope implements ContextHandler.ContextScopeListener 
   private static final String X_CLOUD_TRACE = "x-cloud-trace-context";
   private static final ThreadLocal<Integer> contextDepth = new ThreadLocal<>();
 
-  private final String projectId = System.getProperty("app.deploy.project", "unknown");
+  private final String projectId = ServiceOptions.getDefaultProjectId();
 
   @Override
   public void enterScope(Context context, Request request, Object reason) {
