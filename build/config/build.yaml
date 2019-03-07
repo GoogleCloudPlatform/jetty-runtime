@@ -61,7 +61,6 @@ steps:
   args:
     - 'app'
     - 'deploy'
-    - '--quiet'
     - '--project=${_GCP_TEST_PROJECT}'
   dir: 'tests/runtimes-common-testing/target/deploy'
   waitFor: 'DOCKER_STAGE'
