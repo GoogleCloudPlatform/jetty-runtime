@@ -2,7 +2,7 @@
 export KOKORO_GITHUB_DIR=${KOKORO_ROOT}/src/github
 source ${KOKORO_GFILE_DIR}/kokoro/common.sh
 
-cd ${KOKORO_GITHUB_DIR}
+cd ${KOKORO_GITHUB_DIR}/jetty-runtime
 
 source ./scripts/build.sh --docker-namespace ${DOCKER_NAMESPACE} --project ${GCP_TEST_PROJECT}
 
