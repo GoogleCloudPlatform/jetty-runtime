@@ -5,7 +5,7 @@ source ${KOKORO_GFILE_DIR}/kokoro/common.sh
 
 mkdir -p ${KOKORO_GITHUB_DIR}/${SAMPLE_APP_DIRECTORY}
 
-cd ${KOKORO_GITHUB_DIR}/${SAMPLE_APP_DIRECTORY}
+cd ${KOKORO_GITHUB_DIR}/${SAMPLE_APP_SOURCE_DIRECTORY}
 
 mvn install --batch-mode -DskipTests -Pruntime.java,deploy.war
 
@@ -22,9 +22,9 @@ cd ${KOKORO_GFILE_DIR}/appengine/integration_tests
 
 sudo /usr/local/bin/pip install --upgrade -r requirements.txt
 
-if [ -f ${KOKORO_GITHUB_DIR}/${SAMPLE_APP_DIRECTORY}/requirements.txt ]
+if [ -f ${KOKORO_GITHUB_DIR}/${SAMPLE_APP_SOURCE_DIRECTORY}/requirements.txt ]
 then
-  sudo /usr/local/bin/pip install --upgrade -r ${KOKORO_GITHUB_DIR}/${SAMPLE_APP_DIRECTORY}/requirements.txt
+  sudo /usr/local/bin/pip install --upgrade -r ${KOKORO_GITHUB_DIR}/${SAMPLE_APP_SOURCE_DIRECTORY}/requirements.txt
 fi
 
 export DEPLOY_LATENCY_PROJECT='cloud-deploy-latency'
