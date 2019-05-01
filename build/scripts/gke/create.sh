@@ -20,3 +20,6 @@ TEST_CLUSTER_EXISTENCE=$(gcloud container clusters list --project=${GCP_PROJECT}
 if [ -z "$TEST_CLUSTER_EXISTENCE" ]; then
   gcloud container clusters create "$CLUSTER_NAME" --num-nodes=1 --disk-size=10 --project=${GCP_PROJECT} --zone=${GCP_ZONE}
 fi
+
+# TO-DO replace this with a real test that the cluster is up
+sleep 120
