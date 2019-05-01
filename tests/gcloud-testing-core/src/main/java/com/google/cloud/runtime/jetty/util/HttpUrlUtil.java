@@ -62,7 +62,8 @@ public final class HttpUrlUtil {
       } catch (MalformedURLException e) {
         throw new IllegalArgumentException("Invalid URI: " + uri.toString());
       } catch (IOException e) {
-        log.log(Level.INFO, "Ignoring IOException", e);
+        log.log(Level.INFO, "Ignoring IOException: " + e);
+        log.log(Level.FINEST, "Ignoring IOException", e);
       }
       try {
         wait += 500;
