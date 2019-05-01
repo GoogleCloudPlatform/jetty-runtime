@@ -46,7 +46,7 @@ docker build -t $APP_IMAGE . || gcloud docker -- build -t $APP_IMAGE .
 
 # run app container locally to test shutdown logging
 echo "Starting app container..."
-docker run --rm --name $CONTAINER -e "HEAP_SIZE_MB=8192" -e "SHUTDOWN_LOGGING_THREAD_DUMP=true" -e "SHUTDOWN_LOGGING_HEAP_INFO=true" $APP_IMAGE &> $OUTPUT_FILE &
+docker run --rm --name $CONTAINER -e "HEAP_SIZE_MB=512" -e "SHUTDOWN_LOGGING_THREAD_DUMP=true" -e "SHUTDOWN_LOGGING_HEAP_INFO=true" $APP_IMAGE &> $OUTPUT_FILE &
 
 function waitForOutput() {
   found_output='false'
