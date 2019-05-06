@@ -46,30 +46,36 @@ public final class HttpUrlUtil {
    * @param unit     the time unit to wait for server up
    */
   public static void waitForServerUp(URI uri, int duration, TimeUnit unit) {
-    System.err.println("Waiting for server up: " + uri);
-    boolean waiting = true;
+
+    log.info("Waiting for server up: " + uri);
+    boolean ok = false;
+    long wait = 0;
     long expiration = System.currentTimeMillis() + unit.toMillis(duration);
-    while (waiting && System.currentTimeMillis() < expiration) {
+    while (!ok && System.currentTimeMillis() < expiration) {
       try {
-        System.out.print(".");
         HttpURLConnection http = openTo(uri);
         int statusCode = http.getResponseCode();
-        if (statusCode != HttpURLConnection.HTTP_OK) {
-          log.log(Level.FINER, "Waiting 2s for next attempt");
-          TimeUnit.SECONDS.sleep(2);
-        } else {
-          waiting = false;
+        if (statusCode == HttpURLConnection.HTTP_OK) {
+          ok = true;
+          break;
         }
       } catch (MalformedURLException e) {
         throw new IllegalArgumentException("Invalid URI: " + uri.toString());
       } catch (IOException e) {
+        log.log(Level.INFO, "Ignoring IOException: " + e);
         log.log(Level.FINEST, "Ignoring IOException", e);
+      }
+      try {
+        wait += 500;
+        log.log(Level.INFO, "Waiting " + wait + "ms for next attempt");
+        TimeUnit.MILLISECONDS.sleep(wait);
       } catch (InterruptedException ignore) {
+        System.err.println(ignore);
         // ignore
       }
     }
-    System.err.println();
-    System.err.println("Server seems to be up.");
+
+    log.info("Server up: " + ok);
   }
 
   /**
