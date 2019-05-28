@@ -253,7 +253,7 @@ network:
 env_variables:
   JETTY_MODULES_ENABLE: session-cache-hash,gcp-datastore,session-store-gcloud
 ```
-Sessions will be retrieved from the in memory session cache and multiple requests can share a session instance. The Google Data Cloud is only accessed for unknown sessions (if affinity chances) or if a session is modified.
+Sessions will be retrieved from the in memory session cache and multiple requests can share a session instance. The Google Data Cloud is only accessed for unknown sessions (if affinity changes) or if a session is modified.
 Session cache behaviour can be further configured by following the [Jetty Session Cache](https://www.eclipse.org/jetty/documentation/9.4.x/session-configuration-sessioncache.html) documentation.  Note that affinity is achieved by the Google Load Balancer setting a `GCLB` cookie rather than tracking the `JSESSIONID` cookie.
 
 ### Memcached Google Cloud Session Store (Alpha)
