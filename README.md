@@ -238,7 +238,7 @@ env_variables:
 Jetty will use the default namespace in Datastore as the store for all session data, or
 `jetty.session.gcloud.namespace` property can be used to set an alternative namespace.   By default gcloud has no request affinity, so all session data will be retrieved and stored from the datastore on every request and no session data will be shared in memory.
 
-Note that the same session configuration can be achieved by activating modules individually (which may help understanding other configurations):
+Note that the `gcp-datastore-sessions` module is an aggregate module and the same configuration can be achieved by activating it's dependent modules individually:
 ```yaml
 env_variables:
   JETTY_MODULES_ENABLE: session-cache-null,gcp-datastore,session-store-gcloud
@@ -263,17 +263,13 @@ Sessions can be cached in memcache (without need for affinity) and backed by Goo
 env_variables:
   JETTY_MODULES_ENABLE: gcp-memcache-datastore-sessions
 ```
+Note that the `gcp-memcache-datastore-sessions` module is an aggregate module and the same configuration can be achieved by activating it's dependent modules individually:
 
-The `gcp-datastore-sessions` module is short hand for activating the 
-`session-cache-null`, 
-`gcp-datastore`,
-`session-store-gcloud`,
-`gcp-xmemcached` and
-`session-store-cache` modules.
-The `session-cache-null` module may be replaced with the `session-cache-hash` module to achieve 2 levels of caching (in memory and memcache) prior to accessing the Google Cloud Datastore.
-
-
-
+```yaml
+env_variables:
+  JETTY_MODULES_ENABLE: session-cache-null,gcp-datastore,session-store-gcloud,gcp-xmemcached,session-store-cache
+```
+The `session-cache-null` module may be replaced with the `session-cache-hash` module to achieve 2 levels of caching (in memory and memcache) prior to accessing the Google Cloud Datastore, and network affinity may also be activated as above. 
 
 ## Extending the image
 The image produced by this project may be automatically used/extended by the Cloud SDK and/or App Engine maven plugin. 
