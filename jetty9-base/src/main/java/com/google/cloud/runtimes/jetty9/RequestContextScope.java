@@ -51,7 +51,7 @@ public class RequestContextScope implements ContextHandler.ContextScopeListener 
     if (request != null) {
       Integer depth = contextDepth.get();
       if (depth == null || depth.intValue() == 0) {
-        depth = 1;
+        contextDepth.set(1);
         String currentTraceId = (String) request.getAttribute(X_CLOUD_TRACE);
         if (currentTraceId == null) {
           // extract xCloud Trace in format: TRACE_ID/SPAN_ID;o=TRACE_TRUE
@@ -68,10 +68,9 @@ public class RequestContextScope implements ContextHandler.ContextScopeListener 
               TraceLoggingEnhancer.setCurrentTraceId(currentTraceId);
             }
           }
-        } else {
-          depth = depth + 1;
         }
-        contextDepth.set(depth);
+      } else {
+        contextDepth.set(depth + 1);
       }
     }
   }
