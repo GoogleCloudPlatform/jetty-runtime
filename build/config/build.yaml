@@ -154,3 +154,4 @@ steps:
 
 
 images: ['${_IMAGE}']
+machineType: 'N1_HIGHCPU_8'
