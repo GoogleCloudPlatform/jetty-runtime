@@ -53,7 +53,7 @@ docker run -p 8080 -e JETTY_MODULES_ENABLE=gzip gcr.io/yourproject/yourimage
 Or with GAE (app.yaml):
 ```yaml
 env_variables:
-  JETTY_MODULES_ENABLE: 'gzip'
+  JETTY_MODULES_ENABLE: gzip
 ```
 
 ### Using Quickstart
@@ -226,14 +226,50 @@ When deployed in other environments, logging enhancers can be manually configure
 
 When using Stackdriver logging, it is recommended that `io.grpc` and `sun.net` logging level is kept at INFO level, as both these packages are used by Stackdriver internals and can result in verbose and/or initialisation problems. 
 
-## Distributed Session Storage (BETA)
+## Distributed Session Storage
+The Jetty session mechanism is highly customizable and the options presented below are only a subset of meaningful configurations. Consult the [Jetty Sessions](https://www.eclipse.org/jetty/documentation/9.4.x/session-management.html) documentation for more details.
+### Google Cloud Session Store
 This image can be configured to use [Google Cloud Datastore](https://cloud.google.com/datastore/docs/) for clustered session storage by enabling the `gcp-datastore-sessions` jetty module. You can do this in your app.yaml:
 ```yaml
 env_variables:
   JETTY_MODULES_ENABLE: gcp-datastore-sessions
 ```
-Jetty will use the default namespace in Datastore, but you can also choose a namespace to use by using the
-`jetty.session.gcloud.namespace` property.
+
+Jetty will use the default namespace in Datastore as the store for all session data, or
+`jetty.session.gcloud.namespace` property can be used to set an alternative namespace.   By default gcloud has no request affinity, so all session data will be retrieved and stored from the datastore on every request and no session data will be shared in memory.
+
+Note that the `gcp-datastore-sessions` module is an aggregate module and the same configuration can be achieved by activating it's dependent modules individually:
+```yaml
+env_variables:
+  JETTY_MODULES_ENABLE: session-cache-null,gcp-datastore,session-store-gcloud
+```
+
+### Cached Google Cloud Session Store
+The Google Load Balancer can support instance affinity for more efficient session usage.  This can be configured in `app.yaml` with:
+```yaml
+network:
+  session_affinity: true
+
+env_variables:
+  JETTY_MODULES_ENABLE: session-cache-hash,gcp-datastore,session-store-gcloud
+```
+Sessions will be retrieved from the in memory session cache and multiple requests can share a session instance. The Google Data Cloud is only accessed for unknown sessions (if affinity changes) or if a session is modified.
+Session cache behaviour can be further configured by following the [Jetty Session Cache](https://www.eclipse.org/jetty/documentation/9.4.x/session-configuration-sessioncache.html) documentation.  Note that affinity is achieved by the Google Load Balancer setting a `GCLB` cookie rather than tracking the `JSESSIONID` cookie.
+
+### Memcached Google Cloud Session Store (Alpha)
+Sessions can be cached in memcache (without need for affinity) and backed by Google Cloud Datastore.  This can be configured in `app.yaml` with:
+
+```yaml
+env_variables:
+  JETTY_MODULES_ENABLE: gcp-memcache-datastore-sessions
+```
+Note that the `gcp-memcache-datastore-sessions` module is an aggregate module and the same configuration can be achieved by activating it's dependent modules individually:
+
+```yaml
+env_variables:
+  JETTY_MODULES_ENABLE: session-cache-null,gcp-datastore,session-store-gcloud,gcp-xmemcached,session-store-cache
+```
+The `session-cache-null` module may be replaced with the `session-cache-hash` module to achieve 2 levels of caching (in memory and memcache) prior to accessing the Google Cloud Datastore, and network affinity may also be activated as above. 
 
 ## Extending the image
 The image produced by this project may be automatically used/extended by the Cloud SDK and/or App Engine maven plugin. 
