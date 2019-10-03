@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-set -e
+set -ex
 
 gcloud container clusters get-credentials ${CLUSTER_NAME} --project=${GCP_PROJECT} --zone=${GCP_ZONE}
 
