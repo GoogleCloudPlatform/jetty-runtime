@@ -92,7 +92,7 @@ steps:
     - 'test-war-smoke'
     - '-am'
   dir: 'tests/'
-  waitFor: ['DOCKER_STAGE', 'DOCKER_BUILD_MVN_GCLOUD']
+  waitFor: ['DOCKER_BUILD_MVN_GCLOUD', 'AE_DEPLOY_INT_TEST']
 
 #
 # End of App Engine Integration tests
