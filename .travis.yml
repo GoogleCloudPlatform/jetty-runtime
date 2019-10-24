@@ -25,3 +25,5 @@ jdk:
 script:
   # execute regular local build
   - mvn clean verify -B -V -q
+
+dist: trusty
