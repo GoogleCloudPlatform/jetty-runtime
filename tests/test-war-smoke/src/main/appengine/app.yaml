@@ -13,3 +13,10 @@ handlers:
 env_variables:
   JETTY_ARGS: -Djava.util.logging.config.file=WEB-INF/logging.properties
   JETTY_MODULES_ENABLE: 'gzip,gcp-datastore-sessions'
+
+liveness_check:
+  path: "/liveness_check"
+  check_interval_sec: 30
+  timeout_sec: 4
+  failure_threshold: 2
+  success_threshold: 2
