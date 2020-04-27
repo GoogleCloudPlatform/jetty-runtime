@@ -82,9 +82,37 @@
       </activation>
       <build>
         <plugins>
+
           <plugin>
-            <groupId>com.spotify</groupId>
+            <groupId>io.fabric8</groupId>
             <artifactId>docker-maven-plugin</artifactId>
+            <configuration>
+              <images>
+                <image>
+                  <name>${project.artifactId}</name>
+                  <build>
+                    <from>${jetty.test.image}</from>
+                    <tags>
+                      <tag>${project.version}</tag>
+                    </tags>
+                    <env>
+                      <HEAP_SIZE_MB>512</HEAP_SIZE_MB>
+                    </env>
+                    <assembly>
+                      <inline>
+                        <files>
+                          <file>
+                            <source>${project.build.directory}/${project.build.finalName}.war</source>
+                            <outputDirectory>${jetty.base}/webapps</outputDirectory>
+                            <destName>root.war</destName>
+                          </file>
+                        </files>
+                      </inline>
+                    </assembly>
+                  </build>
+                </image>
+              </images>
+            </configuration>
             <executions>
               <execution>
                 <id>build</id>
@@ -92,21 +120,6 @@
                 <goals>
                   <goal>build</goal>
                 </goals>
-                <configuration>
-                  <imageName>${project.artifactId}</imageName>
-                  <imageTags>
-                    <imageTag>${project.version}</imageTag>
-                  </imageTags>
-                  <dockerDirectory>${project.build.directory}/docker</dockerDirectory>
-                  <resources>
-                    <resource>
-                      <targetPath>/</targetPath>
-                      <directory>${project.build.directory}</directory>
-                      <include>${project.build.finalName}.war</include>
-                    </resource>
-                  </resources>
-                  <forceTags>true</forceTags>
-                </configuration>
               </execution>
             </executions>
           </plugin>
@@ -158,208 +171,6 @@
                 <goals>
                   <goal>stop</goal>
                 </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>test.remote</id>
-      <properties>
-        <gcloud-projectId-file>${project.build.directory}/gcloud-projectid.properties
-        </gcloud-projectId-file>
-        <!--
-           ~ remote tests require image in gcr.io
-           ~ if local tests are enabled with remote, this image is used locally as well
-           -->
-        <jetty.test.image>gcr.io/${app.deploy.project}/jetty:${docker.tag.long}</jetty.test.image>
-      </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-antrun-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>find-app-deploy-project</id>
-                <phase>validate</phase>
-                <goals>
-                  <goal>run</goal>
-                </goals>
-                <configuration>
-                  <target>
-                    <echo file="${gcloud-projectId-file}" append="false">
-                      app.deploy.project=
-                    </echo>
-                    <exec executable="gcloud" logError="true" append="true"
-                          output="${gcloud-projectId-file}">
-                      <arg value="--quiet"/>
-                      <arg value="config"/>
-                      <arg value="list"/>
-                      <arg value="--format=value(core.project)"/>
-                    </exec>
-                  </target>
-                </configuration>
-              </execution>
-              <execution>
-                <id>copy-deploy-artifact</id>
-                <phase>package</phase>
-                <goals>
-                  <goal>run</goal>
-                </goals>
-                <configuration>
-                  <target>
-                    <copy file="${project.build.directory}/${project.build.finalName}.war"
-                          todir="${project.build.directory}/appengine-staging/"/>
-                  </target>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>properties-maven-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>read-gcloud-properties</id>
-                <phase>initialize</phase>
-                <goals>
-                  <goal>read-project-properties</goal>
-                </goals>
-                <configuration>
-                  <files>
-                    <file>${gcloud-projectId-file}</file>
-                  </files>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-failsafe-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>remote-integration-test</id>
-                <phase>integration-test</phase>
-                <goals>
-                  <goal>integration-test</goal>
-                  <goal>verify</goal>
-                </goals>
-                <configuration>
-                  <skipTests>false</skipTests>
-                  <systemPropertyVariables>
-                    <test.mode>remote</test.mode>
-                    <app.deploy.project>${app.deploy.project}</app.deploy.project>
-                    <app.deploy.version>${maven.build.timestamp}</app.deploy.version>
-                  </systemPropertyVariables>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>exec-maven-plugin</artifactId>
-            <executions>
-              <!-- deploy the service -->
-              <execution>
-                <id>deploy-remote-service</id>
-                <phase>pre-integration-test</phase>
-                <goals>
-                  <goal>exec</goal>
-                </goals>
-                <configuration>
-                  <workingDirectory>${project.build.directory}/appengine-staging</workingDirectory>
-                  <executable>gcloud</executable>
-                  <arguments>
-                    <argument>app</argument>
-                    <argument>deploy</argument>
-                    <argument>app.yaml</argument>
-                    <argument>--version</argument>
-                    <argument>${app.deploy.version}</argument>
-                    <argument>--no-stop-previous-version</argument>
-                    <argument>--quiet</argument>
-                    <argument>--project</argument>
-                    <argument>${app.deploy.project}</argument>
-                  </arguments>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>test.remote.deploy</id>
-      <build>
-        <plugins>
-          <!-- create tag for local docker image to push for remote use in test -->
-          <plugin>
-            <groupId>com.spotify</groupId>
-            <artifactId>docker-maven-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>tag-image</id>
-                <phase>generate-resources</phase>
-                <goals>
-                  <goal>tag</goal>
-                </goals>
-                <configuration>
-                  <image>jetty:${docker.tag.long}</image>
-                  <newName>${jetty.test.image}</newName>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>exec-maven-plugin</artifactId>
-            <executions>
-              <!-- push a remote docker image to use with 'deploy-integration-test' -->
-              <execution>
-                <id>deploy-remote-docker</id>
-                <phase>generate-resources</phase>
-                <goals>
-                  <goal>exec</goal>
-                </goals>
-                <configuration>
-                  <executable>gcloud</executable>
-                  <arguments>
-                    <argument>docker</argument>
-                    <argument>-q</argument>
-                    <argument>--</argument>
-                    <argument>push</argument>
-                    <argument>${jetty.test.image}</argument>
-                  </arguments>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>test.remote.clean</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>exec-maven-plugin</artifactId>
-            <executions>
-              <!-- remove the remote image from 'deploy-remote-docker' -->
-              <execution>
-                <id>cleanup-remote-image</id>
-                <phase>post-integration-test</phase>
-                <goals>
-                  <goal>exec</goal>
-                </goals>
-                <configuration>
-                  <executable>bash</executable>
-                  <arguments>
-                    <argument>-c</argument>
-                    <argument>gcloud beta container images delete `docker inspect --format='{{index .RepoDigests 0}}' ${jetty.test.image}` -q --force-delete-tags</argument>
-                  </arguments>
-                </configuration>
               </execution>
             </executions>
           </plugin>

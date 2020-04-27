@@ -73,29 +73,7 @@ The spotify `docker-maven-plugin` is used to build the test docker container and
 Remote Testing
 =====
 
-Remote testing is disabled by default but can be enabled to work in conjunction with local testing.
-
-From the base `jetty-runtime` directory:
-
-```
-> mvn install -Ptest.remote,test.remote.deploy,test.remote.clean -Dapp.deploy.service=smoke
-```
-
-This will activate the remote testing profile. Under this scenario, for each test artifact the `appengine-maven-plugin` is used to deploy an instance of the application to the Google Flexible environment and then run appropriate test cases.  The containers for each webapp will be built through using the cloud builder mechanism available in GCP.  This means the image to be tested (as referenced in the jetty.test.image property) will need to be deployed to the appropriate gcr.io location.  Remote testing can make use of the entire scope of services available to Google Flex.  
-
-It is possible to run local and remote testing at the same time by using `-Ptest.remote,test.local`. It is important to note, however, that the `jetty.test.image` is required to point to an image in `gcr.io` and when remote testing is enabled, local testing will use this same image.
-
-The default value for the `jetty.test.image` property when using the `test.remote` property is `gcr.io/{project}/jetty:{docker.tag.long}`.
-
-The `test.remote.clean` profile will remove the remote container that is deployed via the test.remote.deploy profile.
-
-Note: should the build fail a remote deployed artifact may remain deployed and need to be manually removed through the cloud console or the gcloud cli.
-
-Remote testing can also be run from the `jetty-runtime/tests` directory, but must explicitly define which remote image to use:
-
-```
-> mvn install -Ptest.remote -Djetty.test.image=gcr.io/{project}/{container}:{tag} -Dapp.deploy.service=smoke
-```
+Remote testing is currently not supported
 
 Test Case Requirements and Conventions
 ===

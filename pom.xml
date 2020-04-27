@@ -33,6 +33,9 @@
     <jetty9.minor.version>4</jetty9.minor.version>
     <jetty9.dot.version>27</jetty9.dot.version>
     <jetty9.version>9.${jetty9.minor.version}.${jetty9.dot.version}.v20200227</jetty9.version>
+    <jetty.home>/opt/jetty-home</jetty.home>
+    <jetty.base>/var/lib/jetty</jetty.base>
+    <docker.target.dir>target/dockerbuild</docker.target.dir>
     <docker.tag.prefix></docker.tag.prefix>
     <docker.tag.short>${docker.tag.prefix}9.${jetty9.minor.version}</docker.tag.short>
     <docker.tag.long>${docker.tag.prefix}9.${jetty9.minor.version}-${maven.build.timestamp}</docker.tag.long>

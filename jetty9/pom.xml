@@ -28,12 +28,6 @@
   <artifactId>jetty9</artifactId>
   <packaging>pom</packaging>
 
-  <properties>
-    <jetty.home>/opt/jetty-home</jetty.home>
-    <jetty.base>/var/lib/jetty</jetty.base>
-    <docker.target.dir>target/dockerbuild</docker.target.dir>
-  </properties>
-
   <dependencies>
     <dependency>
       <groupId>com.google.cloud.runtimes</groupId>
