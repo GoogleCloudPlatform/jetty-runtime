@@ -31,6 +31,7 @@
   <properties>
     <jetty.home>/opt/jetty-home</jetty.home>
     <jetty.base>/var/lib/jetty</jetty.base>
+    <docker.target.dir>target/dockerbuild</docker.target.dir>
   </properties>
 
   <dependencies>
@@ -52,38 +53,30 @@
       <build>
         <plugins>
           <plugin>
-            <groupId>com.spotify</groupId>
+            <groupId>io.fabric8</groupId>
             <artifactId>docker-maven-plugin</artifactId>
+            <configuration>
+              <images>
+                <image>
+                  <name>jetty</name>
+                  <build>
+                    <dockerFile>${project.build.directory}/docker/Dockerfile</dockerFile>
+                    <tags>
+                      <tag>latest</tag>
+                      <tag>${docker.tag.long}</tag>
+                      <tag>${docker.tag.short}</tag>
+                    </tags>
+                  </build>
+                </image>
+              </images>
+            </configuration>
             <executions>
               <execution>
                 <id>build</id>
-                <phase>package</phase>
-                <goals>
-                  <goal>build</goal>
-                </goals>
-                <configuration>
-                  <imageName>jetty</imageName>
-                  <imageTags>
-                    <imageTag>${docker.tag.short}</imageTag>
-                    <imageTag>${docker.tag.long}</imageTag>
-                  </imageTags>
-                  <dockerDirectory>${project.build.directory}/docker</dockerDirectory>
-                  <pullOnBuild>true</pullOnBuild>
-                </configuration>
-              </execution>
-              <execution>
-                <id>clean-docker</id>
-                <phase>clean</phase>
-                <goals>
-                  <goal>removeImage</goal>
-                </goals>
-                <configuration>
-                  <imageName>jetty</imageName>
-                  <imageTags>
-                    <imageTag>${docker.tag.short}</imageTag>
-                    <imageTag>${docker.tag.long}</imageTag>
-                  </imageTags>
-                </configuration>
+                  <phase>package</phase>
+                  <goals>
+                    <goal>build</goal>
+                  </goals>
               </execution>
             </executions>
           </plugin>
