@@ -17,7 +17,6 @@
 
 # exit on command failure
 set -e
-set -x
 
 readonly dir=$(dirname $0)
 readonly projectRoot="$dir/.."
