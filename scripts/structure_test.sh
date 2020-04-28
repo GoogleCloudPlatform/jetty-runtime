@@ -19,7 +19,9 @@
 set -e
 
 dir=`dirname $0`
-scriptPath=https://storage.googleapis.com/container-structure-test/v1.1.0/container-structure-test
+#scriptPath=https://storage.googleapis.com/container-structure-test/v1.1.0/container-structure-test
+scriptPath=https://storage.googleapis.com/container-structure-test/v1.2.0/container-structure-test-darwin-amd64
+
 destDir=$dir/../target
 fileName=$destDir/container-structure-test
 

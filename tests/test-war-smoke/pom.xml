@@ -26,6 +26,8 @@
   </parent>
   <properties>
     <app.deploy.version>${maven.build.timestamp}</app.deploy.version>
+    <!-- docker plugin supports only relative path... this is the default but we use it to copy resources -->
+    <docker.outputDirectory>target/docker</docker.outputDirectory>
   </properties>
   <artifactId>test-war-smoke</artifactId>
   <packaging>war</packaging>
@@ -87,6 +89,7 @@
             <groupId>io.fabric8</groupId>
             <artifactId>docker-maven-plugin</artifactId>
             <configuration>
+              <outputDirectory>${docker.outputDirectory}</outputDirectory>
               <images>
                 <image>
                   <name>${project.artifactId}</name>
@@ -171,6 +174,40 @@
                 <goals>
                   <goal>stop</goal>
                 </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <!-- this profile will copy the war file in the docker directory used to build the image by the script local_integration_test.sh -->
+      <id>local-integration-test</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-resources-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>copy-war-for-docker-build</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>copy-resources</goal>
+                </goals>
+                <configuration>
+                  <overwrite>true</overwrite>
+                  <outputDirectory>${project.basedir}/${docker.outputDirectory}</outputDirectory>
+                  <resources>
+                    <resource>
+                      <directory>${project.build.directory}</directory>
+                      <filtering>false</filtering>
+                      <includes>
+                        <include>${project.build.finalName}.war</include>
+                      </includes>
+                    </resource>
+                  </resources>
+                </configuration>
               </execution>
             </executions>
           </plugin>
