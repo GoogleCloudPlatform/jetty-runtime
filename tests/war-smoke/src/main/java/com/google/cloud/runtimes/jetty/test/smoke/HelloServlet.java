@@ -17,6 +17,7 @@
 package com.google.cloud.runtimes.jetty.test.smoke;
 
 import java.io.IOException;
+import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -26,10 +27,20 @@ import javax.servlet.http.HttpServletResponse;
 
 @WebServlet(urlPatterns = {"/hello/*"})
 public class HelloServlet extends HttpServlet {
+
+  private static final Logger log = Logger.getLogger( HelloServlet.class.getName());
+
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
     resp.setContentType("text/plain");
     resp.getWriter().println("Hello from Servlet 3.1");
+  }
+
+  @Override
+  public void init()
+      throws ServletException {
+    super.init();
+    log.info("Init HelloServlet");
   }
 }

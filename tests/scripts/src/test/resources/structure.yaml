@@ -15,43 +15,43 @@ commandTests:
   command: ['env']
   expectedOutput: ['GAE_IMAGE_LABEL=${docker.tag.long}']
 - name: 'check jetty setup default'
-  setup: [[ 'chmod', '+x', '/workspace/jetty9/src/test/workspace/jetty-setup-default.bash' ]]
-  command: [ '/workspace/jetty9/src/test/workspace/jetty-setup-default.bash' ]
+  setup: [[ 'chmod', '+x', '/workspace/jetty-setup-default.bash' ]]
+  command: [ '/workspace/jetty-setup-default.bash' ]
   expectedOutput: ['OK']
   exitCode: 0
 - name: 'check jetty setup default GCP'
-  setup: [[ 'chmod', '+x', '/workspace/jetty9/src/test/workspace/jetty-setup-default-gcp.bash' ]]
-  command: [ '/workspace/jetty9/src/test/workspace/jetty-setup-default-gcp.bash' ]
+  setup: [[ 'chmod', '+x', '/workspace/jetty-setup-default-gcp.bash' ]]
+  command: [ '/workspace/jetty-setup-default-gcp.bash' ]
   expectedOutput: ['OK']
   exitCode: 0
 - name: 'check jetty setup unpack'
-  setup: [[ 'chmod', '+x', '/workspace/jetty9/src/test/workspace/jetty-setup-unpack.bash' ]]
-  command: [ '/workspace/jetty9/src/test/workspace/jetty-setup-unpack.bash' ]
+  setup: [[ 'chmod', '+x', '/workspace/jetty-setup-unpack.bash' ]]
+  command: [ '/workspace/jetty-setup-unpack.bash' ]
   expectedOutput: ['OK']
   exitCode: 0
 - name: 'check jetty setup app'
-  setup: [[ 'chmod', '+x', '/workspace/jetty9/src/test/workspace/jetty-setup-app.bash' ]]
-  command: [ '/workspace/jetty9/src/test/workspace/jetty-setup-app.bash' ]
+  setup: [[ 'chmod', '+x', '/workspace/jetty-setup-app.bash' ]]
+  command: [ '/workspace/jetty-setup-app.bash' ]
   expectedOutput: ['OK']
   exitCode: 0
 - name: 'check jetty setup modules'
-  setup: [[ 'chmod', '+x', '/workspace/jetty9/src/test/workspace/jetty-setup-modules.bash' ]]
-  command: [ '/workspace/jetty9/src/test/workspace/jetty-setup-modules.bash' ]
+  setup: [[ 'chmod', '+x', '/workspace/jetty-setup-modules.bash' ]]
+  command: [ '/workspace/jetty-setup-modules.bash' ]
   expectedOutput: ['OK']
   exitCode: 0
 - name: 'check jetty sessions setup'
-  setup: [[ 'chmod', '+x', '/workspace/jetty9/src/test/workspace/jetty-setup-sessions.bash' ]]
-  command: [ '/workspace/jetty9/src/test/workspace/jetty-setup-sessions.bash' ]
+  setup: [[ 'chmod', '+x', '/workspace/jetty-setup-sessions.bash' ]]
+  command: [ '/workspace/jetty-setup-sessions.bash' ]
   expectedOutput: ['OK']
   exitCode: 0
 - name: 'cloud debugger extra class path is set'
-  setup: [[ 'chmod', '+x', '/workspace/jetty9/src/test/workspace/jetty-setup-debugger.bash' ]]
-  command: ['/workspace/jetty9/src/test/workspace/jetty-setup-debugger.bash']
+  setup: [[ 'chmod', '+x', '/workspace/jetty-setup-debugger.bash' ]]
+  command: ['/workspace/jetty-setup-debugger.bash']
   expectedOutput: ['OK']
   exitCode: 0
 - name: 'check jetty dry-run'
-  setup: [[ 'chmod', '+x', '/workspace/jetty9/src/test/workspace/jetty-setup-dry-run.bash' ]]
-  command: ['/workspace/jetty9/src/test/workspace/jetty-setup-dry-run.bash']
+  setup: [[ 'chmod', '+x', '/workspace/jetty-setup-dry-run.bash' ]]
+  command: ['/workspace/jetty-setup-dry-run.bash']
   expectedOutput: ['OK']
   exitCode: 0
 - name: 'APP_DESTINATION_PATH is set'

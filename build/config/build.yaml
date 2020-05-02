@@ -23,7 +23,7 @@ steps:
 # Build the structure test image
 - name: 'gcr.io/cloud-builders/docker'
   id: 'DOCKER_BUILD_STRUCTURE_TEST'
-  args: ['build', '--tag=${_IMAGE}-structure-test', '--build-arg=RUNTIME_IMAGE=${_IMAGE}', '--no-cache', '-f', 'scripts/structure_test/Dockerfile', '/workspace']
+  args: ['build', '--tag=${_IMAGE}-structure-test', '--build-arg=RUNTIME_IMAGE=${_IMAGE}', '--no-cache', '-f', 'tests/scripts/structure_test/Dockerfile', '/workspace']
 
 # Test the built image
 
@@ -31,7 +31,7 @@ steps:
 # See https://github.com/GoogleContainerTools/container-structure-test
 - name: 'gcr.io/gcp-runtimes/container-structure-test:v1.1.0'
   id: 'STRUCTURE_TEST'
-  args: ['test', '--image', '${_IMAGE}-structure-test', '-v', '--config', 'jetty9/target/test-classes/structure.yaml']
+  args: ['test', '--image', '${_IMAGE}-structure-test', '-v', '--config', 'tests/scripts/src/test/resources/structure.yaml']
   waitFor: 'DOCKER_BUILD_STRUCTURE_TEST'
 
 # Push the image to a staging repository so it can be used in integration tests

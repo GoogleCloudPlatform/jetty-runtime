@@ -31,9 +31,12 @@
     <checkstyle.skip>false</checkstyle.skip>
     <!-- default image name for local tests -->
     <jetty.test.image>jetty:${docker.tag.long}</jetty.test.image>
+    <docker.logfile>${project.build.directory}/docker_run.log</docker.logfile>
   </properties>
   <modules>
+    <module>scripts</module>
     <module>gcloud-testing-core</module>
+    <module>war-smoke</module>
     <module>test-war-smoke</module>
     <module>runtimes-common-testing</module>
   </modules>
@@ -73,7 +76,6 @@
         <plugin>
           <groupId>io.fabric8</groupId>
           <artifactId>docker-maven-plugin</artifactId>
-          <version>0.19.0</version>
           <configuration>
             <images>
               <image>
@@ -86,6 +88,9 @@
                   <env>
                     <JETTY_MODULES_ENABLE>gzip</JETTY_MODULES_ENABLE>
                   </env>
+                  <log>
+                    <file>${docker.logfile}</file>
+                  </log>
                 </run>
               </image>
             </images>
@@ -128,4 +133,13 @@
       </resource>
     </resources>
   </build>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-databind</artifactId>
+        <version>2.11.0</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 </project>
