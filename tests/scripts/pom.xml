@@ -87,14 +87,14 @@
               <goal>exec</goal>
             </goals>
             <configuration>
-              <executable>${project.basedir}/src/test/scripts/structure_test.sh</executable>
+              <executable>${project.basedir}/src/test/scripts/structure_test/structure_test.sh</executable>
               <workingDirectory>${project.build.directory}</workingDirectory>
               <arguments>
                 <argument>jetty:${docker.tag.long}</argument>
                 <argument>./workspace</argument>
                 <argument>${project.build.testOutputDirectory}/structure.yaml</argument>
                 <argument>${project.build.directory}</argument>
-                <argument>${project.basedir}/src/test/scripts</argument>
+                <argument>${project.basedir}/src/test/scripts/structure_test</argument>
                 <argument>${scriptStructureTestUrl}</argument>
               </arguments>
             </configuration>
