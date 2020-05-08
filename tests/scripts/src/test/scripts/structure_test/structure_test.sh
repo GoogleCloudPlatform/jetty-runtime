@@ -46,7 +46,7 @@ TEST_IMAGE="${IMAGE}-struct-test"
 pushd $5
 echo "Creating temporary image $TEST_IMAGE"
 pwd
-docker build --build-arg=RUNTIME_IMAGE=$IMAGE -f Dockerfile -t $TEST_IMAGE workspace
+docker build --build-arg=RUNTIME_IMAGE=$IMAGE -f $5/Dockerfile -t $TEST_IMAGE workspace
 popd
 
 $fileName test --image $TEST_IMAGE --config $CONFIG
