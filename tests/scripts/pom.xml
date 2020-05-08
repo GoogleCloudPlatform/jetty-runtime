@@ -76,74 +76,35 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>structure-test</id>
+            <phase>integration-test</phase>
+            <goals>
+              <goal>exec</goal>
+            </goals>
+            <configuration>
+              <executable>${project.basedir}/src/test/scripts/structure_test.sh</executable>
+              <workingDirectory>${project.build.directory}</workingDirectory>
+              <arguments>
+                <argument>jetty:${docker.tag.long}</argument>
+                <argument>${project.basedir}/src/test/workspace</argument>
+                <argument>${project.build.testOutputDirectory}/structure.yaml</argument>
+                <argument>${project.build.directory}</argument>
+                <argument>${project.basedir}</argument>
+                <argument>${scriptStructureTestUrl}</argument>
+              </arguments>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 
   <profiles>
-    <profile>
-      <!-- Builds and tests a docker image locally -->
-      <id>local-docker-build</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <build>
-        <plugins>
-<!--          <plugin>-->
-<!--            <groupId>io.fabric8</groupId>-->
-<!--            <artifactId>docker-maven-plugin</artifactId>-->
-<!--            <configuration>-->
-<!--              <images>-->
-<!--                <image>-->
-<!--                  <name>jetty</name>-->
-<!--                  <build>-->
-<!--                    <dockerFile>${project.build.directory}/docker/Dockerfile</dockerFile>-->
-<!--                    <tags>-->
-<!--                      <tag>latest</tag>-->
-<!--                      <tag>${docker.tag.long}</tag>-->
-<!--                      <tag>${docker.tag.short}</tag>-->
-<!--                    </tags>-->
-<!--                  </build>-->
-<!--                </image>-->
-<!--              </images>-->
-<!--            </configuration>-->
-<!--            <executions>-->
-<!--              <execution>-->
-<!--                <id>build</id>-->
-<!--                  <phase>package</phase>-->
-<!--                  <goals>-->
-<!--                    <goal>build</goal>-->
-<!--                  </goals>-->
-<!--              </execution>-->
-<!--            </executions>-->
-<!--          </plugin>-->
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>exec-maven-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>structure-test</id>
-                <phase>integration-test</phase>
-                <goals>
-                  <goal>exec</goal>
-                </goals>
-                <configuration>
-                  <executable>${project.basedir}/src/test/scripts/structure_test.sh</executable>
-                  <workingDirectory>${project.build.directory}</workingDirectory>
-                  <arguments>
-                    <argument>jetty:${docker.tag.long}</argument>
-                    <argument>${project.basedir}/src/test/workspace</argument>
-                    <argument>${project.build.testOutputDirectory}/structure.yaml</argument>
-                    <argument>${project.build.directory}</argument>
-                    <argument>${project.basedir}</argument>
-                    <argument>${scriptStructureTestUrl}</argument>
-                  </arguments>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
     <profile>
       <id>osx</id>
       <activation>
