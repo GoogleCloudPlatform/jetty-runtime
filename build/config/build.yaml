@@ -23,7 +23,7 @@ steps:
 # Build the structure test image
 - name: 'gcr.io/cloud-builders/docker'
   id: 'DOCKER_BUILD_STRUCTURE_TEST'
-  args: ['build', '--tag=${_IMAGE}-structure-test', '--build-arg=RUNTIME_IMAGE=${_IMAGE}', '--no-cache', '-f', 'tests/scripts/structure_test/Dockerfile', '/workspace']
+  args: ['build', '--tag=${_IMAGE}-structure-test', '--build-arg=RUNTIME_IMAGE=${_IMAGE}', '--no-cache', '-f', 'tests/scripts/src/test/scripts/structure_test/Dockerfile', '/workspace']
 
 # Test the built image
 

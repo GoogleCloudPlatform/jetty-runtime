@@ -91,10 +91,10 @@
               <workingDirectory>${project.build.directory}</workingDirectory>
               <arguments>
                 <argument>jetty:${docker.tag.long}</argument>
-                <argument>${project.basedir}/src/test/workspace</argument>
+                <argument>./workspace</argument>
                 <argument>${project.build.testOutputDirectory}/structure.yaml</argument>
                 <argument>${project.build.directory}</argument>
-                <argument>${project.basedir}</argument>
+                <argument>${project.basedir}/src/test/scripts</argument>
                 <argument>${scriptStructureTestUrl}</argument>
               </arguments>
             </configuration>
