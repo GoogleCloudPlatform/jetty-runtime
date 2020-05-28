@@ -36,7 +36,7 @@ fi
 # build the test app
 pushd ${testAppDir}
 cd ..
-mvn clean install -Djetty.test.image=$imageUnderTest -P-test.local -DskipTests --batch-mode
+mvn clean install -Djetty.test.image=$imageUnderTest -P-test.local -DskipTests --batch-mode -Plocal-integration-test
 popd
 
 # build app container locally

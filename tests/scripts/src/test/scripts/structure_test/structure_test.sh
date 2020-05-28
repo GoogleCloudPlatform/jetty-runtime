@@ -17,10 +17,13 @@
 #
 # Fetch and execute the structure test framework run script.
 set -e
-
+set -x
 dir=`dirname $0`
-scriptPath=https://storage.googleapis.com/container-structure-test/v1.1.0/container-structure-test
-destDir=$dir/../target
+#scriptPath=https://storage.googleapis.com/container-structure-test/v1.1.0/container-structure-test
+#scriptPath=https://storage.googleapis.com/container-structure-test/v1.2.0/container-structure-test-darwin-amd64
+scriptPath=$6
+
+destDir=$4
 fileName=$destDir/container-structure-test
 
 if [ ! -d $destDir ]
@@ -28,7 +31,11 @@ then
   mkdir -p $destDir
 fi
 
-wget -O $fileName --no-verbose $scriptPath
+if [[ ! -f $fileName ]]
+then
+    wget -O $fileName --no-verbose $scriptPath
+fi
+
 chmod +x $fileName
 
 IMAGE=$1
@@ -36,9 +43,11 @@ WORKSPACE=$2
 CONFIG=$3
 TEST_IMAGE="${IMAGE}-struct-test"
 
-pushd `pwd`
+pushd $5
 echo "Creating temporary image $TEST_IMAGE"
-docker build --build-arg=RUNTIME_IMAGE=$IMAGE -f $dir/structure_test/Dockerfile -t $TEST_IMAGE $WORKSPACE
+pwd
+docker -v
+docker build --build-arg=RUNTIME_IMAGE=$IMAGE -f $5/Dockerfile -t $TEST_IMAGE workspace
 popd
 
 $fileName test --image $TEST_IMAGE --config $CONFIG

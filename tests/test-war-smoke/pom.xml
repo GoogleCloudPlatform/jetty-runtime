@@ -26,17 +26,18 @@
   </parent>
   <properties>
     <app.deploy.version>${maven.build.timestamp}</app.deploy.version>
+    <!-- docker plugin supports only relative path... this is the default but we use it to copy resources -->
+    <docker.outputDirectory>target/docker</docker.outputDirectory>
   </properties>
   <artifactId>test-war-smoke</artifactId>
-  <packaging>war</packaging>
-  <name>Jetty-Runtime :: Tests :: Smoke Tests (Servlet 3.1)</name>
-
+  <packaging>jar</packaging>
+  <name>Jetty-Runtime :: Tests :: War Smoke Tests (Servlet 3.1)</name>
   <dependencies>
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
-      <version>3.1.0</version>
-      <scope>provided</scope>
+      <groupId>com.google.cloud.runtimes.tests</groupId>
+      <artifactId>war-smoke</artifactId>
+      <version>${project.version}</version>
+      <type>war</type>
     </dependency>
     <dependency>
       <groupId>com.google.cloud</groupId>
@@ -71,7 +72,19 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>2.8.9</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>testcontainers</artifactId>
+      <version>1.14.1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <version>1.7.30</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
   <profiles>
@@ -82,11 +95,11 @@
       </activation>
       <build>
         <plugins>
-
           <plugin>
             <groupId>io.fabric8</groupId>
             <artifactId>docker-maven-plugin</artifactId>
             <configuration>
+              <outputDirectory>${docker.outputDirectory}</outputDirectory>
               <images>
                 <image>
                   <name>${project.artifactId}</name>
@@ -99,14 +112,17 @@
                       <HEAP_SIZE_MB>512</HEAP_SIZE_MB>
                     </env>
                     <assembly>
+                      <targetDir>/</targetDir>
                       <inline>
-                        <files>
-                          <file>
-                            <source>${project.build.directory}/${project.build.finalName}.war</source>
-                            <outputDirectory>${jetty.base}/webapps</outputDirectory>
-                            <destName>root.war</destName>
-                          </file>
-                        </files>
+                        <dependencySets>
+                          <dependencySet>
+                            <includes>
+                              <include>com.google.cloud.runtimes.tests:war-smoke</include>
+                            </includes>
+                            <outputDirectory>/${jetty.base}/webapps</outputDirectory>
+                            <outputFileNameMapping>ROOT.war</outputFileNameMapping>
+                          </dependencySet>
+                        </dependencySets>
                       </inline>
                     </assembly>
                   </build>
@@ -116,7 +132,7 @@
             <executions>
               <execution>
                 <id>build</id>
-                <phase>package</phase>
+                <phase>generate-test-resources</phase>
                 <goals>
                   <goal>build</goal>
                 </goals>
@@ -147,6 +163,7 @@
                   <skipTests>false</skipTests>
                   <systemPropertyVariables>
                     <test.mode>local</test.mode>
+                    <docker.logfile>${docker.logfile}</docker.logfile>
                   </systemPropertyVariables>
                 </configuration>
               </execution>
