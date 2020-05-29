@@ -56,16 +56,38 @@ if [ "$PLATFORM" = "gae" ]; then
   JETTY_ARGS="$JETTY_ARGS --module=gcp"
 fi
 
-# If command line is running java, then assume it is jetty and mix in JETTY_ARGS
+# If command line is running java, then assume it is jetty related and mix in JETTY_ARGS
 if [ "$1" = "java" ]; then
-  # Check for jetty start.jar and prepend if missing
-  if [ "$(echo $@ | egrep start.jar | wc -l )" = "0" ]; then
+  # check the args
+  for ARG in $@ ; do
+    if [[ "$ARG" =~ ^([a-z0-9]+\.)*[A-Z][A-Za-z0-9]+$ ]] ; then
+      MAIN="true"
+    elif [[ "$ARG" =~ ^.*-Djetty\.base=.*$ ]] ; then
+      BASE="true"
+    elif [[ "$ARG" == -jar ]] ; then
+      MAIN="true"
+      JAR="true"
+    elif [[ $ARG == *start.jar ]] ; then
+      START="true"
+    fi
+  done
+
+  if [[ "$MAIN" != "true" ]] ; then
     shift
-    set -- java -Djetty.base=${JETTY_BASE} -jar ${JETTY_HOME}/start.jar $@
+    set -- java -jar ${JETTY_HOME}/start.jar $@
+    JAR="true"
+    MAIN="true"
+    START="true"
+  fi
+
+  if [[ "$BASE" != "true" ]] ; then
+    shift
+    set -- java -Djetty.base=${JETTY_BASE} $@
+    BASE="true"
   fi
 
   # Append JETTY_ARGS
-  if [ -n "$JETTY_ARGS" ]; then
+  if [[ $JAR == "true" && $START == "true" && -n "$JETTY_ARGS" ]] ; then
     shift
     set -- java $@ $JETTY_ARGS
   fi
