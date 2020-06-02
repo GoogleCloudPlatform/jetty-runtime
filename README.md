@@ -326,6 +326,40 @@ RUN /scripts/jetty/generate-jetty-start.sh
 NOTE: Make sure that the web application and any additional custom jetty modules have been added to the container
 BEFORE running this script.
 
+## Google Authentication using Jetty OpenID Module
+
+The Jetty `openid` module adds support for the OpenID Connect authentication protocol over OAuth 2.0. This can be set up so that Jetty authenticates users with Google's Identity Platform allowing users to sign in with their Google account.
+
+### Set Up Application on Google API Console
+
+Before your application can use Google's OAuth 2.0 authentication system for user login, 
+you must set up a project in the [Google API Console](https://console.developers.google.com/) 
+to obtain OAuth 2.0 credentials (clientID and clientSecret), set a redirect URI, and (optionally) customize the 
+branding information that your users see on the user-consent screen.
+
+Guide to setting up Application in Google API Console:
+https://developers.google.com/identity/protocols/oauth2/openid-connect#appsetup
+
+### Jetty Configuration
+
+The Jetty OpenID configuration is usually set in the `openid.ini` file. In this file we must set the values for the OpenID provider, the clientID and clientSecret. The OpenID provider should be set to `https://accounts.google.com`. The clientID and clientSecret should be obtained from the project which was set up in the Google API Console.
+
+See the Jetty documentation for [OpenID Support](https://www.eclipse.org/jetty/documentation/current/openid-support.html) to get a general overview of how to enable OpenID authentication in your a webapp and how to access the authenticated users information.
+
+### Docker Configuration
+
+Special configuration should be added to the Dockerfile to enable the `openid` module and then to copy the `openid.ini` file to `$JETTY_BASE/start.d/`.
+
+Example Dockerfile:
+
+```Dockerfile
+FROM gcr.io/google-appengine/jetty
+RUN java -jar "$JETTY_HOME/start.jar" --create-startd
+RUN java -jar "$JETTY_HOME/start.jar" --add-to-start=webapp,deploy,http,openid
+COPY openid.ini $JETTY_BASE/start.d/
+COPY openid-webapp.war $JETTY_BASE/webapps/
+```
+
 # Development Guide
 
 * See [instructions](DEVELOPING.md) on how to build and test this image.
