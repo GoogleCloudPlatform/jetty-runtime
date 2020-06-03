@@ -1,4 +1,4 @@
 #!/bin/bash
 
-rm -f /jetty-start /jetty-start.properties
-/docker-entrypoint.bash --dry-run --exec-properties=/jetty-start.properties > /jetty-start
+rm -f /jetty-start /jetty-start.properties /jetty-start.args
+GENERATE_JETTY_START=TRUE /docker-entrypoint.bash

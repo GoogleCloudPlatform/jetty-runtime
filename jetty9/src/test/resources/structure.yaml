@@ -49,9 +49,9 @@ commandTests:
   command: ['/workspace/jetty9/src/test/workspace/jetty-setup-debugger.bash']
   expectedOutput: ['OK']
   exitCode: 0
-- name: 'check jetty dry-run'
-  setup: [[ 'chmod', '+x', '/workspace/jetty9/src/test/workspace/jetty-setup-dry-run.bash' ]]
-  command: ['/workspace/jetty9/src/test/workspace/jetty-setup-dry-run.bash']
+- name: 'check jetty start'
+  setup: [[ 'chmod', '+x', '/workspace/jetty9/src/test/workspace/jetty-setup-start.bash' ]]
+  command: ['/workspace/jetty9/src/test/workspace/jetty-setup-start.bash']
   expectedOutput: ['OK']
   exitCode: 0
 - name: 'APP_DESTINATION_PATH is set'

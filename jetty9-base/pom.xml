@@ -186,8 +186,6 @@
           <appendAssemblyId>false</appendAssemblyId>
         </configuration>
       </plugin>
-
-
     </plugins>
   </build>
 </project>

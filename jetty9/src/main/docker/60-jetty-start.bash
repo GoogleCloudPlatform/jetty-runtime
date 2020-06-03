@@ -30,8 +30,15 @@ if expr "$*" : '^java .*/start\.jar.*$' >/dev/null ; then
     esac
   done
 
+  # Generate /jetty-start ?
+  if [[ "$GENERATE_JETTY_START" == "TRUE" ]] ; then
+    echo $@ > /jetty-start.args
+    $@ --dry-run --exec-properties=/jetty-start.properties > /jetty-start
+    exit
+  fi
+
   # Check if a start command has already been generated
-  if [[ -f /jetty-start  && $(echo $@ | xargs) == $(cat /jetty-start-args) ]] ; then
+  if [[ -f /jetty-start  && $(echo $@ | xargs) == "$(cat /jetty-start.args)" ]] ; then
     if [ $JETTY_BASE/start.d -nt /jetty-start ] ; then
       cat >&2 <<- 'EOWARN'
 ********************************************************************
@@ -47,7 +54,6 @@ EOWARN
     set -- $(cat /jetty-start)
   else
     # Do a jetty dry run to set the final command
-    echo $@ >> /jetty-start-args
     set -- $("$@" --dry-run --exec-properties=$(mktemp --suffix=.properties))
   fi
 fi
