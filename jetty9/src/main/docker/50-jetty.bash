@@ -52,7 +52,7 @@ if [ "$JETTY_MODULES_DISABLE" ]; then
 fi
 
 # If we are deployed on a GAE platform, enable the gcp module
-if [ "$PLATFORM" = "gae" ]; then
+if [[ "$PLATFORM" = "gae" || "$GENERATE_JETTY_START" == "TRUE" ]]; then
   JETTY_ARGS="$JETTY_ARGS --module=gcp"
 fi
 
