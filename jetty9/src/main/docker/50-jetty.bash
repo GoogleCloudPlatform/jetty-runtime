@@ -72,18 +72,17 @@ if [ "$1" = "java" ]; then
     fi
   done
 
-  if [[ "$MAIN" != "true" ]] ; then
-    shift
-    set -- java -jar ${JETTY_HOME}/start.jar $@
-    JAR="true"
-    MAIN="true"
-    START="true"
-  fi
-
   if [[ "$BASE" != "true" ]] ; then
     shift
     set -- java -Djetty.base=${JETTY_BASE} $@
     BASE="true"
+  fi
+
+  if [[ "$MAIN" != "true" ]] ; then
+    shift
+    set -- java $@ -jar ${JETTY_HOME}/start.jar
+    JAR="true"
+    START="true"
   fi
 
   # Append JETTY_ARGS
