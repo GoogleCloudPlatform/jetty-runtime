@@ -30,10 +30,30 @@ if expr "$*" : '^java .*/start\.jar.*$' >/dev/null ; then
     esac
   done
 
-  # Check if a start command has already been generated
-  if [ -f /jetty-start ] ; then
-    if [ $JETTY_BASE/start.d -nt /jetty-start ] ; then
-      cat >&2 <<- 'EOWARN'
+  # Generate /jetty-start ?
+  if [[ "$GENERATE_JETTY_START" == "TRUE" || ! -f /jetty-start || $(echo $@ | xargs) != "$(cat /jetty-start.args)" ]] ; then
+    echo $@ > /jetty-start.args
+    rm -f /jetty-start
+
+    # Generate start command but remove -D arguments that are already in $JAVA_OPTS (which is mixed
+    # in later by /docker-entrypoint.bash)
+    for ARG in $($@ --dry-run --exec-properties=/jetty-start.properties | egrep '^[^ ]*java ' 2>/dev/null) ; do
+      case $ARG in
+        */java) echo java > /jetty-start ;;
+        -D*)
+          PROPERTY=$(expr "$ARG" : '\(-D[^=]*=\).*')
+          [[ "$JAVA_OPTS" =~ ^.*$PROPERTY.*$ ]] || echo $ARG >> /jetty-start
+          ;;
+        *) echo $ARG >> /jetty-start ;;
+      esac
+    done
+    [[ "$GENERATE_JETTY_START" == "TRUE" ]] && exit
+  else
+    echo $(date +'%Y-%m-%d %H:%M:%S.000'):INFO:docker-entrypoint:jetty start command from /jetty-start
+  fi
+
+  if [ $JETTY_BASE/start.d -nt /jetty-start ] ; then
+    cat >&2 <<- 'EOWARN'
 ********************************************************************
 WARNING: The $JETTY_BASE/start.d directory has been modified since
          the /jetty-start files was generated. Please either delete
@@ -41,12 +61,6 @@ WARNING: The $JETTY_BASE/start.d directory has been modified since
          /scripts/jetty/generate-jetty-start.sh from a Dockerfile
 ********************************************************************
 EOWARN
-    fi
-
-    echo $(date +'%Y-%m-%d %H:%M:%S.000'):INFO:docker-entrypoint:jetty start command from /jetty-start
-    set -- $(cat /jetty-start)
-  else
-    # Do a jetty dry run to set the final command
-    set -- $("$@" --dry-run --exec-properties=$(mktemp --suffix=.properties))
   fi
+  set -- $(cat /jetty-start)
 fi
