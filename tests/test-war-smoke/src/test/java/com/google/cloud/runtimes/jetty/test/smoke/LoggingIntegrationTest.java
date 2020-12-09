@@ -60,21 +60,21 @@ public class LoggingIntegrationTest extends AbstractIntegrationTest {
         new BufferedReader(new StringReader(responseBody)).lines().collect(Collectors.toList());
     assertThat(lines.stream().filter(s -> s.startsWith("requestURI=")).findFirst().get(),
         containsString(id));
-    String traceId = lines.stream().filter(s -> s.startsWith("X-Cloud-Trace-Context: ")).findFirst()
-        .get().split("[ /]")[1];
+    String traceId =
+        lines.stream().filter(s -> s.startsWith("X-Cloud-Trace-Context: ")).findFirst().get()
+            .split("[ /]")[1];
     assertThat(traceId, Matchers.notNullValue());
 
     // wait for logs to propagate
     Thread.sleep(30 * 1000);
 
-    LoggingOptions options = LoggingOptions.newBuilder()
-        .setProjectId(System.getProperty("app.deploy.project"))
-        .build();
+    LoggingOptions options =
+        LoggingOptions.newBuilder().setProjectId(System.getProperty("app.deploy.project")).build();
 
     String moduleId = System.getProperty("app.deploy.service");
     String filter =
-        "resource.type=gae_app AND resource.labels.module_id=" + moduleId
-        + " AND textPayload:" + id;
+        "resource.type=gae_app AND resource.labels.module_id=" + moduleId + " AND textPayload:"
+            + id;
 
     int expected = 2;
     try (Logging logging = options.getService()) {
@@ -105,12 +105,35 @@ public class LoggingIntegrationTest extends AbstractIntegrationTest {
   }
 
   @Test
-  public void testClassPath() throws Exception {
+  public void testClassPathA() throws Exception {
+    testClassPath("i=A");
+  }
 
-    URI target = getUri().resolve("/classloader");
+  @Test
+  public void testClassPathB() throws Exception {
+    testClassPath("i=B");
+  }
+
+  @Test
+  public void testClassPathC() throws Exception {
+    testClassPath("i=C");
+  }
+
+  @Test
+  public void testClassPathD() throws Exception {
+    testClassPath("i=D");
+  }
+
+  @Test
+  public void testClassPathE() throws Exception {
+    testClassPath("i=E");
+  }
+
+  private void testClassPath(String query) throws Exception {
+    URI target = getUri().resolve("/classloader?" + query);
     HttpURLConnection http = HttpUrlUtil.openTo(target);
-    assertThat(http.getResponseCode(), is(200));
     String responseBody = HttpUrlUtil.getResponseBody(http);
+    assertThat(responseBody, http.getResponseCode(), is(200));
 
     Assert.assertThat(responseBody, Matchers.containsString("Found classes = 0 (0 expected)"));
     Assert.assertThat(responseBody, Matchers.containsString("Not found classes = 7 (7 expected)"));

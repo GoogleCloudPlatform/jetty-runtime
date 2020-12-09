@@ -38,28 +38,33 @@ public class ClassLoaderServlet extends HttpServlet {
         "com.google.cloud.logging.Logging",
         "com.google.cloud.datastore.Datastore",
         "org.eclipse.jetty.server.Server",
-        "com.google.cloud.BaseService", 
+        "com.google.cloud.BaseService",
         "io.netty.channel.Channel",
         "io.netty.util.Timer",
         "org.slf4j.Logger"
-        };
+    };
 
     int notFound = 0;
     int found = 0;
 
-    ClassLoader loader = Thread.currentThread().getContextClassLoader();
-    for (String name : hidden) {
-      try {
-        Class<?> clazz = loader.loadClass(name);
-        resp.getWriter().printf("Context loaded %s from%s%n", name, clazz.getClassLoader());
-        found++;
-      } catch (ClassNotFoundException e) {
-        resp.getWriter().printf("Context Not Found %s%n", name);
-        notFound++;
+    try {
+      ClassLoader loader = Thread.currentThread().getContextClassLoader();
+      for (String name : hidden) {
+        try {
+          Class<?> clazz = loader.loadClass(name);
+          resp.getWriter().printf("Context loaded %s from%s%n", name, clazz.getClassLoader());
+          found++;
+        } catch (ClassNotFoundException e) {
+          resp.getWriter().printf("Context Not Found %s%n", name);
+          notFound++;
+        }
       }
-    }
 
-    resp.getWriter().printf("Found classes = %s (0 expected)%n", found);
-    resp.getWriter().printf("Not found classes = %s (%d expected)%n", notFound, hidden.length);
+      resp.getWriter().printf("Found classes = %s (0 expected)%n", found);
+      resp.getWriter().printf("Not found classes = %s (%d expected)%n", notFound, hidden.length);
+    } catch (Throwable t) {
+      resp.setStatus(500);
+      t.printStackTrace(resp.getWriter());
+    }
   }
 }
