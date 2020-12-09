@@ -16,12 +16,9 @@
 
 package com.google.cloud.runtimes.jetty.test.smoke;
 
-import java.io.BufferedReader;
-import java.io.StringReader;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.util.List;
-import java.util.stream.Collectors;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import com.google.api.gax.paging.Page;
 import com.google.cloud.logging.LogEntry;
@@ -32,13 +29,17 @@ import com.google.cloud.logging.Severity;
 import com.google.cloud.runtime.jetty.test.AbstractIntegrationTest;
 import com.google.cloud.runtime.jetty.test.annotation.RemoteOnly;
 import com.google.cloud.runtime.jetty.util.HttpUrlUtil;
+
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import java.io.BufferedReader;
+import java.io.StringReader;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class LoggingIntegrationTest extends AbstractIntegrationTest {
 
@@ -59,21 +60,21 @@ public class LoggingIntegrationTest extends AbstractIntegrationTest {
         new BufferedReader(new StringReader(responseBody)).lines().collect(Collectors.toList());
     assertThat(lines.stream().filter(s -> s.startsWith("requestURI=")).findFirst().get(),
         containsString(id));
-    String traceId = lines.stream().filter(s -> s.startsWith("X-Cloud-Trace-Context: ")).findFirst()
-        .get().split("[ /]")[1];
+    String traceId =
+        lines.stream().filter(s -> s.startsWith("X-Cloud-Trace-Context: ")).findFirst().get()
+            .split("[ /]")[1];
     assertThat(traceId, Matchers.notNullValue());
 
     // wait for logs to propagate
     Thread.sleep(30 * 1000);
 
-    LoggingOptions options = LoggingOptions.newBuilder()
-        .setProjectId(System.getProperty("app.deploy.project"))
-        .build();
+    LoggingOptions options =
+        LoggingOptions.newBuilder().setProjectId(System.getProperty("app.deploy.project")).build();
 
     String moduleId = System.getProperty("app.deploy.service");
     String filter =
-        "resource.type=gae_app AND resource.labels.module_id=" + moduleId
-        + " AND textPayload:" + id;
+        "resource.type=gae_app AND resource.labels.module_id=" + moduleId + " AND textPayload:"
+            + id;
 
     int expected = 2;
     try (Logging logging = options.getService()) {
@@ -104,9 +105,32 @@ public class LoggingIntegrationTest extends AbstractIntegrationTest {
   }
 
   @Test
-  public void testClassPath() throws Exception {
+  public void testClassPathA() throws Exception {
+    testClassPath("i=A");
+  }
 
-    URI target = getUri().resolve("/classloader");
+  @Test
+  public void testClassPathB() throws Exception {
+    testClassPath("i=B");
+  }
+
+  @Test
+  public void testClassPathC() throws Exception {
+    testClassPath("i=C");
+  }
+
+  @Test
+  public void testClassPathD() throws Exception {
+    testClassPath("i=D");
+  }
+
+  @Test
+  public void testClassPathE() throws Exception {
+    testClassPath("i=E");
+  }
+
+  private void testClassPath(String query) throws Exception {
+    URI target = getUri().resolve("/classloader?" + query);
     HttpURLConnection http = HttpUrlUtil.openTo(target);
     String responseBody = HttpUrlUtil.getResponseBody(http);
     assertThat(responseBody, http.getResponseCode(), is(200));
