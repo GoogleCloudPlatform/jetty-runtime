@@ -16,9 +16,12 @@
 
 package com.google.cloud.runtimes.jetty.test.smoke;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import java.io.BufferedReader;
+import java.io.StringReader;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import com.google.api.gax.paging.Page;
 import com.google.cloud.logging.LogEntry;
@@ -29,17 +32,13 @@ import com.google.cloud.logging.Severity;
 import com.google.cloud.runtime.jetty.test.AbstractIntegrationTest;
 import com.google.cloud.runtime.jetty.test.annotation.RemoteOnly;
 import com.google.cloud.runtime.jetty.util.HttpUrlUtil;
-
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.BufferedReader;
-import java.io.StringReader;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.util.List;
-import java.util.stream.Collectors;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class LoggingIntegrationTest extends AbstractIntegrationTest {
 
@@ -109,8 +108,8 @@ public class LoggingIntegrationTest extends AbstractIntegrationTest {
 
     URI target = getUri().resolve("/classloader");
     HttpURLConnection http = HttpUrlUtil.openTo(target);
-    assertThat(http.getResponseCode(), is(200));
     String responseBody = HttpUrlUtil.getResponseBody(http);
+    assertThat(responseBody, http.getResponseCode(), is(200));
 
     Assert.assertThat(responseBody, Matchers.containsString("Found classes = 0 (0 expected)"));
     Assert.assertThat(responseBody, Matchers.containsString("Not found classes = 7 (7 expected)"));
