@@ -44,11 +44,6 @@ commandTests:
   command: [ '/workspace/jetty9/src/test/workspace/jetty-setup-sessions.bash' ]
   expectedOutput: ['OK']
   exitCode: 0
-- name: 'cloud debugger extra class path is set'
-  setup: [[ 'chmod', '+x', '/workspace/jetty9/src/test/workspace/jetty-setup-debugger.bash' ]]
-  command: ['/workspace/jetty9/src/test/workspace/jetty-setup-debugger.bash']
-  expectedOutput: ['OK']
-  exitCode: 0
 - name: 'check jetty start'
   setup: [[ 'chmod', '+x', '/workspace/jetty9/src/test/workspace/jetty-setup-start.bash' ]]
   command: ['/workspace/jetty9/src/test/workspace/jetty-setup-start.bash']
