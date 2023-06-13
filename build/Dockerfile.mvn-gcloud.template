@@ -8,13 +8,13 @@ ARG CLOUD_SDK_VERSION=305.0.0
 # The zone will be substituted here by build.sh
 ARG GCP_ZONE=[INSERT_GCP_ZONE]
 
-RUN apt-get -y update && \
+RUN echo 'deb http://archive.debian.org/debian stretch main' > /etc/apt/sources.list && apt-get -y update && \
     apt-get -y install gcc python2.7 python-dev python-setuptools curl wget ca-certificates && \
 
     # Setup Google Cloud SDK (latest)
     mkdir -p /builder && \
     wget -qO- "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-${CLOUD_SDK_VERSION}-linux-x86_64.tar.gz" | tar zxv -C /builder && \
-    CLOUDSDK_PYTHON="python2.7" /builder/google-cloud-sdk/install.sh \
+    /builder/google-cloud-sdk/install.sh \
         --usage-reporting=false \
         --bash-completion=false \
         --disable-installation-options && \
