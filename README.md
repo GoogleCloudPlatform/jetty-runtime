@@ -1,4 +1,3 @@
-![Build Status](http://storage.googleapis.com/java-runtimes-kokoro-build-badges/jetty-runtime-master.png)
 
 # Google Cloud Platform Jetty Docker Image
 
